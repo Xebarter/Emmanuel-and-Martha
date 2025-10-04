@@ -1,12 +1,17 @@
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation'; // Updated import for Next.js 13+
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function Callback() {
-  const router = useRouter();
-  const { OrderTrackingId, OrderMerchantReference } = router.query;
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Add error handling and proper state management
   useEffect(() => {
+    // Get query parameters from location
+    const queryParams = new URLSearchParams(location.search);
+    const OrderTrackingId = queryParams.get('OrderTrackingId');
+    const OrderMerchantReference = queryParams.get('OrderMerchantReference');
+
     if (!OrderTrackingId || !OrderMerchantReference) {
       // Handle missing parameters
       return;
@@ -23,7 +28,7 @@ export default function Callback() {
           
           // If payment is successful, redirect to success page
           if (data.status === 'success') {
-            router.push('/payment-success');
+            navigate('/payment-success');
           }
         } else {
           // Handle API errors properly
@@ -35,7 +40,7 @@ export default function Callback() {
     };
 
     verifyPayment();
-  }, [OrderTrackingId, OrderMerchantReference, router]);
+  }, [location.search, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -51,7 +56,7 @@ export default function Callback() {
         <p className="text-gray-600 mb-8">Failed to retrieve payment details</p>
         
         <button 
-          onClick={() => router.push('/')}
+          onClick={() => navigate('/')}
           className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200"
         >
           Return to Homepage
