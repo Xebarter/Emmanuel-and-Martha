@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script&family=Tangerine:wght@400;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Quivira', serif;
+  }
+}
+
+body {
+  font-family: 'Tangerine', cursive;
+  @apply text-gray-800;
+}
+
+.wedding-font {
+  font-family: 'Dancing Script', cursive;
+}

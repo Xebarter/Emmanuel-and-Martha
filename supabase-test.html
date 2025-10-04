@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Connection Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .test {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background: white;
+            border-left: 4px solid #ddd;
+        }
+        .success {
+            border-left-color: #10b981;
+            background: #ecfdf5;
+        }
+        .error {
+            border-left-color: #ef4444;
+            background: #fef2f2;
+        }
+        .loading {
+            color: #6b7280;
+        }
+        h1 {
+            color: #1f2937;
+        }
+        code {
+            background: #e5e7eb;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Supabase Connection Test</h1>
+    
+    <div class="container">
+        <div>
+            <label for="supabaseUrl">Supabase URL:</label><br>
+            <input type="text" id="supabaseUrl" style="width: 100%; padding: 8px; margin: 5px 0 15px 0;" 
+                   placeholder="https://your-project-ref.supabase.co">
+        </div>
+        
+        <div>
+            <label for="supabaseKey">Supabase Anon Key:</label><br>
+            <input type="text" id="supabaseKey" style="width: 100%; padding: 8px; margin: 5px 0 15px 0;" 
+                   placeholder="eyJ...">
+        </div>
+        
+        <button id="testButton" style="padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            Test Connection
+        </button>
+        
+        <div id="testResults" style="margin-top: 20px;">
+            <!-- Initialization Test -->
+            <div id="test1" class="test loading">
+                <strong>1. Testing Supabase Initialization...</strong>
+                <div class="details"></div>
+            </div>
+            
+            <!-- Authentication Tests -->
+            <div class="test-section">
+                <h3>Authentication Tests</h3>
+                <div id="test2" class="test">
+                    <strong>2. Testing Anonymous Authentication...</strong>
+                    <div class="details"></div>
+                </div>
+                <div id="test3" class="test">
+                    <strong>3. Testing Email/Password Sign Up...</strong>
+                    <div class="details"></div>
+                </div>
+                <div id="test4" class="test">
+                    <strong>4. Testing Email/Password Sign In...</strong>
+                    <div class="details"></div>
+                </div>
+                <div id="test5" class="test">
+                    <strong>5. Testing Session Management...</strong>
+                    <div class="details"></div>
+                </div>
+                <div id="test6" class="test">
+                    <strong>6. Testing Sign Out...</strong>
+                    <div class="details"></div>
+                </div>
+            </div>
+            
+            <!-- Database Test -->
+            <div class="test-section">
+                <h3>Database Tests</h3>
+                <div id="test7" class="test">
+                    <strong>7. Testing Database Connection...</strong>
+                    <div class="details"></div>
+                </div>
+            </div>
+            
+            <!-- Storage Test -->
+            <div class="test-section">
+                <h3>Storage Tests</h3>
+                <div id="test8" class="test">
+                    <strong>8. Testing Storage Connection...</strong>
+                    <div class="details"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Helper function to generate a random email
+        function generateTestEmail() {
+            return `test-${Math.random().toString(36).substring(2, 10)}@test.com`;
+        }
+
+        // Helper function to update test status
+        function updateTest(testElement, status, message) {
+            testElement.className = `test ${status}`;
+            testElement.querySelector('.details').textContent = message;
+            return message;
+        }
+
+        document.getElementById('testButton').addEventListener('click', async () => {
+            const supabaseUrl = document.getElementById('supabaseUrl').value.trim();
+            const supabaseKey = document.getElementById('supabaseKey').value.trim();
+            
+            if (!supabaseUrl || !supabaseKey) {
+                alert('Please enter both Supabase URL and Anon Key');
+                return;
+            }
+            
+            // Reset test states
+            document.querySelectorAll('.test').forEach(el => {
+                el.className = 'test';
+                el.querySelector('.details').textContent = '';
+            });
+            
+            // Get all test elements
+            const testElements = {};
+            for (let i = 1; i <= 8; i++) {
+                testElements[`test${i}`] = document.getElementById(`test${i}`);
+            }
+            
+            try {
+                // Test 1: Initialize Supabase
+                updateTest(testElements.test1, 'loading', 'Initializing Supabase client...');
+                
+                // Initialize Supabase client
+                let supabaseClient;
+                try {
+                    // First try with the global supabase object
+                    if (window.supabase && typeof window.supabase.createClient === 'function') {
+                        supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey, {
+                            auth: { 
+                                persistSession: false,
+                                autoRefreshToken: false
+                            }
+                        });
+                    } 
+                    // If that fails, try using the CDN version
+                    else if (window.supabase && window.supabase.createClient) {
+                        supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey, {
+                            auth: { 
+                                persistSession: false,
+                                autoRefreshToken: false
+                            }
+                        });
+                    } else {
+                        throw new Error('Could not initialize Supabase client. Make sure the Supabase JS library is loaded.');
+                    }
+                    
+                    // Test the client by making a simple auth request
+                    const { data, error } = await supabaseClient.auth.getSession();
+                    if (error) throw error;
+                    
+                    updateTest(testElements.test1, 'success', 'Supabase client initialized successfully');
+                    return supabaseClient; // Return the client for other tests
+                } catch (error) {
+                    console.error('Initialization error:', error);
+                    throw new Error(`Failed to initialize Supabase: ${error.message}`);
+                }
+
+                // Test 2: Test Anonymous Authentication
+                try {
+                    updateTest(testElements.test2, 'loading', 'Checking anonymous access...');
+                    
+                    // First, ensure we're signed out
+                    await supabaseClient.auth.signOut();
+                    
+                    // Try to get the session
+                    const { data: { session }, error } = await supabaseClient.auth.getSession();
+                    
+                    if (error) {
+                        console.error('Session error:', error);
+                        throw error;
+                    }
+                    
+                    if (session) {
+                        updateTest(testElements.test2, 'success', 
+                            `Authenticated as: ${session.user?.email || 'Anonymous'}\n` +
+                            `User ID: ${session.user?.id || 'N/A'}`);
+                    } else {
+                        updateTest(testElements.test2, 'success', 
+                            'Anonymous access working (no active session)\n' +
+                            'This is expected behavior if email confirmation is required');
+                    }
+                } catch (error) {
+                    console.error('Anonymous auth error:', error);
+                    updateTest(testElements.test2, 'warning', 
+                        `Anonymous auth check failed: ${error.message}\n` +
+                        'This might be normal if your project requires authentication');
+                    // Don't throw here, continue with other tests
+                }
+
+                // Generate test credentials with a known good domain
+                const testEmail = `test-${Math.random().toString(36).substring(2, 10)}@example.com`;
+                const testPassword = 'Test@1234!'; // Add special character for password requirements
+                let testUserId = null;
+
+                // Test 3: Test Email/Password Sign Up
+                try {
+                    updateTest(testElements.test3, 'loading', `Creating test user (${testEmail})...`);
+                    
+                    // First, check if the email domain is allowed
+                    const emailDomain = testEmail.split('@')[1];
+                    const allowedDomains = ['example.com', 'test.com', 'supabase.co'];
+                    
+                    if (!allowedDomains.includes(emailDomain)) {
+                        updateTest(testElements.test3, 'warning', 
+                            `Email domain ${emailDomain} might be restricted.\n` +
+                            'Try using an email from example.com or check your Supabase auth settings.');
+                        return;
+                    }
+                    
+                    // Try to sign up
+                    const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
+                        email: testEmail,
+                        password: testPassword,
+                        options: {
+                            emailRedirectTo: window.location.origin + '/auth/callback'
+                        }
+                    });
+                    
+                    if (signUpError) {
+                        if (signUpError.message.includes('email domain')) {
+                            updateTest(testElements.test3, 'error', 
+                                `Sign up failed: ${signUpError.message}\n` +
+                                'Please check your Supabase project settings under Authentication > Providers > Email')
+                        } else {
+                            throw signUpError;
+                        }
+                        return;
+                    }
+                    
+                    testUserId = signUpData.user?.id;
+                    const needsConfirmation = signUpData.user && 
+                        (signUpData.user.identities?.length === 0 || 
+                         signUpData.user.confirmation_sent_at);
+                    
+                    if (needsConfirmation) {
+                        updateTest(testElements.test3, 'warning', 
+                            'Sign up successful but requires email confirmation.\n' +
+                            `Check your email (${testEmail}) to confirm the account.\n` +
+                            'Note: You may need to check your Supabase logs if using a test email.');
+                    } else if (signUpData.user) {
+                        updateTest(testElements.test3, 'success', 
+                            `User created successfully!\n` +
+                            `User ID: ${testUserId || 'N/A'}\n` +
+                            `Email: ${signUpData.user.email}`);
+                    } else {
+                        updateTest(testElements.test3, 'warning', 
+                            'Sign up response received but no user data.\n' +
+                            'Check your Supabase logs for more information.');
+                    }
+                } catch (error) {
+                    console.error('Sign up error:', error);
+                    let errorMessage = error.message || 'Unknown error occurred';
+                    
+                    // Add more user-friendly messages for common errors
+                    if (errorMessage.includes('password')) {
+                        errorMessage += '\nMake sure your password meets the requirements (min 6 characters)';
+                    } else if (errorMessage.includes('email')) {
+                        errorMessage += '\nThe email address might be invalid or already in use';
+                    }
+                    
+                    updateTest(testElements.test3, 'error', 
+                        `Sign up failed: ${errorMessage}\n\n` +
+                        'Troubleshooting tips:\n' +
+                        '1. Check your Supabase project authentication settings\n' +
+                        '2. Verify that email/password auth is enabled\n' +
+                        '3. Check the browser console for detailed error messages');
+                }
+
+                // Test 4: Test Email/Password Sign In
+                try {
+                    updateTest(testElements.test4, 'loading', `Signing in as ${testEmail}...`);
+                    
+                    const { data: signInData, error: signInError } = await supabaseClient.auth.signInWithPassword({
+                        email: testEmail,
+                        password: testPassword,
+                    });
+                    
+                    if (signInError) {
+                        // Handle specific error cases
+                        if (signInError.message.includes('Invalid login credentials')) {
+                            updateTest(testElements.test4, 'warning', 
+                                'Sign in failed: Invalid credentials\n' +
+                                'This is expected if the user was not created or email is not confirmed');
+                            return;
+                        } else if (signInError.message.includes('Email not confirmed')) {
+                            updateTest(testElements.test4, 'warning',
+                                'Email not confirmed yet\n' +
+                                'Please check your email and confirm your account');
+                            return;
+                        }
+                        throw signInError;
+                    }
+                    
+                    // If we get here, sign in was successful
+                    updateTest(testElements.test4, 'success', 
+                        `Successfully signed in!\n` +
+                        `User: ${signInData.user?.email || 'Unknown'}\n` +
+                        `Last sign in: ${signInData.user?.last_sign_in_at ? 
+                            new Date(signInData.user.last_sign_in_at).toLocaleString() : 'N/A'}`);
+                    
+                } catch (error) {
+                    console.error('Sign in error:', error);
+                    let errorMessage = error.message || 'Unknown error occurred during sign in';
+                    
+                    // Add more context to common errors
+                    if (errorMessage.includes('network')) {
+                        errorMessage += '\nCheck your internet connection and CORS settings';
+                    } else if (errorMessage.includes('auth')) {
+                        errorMessage += '\nVerify your authentication settings in Supabase';
+                    }
+                    
+                    updateTest(testElements.test4, 'error', 
+                        `Sign in failed: ${errorMessage}\n\n` +
+                        'Troubleshooting tips:\n' +
+                        '1. Make sure the user exists and the password is correct\n' +
+                        '2. Check if email confirmation is required\n' +
+                        '3. Verify your Supabase project authentication settings');
+                }
+
+                // Test 5: Test Session Management
+                try {
+                    updateTest(testElements.test5, 'loading', 'Checking session...');
+                    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+                    
+                    if (userError) throw userError;
+                    
+                    if (user) {
+                        updateTest(testElements.test5, 'success', 
+                            `Active session found for: ${user.email}\n` +
+                            `User ID: ${user.id}\n` +
+                            `Last sign in: ${user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString() : 'N/A'}`);
+                    } else {
+                        updateTest(testElements.test5, 'warning', 'No active user session found');
+                    }
+                } catch (error) {
+                    updateTest(testElements.test5, 'error', `Session check failed: ${error.message}`);
+                }
+
+                // Test 6: Test Sign Out
+                try {
+                    updateTest(testElements.test6, 'loading', 'Signing out...');
+                    const { error: signOutError } = await supabaseClient.auth.signOut();
+                    
+                    if (signOutError) throw signOutError;
+                    
+                    // Verify sign out
+                    const { data: { session } } = await supabaseClient.auth.getSession();
+                    
+                    if (session) {
+                        throw new Error('Sign out did not clear the session');
+                    }
+                    
+                    updateTest(testElements.test6, 'success', 'Successfully signed out');
+                } catch (error) {
+                    updateTest(testElements.test6, 'error', `Sign out failed: ${error.message}`);
+                }
+                
+                // Test 2: Test Authentication
+                test2.className = 'test loading';
+                test2.querySelector('.details').textContent = 'Checking authentication...';
+                
+                const { data: authData, error: authError } = await supabase.auth.getSession();
+                
+                if (authError) throw authError;
+                
+                test2.className = 'test success';
+                test2.querySelector('.details').textContent = 'Authentication successful';
+                
+                // Test 3: Test Database Connection
+                test3.className = 'test loading';
+                test3.querySelector('.details').textContent = 'Querying database...';
+                
+                const { data: tables, error: dbError } = await supabase
+                    .from('pg_tables')
+                    .select('tablename')
+                    .eq('schemaname', 'public')
+                    .limit(5);
+                
+                if (dbError) throw dbError;
+                
+                test3.className = 'test success';
+                test3.querySelector('.details').textContent = `Found tables: ${tables.map(t => t.tablename).join(', ')}`;
+                
+                // Test 4: Test Storage Connection
+                test4.className = 'test loading';
+                test4.querySelector('.details').textContent = 'Checking storage buckets...';
+                
+                const { data: buckets, error: storageError } = await supabase.storage.listBuckets();
+                
+                if (storageError) throw storageError;
+                
+                test4.className = 'test success';
+                test4.querySelector('.details').textContent = `Found buckets: ${buckets.map(b => b.name).join(', ')}`;
+                
+            } catch (error) {
+                console.error('Test failed:', error);
+                
+                // Update the failed test
+                const currentTest = document.querySelector('.loading') || document.querySelector('.test:not(.success)');
+                if (currentTest) {
+                    currentTest.className = 'test error';
+                    currentTest.querySelector('.details').textContent = `Error: ${error.message || 'Unknown error occurred'}`;
+                }
+                
+                // Show error details
+                const errorDetails = document.createElement('div');
+                errorDetails.className = 'test error';
+                errorDetails.innerHTML = `
+                    <strong>Error Details:</strong>
+                    <pre style="white-space: pre-wrap; word-break: break-word;">${JSON.stringify(error, null, 2)}</pre>
+                `;
+                document.getElementById('testResults').appendChild(errorDetails);
+            }
+        });
+    </script>
+</body>
+</html>

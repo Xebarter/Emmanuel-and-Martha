@@ -1,0 +1,217 @@
+import { useEffect, useState } from 'react';
+import { supabase } from '../lib/supabase';
+import { SiteMetadata, Meeting } from '../lib/types';
+import type { PostgrestResponse } from '@supabase/supabase-js';
+
+export function useMetadata() {
+  console.log('[useMetadata] Hook initializing');
+  const [metadata, setMetadata] = useState<SiteMetadata | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Helper function to create a timeout promise
+  const createTimeout = (ms: number) => new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error(`Operation timed out after ${ms}ms`)), ms)
+  );
+
+  useEffect(() => {
+    console.log('[useMetadata] Starting fetch...');
+    const TIMEOUT_MS = 5000; // 5 second timeout for each query
+
+    async function fetchMetadata() {
+      try {
+        console.log('[useMetadata] Fetching all data in parallel...');
+      useEffect(() => {
+    console.log('[useMetadata] Starting fetch...');
+    const TIMEOUT_MS = 5000; // 5 second timeout for each query
+
+    async function fetchMetadata() {
+      try {
+        console.log('[useMetadata] Fetching all data in parallel...');
+    }
+
+    export function useMetadata() {
+      console.log('[useMetadata] Hook initializing');
+      const [metadata, setMetadata] = useState<SiteMetadata | null>(null);
+      const [loading, setLoading] = useState(true);
+      const [error, setError] = useState<string | null>(null);
+
+      // Helper function to create a timeout promise
+      const createTimeout = (ms: number) => new Promise((_, reject) =>
+        setTimeout(() => reject(new Error(`Operation timed out after ${ms}ms`)), ms)
+      );
+
+      useEffect(() => {
+        console.log('[useMetadata] Starting fetch...');
+        let isMounted = true; // Track if component is mounted
+        const TIMEOUT_MS = 5000; // 5 second timeout for each query
+
+        async function fetchMetadata() {
+          try {
+            console.log('[useMetadata] Fetching all data in parallel...');
+
+            const promises = {
+              settings: Promise.race([
+                supabase.from('site_settings').select('*'),
+                createTimeout(TIMEOUT_MS)
+              ]).catch(error => {
+                console.error('[useMetadata] Settings fetch error:', error);
+                return {
+                  data: [
+                    { key: 'couple_info', value: { names: 'John & Priscilla', wedding_date: '2026-02-14', location: 'Kampala, Uganda' } }
+                  ],
+                  error: null
+                };
+              }),
+              meetings: Promise.race([
+                supabase.from('meetings').select('*')
+                  .gte('starts_at', new Date().toISOString())
+                  .order('starts_at', { ascending: true })
+                  .limit(1),
+                createTimeout(TIMEOUT_MS)
+              ]).catch(error => {
+                // Return safe default values on error
+                console.error('[useMetadata] Error fetching data:', error);
+                return {
+                  data: null,
+                  error: error instanceof Error ? error : new Error('Failed to fetch data')
+                };
+              }),
+
+              // Contributions with timeout
+              Promise.race([
+                supabase.from('contributions')
+                  .select('amount', { count: 'exact', head: false })
+                  .eq('status', 'completed'),
+                createTimeout(TIMEOUT_MS)
+              ]).catch(error => ({
+                data: [], count: 0,
+                error: error instanceof Error ? error : new Error('Failed to fetch contributions')
+              })),
+
+              // Pledges with timeout
+              Promise.race([
+                supabase.from('pledges')
+                  .select('id', { count: 'exact', head: true }),
+                createTimeout(TIMEOUT_MS)
+              ]).catch(error => ({
+                data: [], count: 0,
+                error: error instanceof Error ? error : new Error('Failed to fetch pledges')
+              })),
+
+              // Guests with timeout
+              Promise.race([
+                supabase.from('guests')
+                  .select('id', { count: 'exact', head: true }),
+                createTimeout(TIMEOUT_MS)
+              ]).catch(error => ({
+                data: [], count: 0,
+                error: error instanceof Error ? error : new Error('Failed to fetch guests')
+              })),
+
+              // Gallery with timeout
+              Promise.race([
+                supabase.from('uploads')
+                  .select('url')
+                  .eq('bucket', 'wedding-public')
+                  .limit(20),
+                createTimeout(TIMEOUT_MS)
+              ]).catch(error => ({
+                data: [],
+                error: error instanceof Error ? error : new Error('Failed to fetch gallery')
+              })),
+        ];
+
+            console.log('[useMetadata] All fetch promises created, waiting for results...');
+
+            const [
+              contributionsResult,
+              pledgesResult,
+              guestsResult,
+              uploadsResult
+            ] = await Promise.all([
+              // Contributions with timeout
+              Promise.race([
+                supabase.from('contributions')
+                  .select('amount', { count: 'exact', head: false })
+                  .eq('status', 'completed'),
+                createTimeout(5000)
+              ]).catch(err => ({
+                data: [],
+                count: 0,
+                error: err instanceof Error ? err : new Error('Failed to fetch contributions')
+              })),
+
+              // Pledges with timeout
+              Promise.race([
+                supabase.from('pledges')
+                  .select('id', { count: 'exact', head: true }),
+                createTimeout(5000)
+              ]).catch(err => ({
+                data: [],
+                count: 0,
+                error: err instanceof Error ? err : new Error('Failed to fetch pledges')
+              })),
+
+              // Guests with timeout
+              Promise.race([
+                supabase.from('guests')
+                  .select('id', { count: 'exact', head: true }),
+                createTimeout(5000)
+              ]).catch(err => ({
+                data: [],
+                count: 0,
+                error: err instanceof Error ? err : new Error('Failed to fetch guests')
+              })),
+
+              // Gallery with timeout
+              Promise.race([
+                supabase.from('uploads')
+                  .select('url')
+                  .eq('bucket', 'wedding-public')
+                  .limit(20),
+                createTimeout(5000)
+              ]).catch(err => ({
+                data: [],
+                error: err instanceof Error ? err : new Error('Failed to fetch gallery')
+              })),
+            ]);
+            if (contributionsResult.error) throw contributionsResult.error;
+
+            const settings = settingsResult.data?.reduce((acc, item) => {
+              acc[item.key] = item.value;
+              return acc;
+            }, {} as Record<string, any>);
+
+            const totalContributions = contributionsResult.data?.reduce((sum, c) => sum + (c.amount || 0), 0) || 0;
+            const totalPledges = pledgesResult.count || 0;
+            const totalGuests = guestsResult.count || 0;
+
+            const metadata = {
+              couple: settings?.couple_info || { names: 'John & Priscilla', wedding_date: '2026-02-14', location: 'Kampala, Uganda' },
+              next_meeting: (meetingsResult.data?.[0] as Meeting) || null,
+              counts: {
+                total_contributions: totalContributions,
+                total_pledges: totalPledges,
+                total_guests: totalGuests,
+              },
+              gallery: uploadsResult.data?.map(u => u.url) || [],
+            };
+            console.log('[useMetadata] Setting metadata:', metadata);
+            setMetadata(metadata);
+            setError(null);
+          } catch (err: unknown) {
+            const errorMessage = err instanceof Error ? err.message : 'Failed to fetch metadata';
+            console.error('[useMetadata] Error:', err);
+            setError(errorMessage);
+          } finally {
+            console.log('[useMetadata] Setting loading to false');
+            setLoading(false);
+          }
+        }
+
+        fetchMetadata();
+      }, []);
+
+      return { metadata, loading, error };
+    }
