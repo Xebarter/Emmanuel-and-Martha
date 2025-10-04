@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation'; // Updated import for Next.js 13+
 
 export default function Callback() {
   const router = useRouter();
