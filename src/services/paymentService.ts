@@ -200,7 +200,7 @@ export async function queryPaymentStatus(orderTrackingId: string): Promise<Pesap
     const { data: contribution, error } = await supabase
       .from('contributions')
       .select('*')
-      .eq('pesapal_tracking_id', orderTrackingId)
+      .eq('pesapal_reference', orderTrackingId)
       .single();
 
     if (error || !contribution) {
