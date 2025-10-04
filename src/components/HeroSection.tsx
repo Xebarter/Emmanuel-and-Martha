@@ -1,6 +1,15 @@
 import { Heart, MapPin, Calendar } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { CoupleInfo } from '../lib/types';
+import { useEffect, useState, useRef } from 'react';
+
+interface CoupleInfo {
+  bride_name?: string;
+  groom_name?: string;
+  names?: string;
+  wedding_date: string;
+  location?: string;
+  venue?: string;
+  tagline?: string;
+}
 
 interface HeroSectionProps {
   coupleInfo: CoupleInfo;
@@ -13,8 +22,16 @@ interface TimeRemaining {
   seconds: number;
 }
 
+interface GalleryImage {
+  id: string;
+  url: string;
+}
+
 export function HeroSection({ coupleInfo }: HeroSectionProps) {
   const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const carouselIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const calculateTimeRemaining = () => {
@@ -37,6 +54,43 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
     return () => clearInterval(interval);
   }, [coupleInfo.wedding_date]);
 
+  // Fetch gallery images
+  useEffect(() => {
+    const loadGalleryImages = async () => {
+      try {
+        // Importing galleryService here to avoid potential SSR issues
+        const { galleryService } = await import('../services/galleryService');
+        const images = await galleryService.getGalleryImages();
+        if (images.length > 0) {
+          // Take only the first 10 images for better performance
+          setGalleryImages(images.slice(0, 10));
+        }
+      } catch (error) {
+        console.error('Failed to load gallery images for carousel:', error);
+        // Continue without images if there's an error
+      }
+    };
+
+    loadGalleryImages();
+  }, []);
+
+  // Carousel effect
+  useEffect(() => {
+    if (galleryImages.length <= 1) return;
+
+    const changeImage = () => {
+      setCurrentImageIndex(prevIndex => (prevIndex + 1) % galleryImages.length);
+    };
+
+    carouselIntervalRef.current = setInterval(changeImage, 5000); // Change image every 5 seconds
+
+    return () => {
+      if (carouselIntervalRef.current) {
+        clearInterval(carouselIntervalRef.current);
+      }
+    };
+  }, [galleryImages.length]);
+
   const formatWeddingDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -51,18 +105,41 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
   const displayNames = coupleInfo.names ||
     (coupleInfo.bride_name && coupleInfo.groom_name
       ? `${coupleInfo.groom_name} & ${coupleInfo.bride_name}`
-      : 'Our Wedding');
+      : 'John & Priscilla');
 
   const displayLocation = coupleInfo.location || coupleInfo.venue || 'TBA';
   const displayTagline = coupleInfo.tagline || 'Join us as we celebrate our love';
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50 wedding-font">
+      {/* Gallery image carousel background */}
+      {galleryImages.length > 0 && (
+        <div className="absolute inset-0 z-0">
+          {galleryImages.map((image, index) => (
+            <div 
+              key={image.id}
+              className={`absolute inset-0 transition-all duration-1000 ${
+                index === currentImageIndex ? 'opacity-50' : 'opacity-0'
+              }`}
+              style={{ 
+                backgroundImage: `url(${image.url})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                filter: 'brightness(1.1) contrast(1.05)'
+              }}
+            />
+          ))}
+          {/* Enhanced gradient overlay to ensure text readability while showing more of the image */}
+          <div className="absolute inset-0 bg-gradient-to-br from-rose-50/50 via-pink-50/40 to-amber-50/50"></div>
+        </div>
+      )}
+
       {/* Animated background pattern */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(251,191,36,0.1),transparent_50%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(244,114,182,0.15),transparent_50%)]"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(251,113,133,0.15),transparent_50%)]"></div>
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(251,191,36,0.15),transparent_50%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(244,114,182,0.2),transparent_50%)]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(251,113,133,0.2),transparent_50%)]"></div>
       </div>
 
       {/* Floating hearts decoration */}

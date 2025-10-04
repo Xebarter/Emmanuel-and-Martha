@@ -256,120 +256,118 @@ export function PledgeSection({ totalPledges }: PledgeSectionProps) {
   };
 
   return (
-    <section id="pledge" className="py-20 bg-gradient-to-br from-amber-50 via-white to-rose-50">
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-serif font-bold text-gray-900 mb-4">
+    <section id="pledge" className="py-12 md:py-20 bg-gradient-to-br from-amber-50 via-white to-rose-50">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12 md:mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-gray-900 mb-3 sm:mb-4">
             Make a Pledge
           </h2>
-          <p className="text-lg text-gray-600 mb-8">
+          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
             Promise to contribute money or items for our special day
           </p>
-          <div className="inline-flex items-center gap-2 bg-white px-8 py-4 rounded-full shadow-lg border border-amber-200">
-            <Gift className="w-6 h-6 text-amber-600" />
-            <span className="text-2xl font-bold text-gray-900">{totalPledges}</span>
-            <span className="text-gray-600">pledges made</span>
-          </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">Create Your Pledge</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-5 sm:p-6 md:p-8 border border-gray-100">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Create Your Pledge</h3>
 
             <form onSubmit={handleSubmit(onSubmit)}>
-              <div className="mb-6">
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name *
+              <div className="mb-4 sm:mb-6">
+                <label htmlFor="name" className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
+                  Full Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   {...register('name')}
                   type="text"
                   id="name"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
                   placeholder="John Doe"
                 />
-                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+                {errors.name && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.name.message}</p>}
               </div>
 
-              <div className="mb-6">
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number *
+              <div className="mb-4 sm:mb-6">
+                <label htmlFor="phone" className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
+                  Phone Number <span className="text-red-500">*</span>
                 </label>
                 <input
                   {...register('phone')}
                   type="tel"
                   id="phone"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
                   placeholder="+256700000000"
                 />
-                {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
+                {errors.phone && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.phone.message}</p>}
               </div>
 
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">Pledge Type *</label>
-                <div className="grid grid-cols-2 gap-4">
-                  <label className="flex items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition-all hover:border-amber-500">
+              <div className="mb-4 sm:mb-6">
+                <label className="block text-sm sm:text-base font-medium text-gray-700 mb-2 sm:mb-3">
+                  Pledge Type <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                  <label className="flex items-center justify-center p-2 sm:p-3 md:p-4 border-2 rounded-lg cursor-pointer transition-all hover:border-amber-500">
                     <input
                       {...register('type')}
                       type="radio"
                       value="money"
-                      className="mr-3"
+                      className="mr-2 sm:mr-3 w-4 h-4 sm:w-5 sm:h-5"
                     />
-                    <DollarSign className="w-5 h-5 mr-2 text-amber-600" />
-                    <span className="font-medium">Money</span>
+                    <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 text-amber-600" />
+                    <span className="text-sm sm:text-base font-medium">Money</span>
                   </label>
-                  <label className="flex items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition-all hover:border-amber-500">
+                  <label className="flex items-center justify-center p-2 sm:p-3 md:p-4 border-2 rounded-lg cursor-pointer transition-all hover:border-amber-500">
                     <input
                       {...register('type')}
                       type="radio"
                       value="item"
-                      className="mr-3"
+                      className="mr-2 sm:mr-3 w-4 h-4 sm:w-5 sm:h-5"
                     />
-                    <Package className="w-5 h-5 mr-2 text-amber-600" />
-                    <span className="font-medium">Item</span>
+                    <Package className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 text-amber-600" />
+                    <span className="text-sm sm:text-base font-medium">Item</span>
                   </label>
                 </div>
               </div>
 
               {pledgeType === 'money' && (
-                <div className="mb-6">
-                  <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-2">
-                    Pledge Amount (UGX) *
+                <div className="mb-4 sm:mb-6">
+                  <label htmlFor="amount" className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
+                    Pledge Amount (UGX) <span className="text-red-500">*</span>
                   </label>
                   <input
                     {...register('amount', { valueAsNumber: true })}
                     type="number"
                     id="amount"
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
                     placeholder="50000"
                     step="1000"
+                    min="0"
                   />
                 </div>
               )}
 
               {pledgeType === 'item' && (
                 <>
-                  <div className="mb-6">
-                    <label htmlFor="item_description" className="block text-sm font-medium text-gray-700 mb-2">
-                      Item Description *
+                  <div className="mb-4 sm:mb-6">
+                    <label htmlFor="item_description" className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
+                      Item Description <span className="text-red-500">*</span>
                     </label>
                     <input
                       {...register('item_description')}
                       type="text"
                       id="item_description"
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
                       placeholder="e.g., 10 plastic chairs"
                     />
                   </div>
-                  <div className="mb-6">
-                    <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="mb-4 sm:mb-6">
+                    <label htmlFor="quantity" className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
                       Quantity
                     </label>
                     <input
                       {...register('quantity', { valueAsNumber: true })}
                       type="number"
                       id="quantity"
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
                       placeholder="1"
                       min="1"
                     />
@@ -377,22 +375,22 @@ export function PledgeSection({ totalPledges }: PledgeSectionProps) {
                 </>
               )}
 
-              <div className="mb-6">
-                <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="mb-4 sm:mb-6">
+                <label htmlFor="notes" className="block text-sm sm:text-base font-medium text-gray-700 mb-1 sm:mb-2">
                   Additional Notes (Optional)
                 </label>
                 <textarea
                   {...register('notes')}
                   id="notes"
                   rows={3}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
                   placeholder="Any additional information..."
                 />
               </div>
 
               {submitMessage && (
                 <div
-                  className={`mb-6 p-4 rounded-lg ${
+                  className={`mb-4 sm:mb-6 p-3 sm:p-4 rounded-lg text-sm sm:text-base ${
                     submitMessage.type === 'success'
                       ? 'bg-green-50 text-green-800 border border-green-200'
                       : 'bg-red-50 text-red-800 border border-red-200'

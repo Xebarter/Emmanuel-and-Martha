@@ -152,16 +152,9 @@ export function ContributeSection({ totalContributions }: ContributeSectionProps
           <h2 className="text-4xl md:text-5xl font-serif font-bold text-gray-900 mb-4">
             Contribute to Our Celebration
           </h2>
-          <p className="text-lg text-gray-600 mb-8">
+          <p className="text-lg text-gray-600">
             Your generous contribution helps us start our journey together
           </p>
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-rose-50 to-amber-50 px-8 py-4 rounded-full border border-rose-200">
-            <DollarSign className="w-6 h-6 text-rose-600" />
-            <span className="text-2xl font-bold text-gray-900">
-              {formatCurrency(totalContributions)}
-            </span>
-            <span className="text-gray-600">raised so far</span>
-          </div>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="bg-gray-50 rounded-2xl shadow-lg p-8 border border-gray-100">
