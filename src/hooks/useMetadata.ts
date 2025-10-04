@@ -91,16 +91,38 @@ export function useMetadata() {
       // Try to fetch from Supabase if online
       try {
         console.log("[useMetadata] Fetching metadata from Supabase.");
-        const { data, error } = await supabase
-          .from("wedding_metadata")
+        
+        // Fetch site settings
+        const { data: settings, error: settingsError } = await supabase
+          .from("site_settings")
           .select("*")
-          .single();
+          .eq("is_public", true);
 
-        if (error) throw error;
+        if (settingsError) throw settingsError;
+
+        // Process the settings into the metadata structure
+        const metadataSettings: Record<string, any> = {};
+        settings.forEach((setting: any) => {
+          metadataSettings[setting.key] = setting.value;
+        });
 
         if (isMounted) {
-          console.log("[useMetadata] Data fetched from Supabase:", data);
-          setMetadata(data as Metadata);
+          console.log("[useMetadata] Data fetched from Supabase:", settings);
+          setMetadata({
+            couple: {
+              bride_name: 'Bride', // Will be updated from settings
+              groom_name: 'Groom', // Will be updated from settings
+              wedding_date: metadataSettings['wedding_date'] || new Date().toISOString(),
+              venue: metadataSettings['wedding_location']?.name || 'Wedding Venue',
+              tagline: 'Celebrating Our Love'
+            },
+            counts: {
+              total_contributions: 0,
+              total_pledges: 0,
+              total_meetings: 0,
+              total_guests: 0
+            }
+          });
         }
       } catch (error) {
         console.warn("[useMetadata] Using default metadata due to error:", error);
