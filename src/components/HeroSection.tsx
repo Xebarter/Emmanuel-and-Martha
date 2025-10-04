@@ -1,6 +1,5 @@
 import { Heart, MapPin, Calendar } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
-import { settingsService } from '../services/settingsService';
 
 interface CoupleInfo {
   bride_name?: string;
@@ -37,6 +36,7 @@ interface TimeRemaining {
 interface GalleryImage {
   id: string;
   url: string;
+  created_at: string;
 }
 
 export function HeroSection({ coupleInfo }: HeroSectionProps) {
@@ -67,20 +67,6 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
     return () => clearInterval(interval);
   }, [coupleInfo.wedding_date]);
 
-  // Fetch site settings
-  useEffect(() => {
-    const loadSiteSettings = async () => {
-      try {
-        const settings = await settingsService.getSiteSettings();
-        setSiteSettings(settings);
-      } catch (error) {
-        console.error('Failed to load site settings:', error);
-        // Continue with default settings
-      }
-    };
-
-    loadSiteSettings();
-  }, []);
 
   // Fetch gallery images
   useEffect(() => {
@@ -130,13 +116,13 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
   };
 
   // Get names - support both formats
-  const displayNames = siteSettings?.heroSection?.headingText || coupleInfo.names ||
+  const displayNames = coupleInfo.names ||
     (coupleInfo.bride_name && coupleInfo.groom_name
       ? `${coupleInfo.groom_name} & ${coupleInfo.bride_name}`
       : 'Our Wedding');
 
-  const displayLocation = siteSettings?.heroSection?.location || coupleInfo.location || coupleInfo.venue || 'TBA';
-  const displayTagline = siteSettings?.heroSection?.taglineText || coupleInfo.tagline || 'Join us as we celebrate our love';
+  const displayLocation = coupleInfo.location || coupleInfo.venue || 'TBA';
+  const displayTagline = coupleInfo.tagline || 'Join us as we celebrate our love';
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50 wedding-font">
@@ -150,7 +136,7 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
                 index === currentImageIndex ? 'opacity-50' : 'opacity-0'
               }`}
               style={{ 
-                backgroundImage: `url(${siteSettings?.heroSection?.backgroundImageUrl || image.url})`,
+                backgroundImage: `url(${image.url})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
@@ -159,9 +145,7 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
             />
           ))}
           {/* Enhanced gradient overlay to ensure text readability while showing more of the image */}
-          <div className="absolute inset-0" style={{
-            background: `linear-gradient(to br, rgba(255, 105, 180, ${siteSettings?.heroSection?.backgroundOverlayOpacity ?? 0.5}), rgba(255, 192, 203, ${siteSettings?.heroSection?.backgroundOverlayOpacity ?? 0.4}), rgba(255, 160, 122, ${siteSettings?.heroSection?.backgroundOverlayOpacity ?? 0.5}))`
-          }}></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-rose-50/50 via-pink-50/40 to-amber-50/50"></div>
         </div>
       )}
 
@@ -196,22 +180,21 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
           <div className="relative">
             <div className="absolute inset-0 bg-rose-400 blur-2xl opacity-30 rounded-full"></div>
             <div className="relative p-5 bg-white/80 backdrop-blur-sm rounded-full shadow-2xl border border-rose-100">
-              <Heart className={`w-14 h-14 ${siteSettings?.heroSection?.heartIconColor || 'text-rose-500 fill-rose-500'} animate-pulse`} />
+              <Heart className="w-14 h-14 text-rose-500 fill-rose-500 animate-pulse" />
             </div>
           </div>
         </div>
 
         {/* Main heading with elegant typography */}
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold bg-gradient-to-r from-rose-600 via-pink-600 to-rose-600 bg-clip-text text-transparent mb-6 leading-tight" style={{ 
-          fontFamily: 'Tangerine, cursive',
-          color: siteSettings?.heroSection?.heartIconColor || 'rose-500'
+          fontFamily: 'Tangerine, cursive'
         }}>
           {displayNames}
         </h1>
 
         {/* Tagline */}
         <p className="text-xl md:text-2xl text-gray-700 mb-8 font-light italic max-w-2xl mx-auto">
-          "{displayTagline || siteSettings?.heroSection?.taglineText || 'Join us as we celebrate our love'}"
+          "{displayTagline}"
         </p>
 
         {/* Wedding details with icons */}
@@ -252,7 +235,7 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
         {/* Call to action text */}
         <div className="max-w-2xl mx-auto">
           <p className="text-gray-700 leading-relaxed text-lg">
-            {siteSettings?.heroSection?.ctaText || 'Your presence and support mean the world to us as we begin this beautiful journey together.'}
+            Your presence and support mean the world to us as we begin this beautiful journey together.
           </p>
         </div>
 
