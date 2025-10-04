@@ -12,7 +12,12 @@ type Contribution = {
   status: string;
   type?: string;
   metadata?: any;
+  created_at?: string;
   date?: string;
+  contributor_name?: string;
+  contributor_email?: string;
+  contributor_phone?: string;
+  message?: string;
 };
 
 export default function ContributionsManager() {
@@ -22,7 +27,7 @@ export default function ContributionsManager() {
   const [selectedPeriod, setSelectedPeriod] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [showActionMenu, setShowActionMenu] = useState(null);
+  const [showActionMenu, setShowActionMenu] = useState<string | null>(null);
   const itemsPerPage = 5;
 
   useEffect(() => {
@@ -35,7 +40,7 @@ export default function ContributionsManager() {
       const data = await getContributions();
       setContributions(data || []);
     } catch (err) {
-      // Optionally handle error
+      console.error('Error fetching contributions:', err);
     }
     setLoading(false);
   };
@@ -56,7 +61,7 @@ export default function ContributionsManager() {
       });
       await fetchContributions();
     } catch (err) {
-      // Optionally handle error
+      console.error('Error adding contribution:', err);
     }
     setLoading(false);
   };
@@ -67,24 +72,48 @@ export default function ContributionsManager() {
       await updateContribution(id, updates);
       await fetchContributions();
     } catch (err) {
-      // Optionally handle error
+      console.error('Error updating contribution:', err);
     }
     setLoading(false);
   };
 
   const handleDeleteContribution = async (id: string): Promise<void> => {
+    if (!window.confirm('Are you sure you want to delete this contribution?')) {
+      return;
+    }
+    
     setLoading(true);
     try {
       await deleteContribution(id);
       await fetchContributions();
     } catch (err) {
-      // Optionally handle error
+      console.error('Error deleting contribution:', err);
     }
     setLoading(false);
   };
 
+  const handleAction = (action: string, id: string) => {
+    console.log(`${action} contribution ${id}`);
+    setShowActionMenu(null);
+    
+    switch (action) {
+      case 'view':
+        // Implement view details functionality
+        break;
+      case 'edit':
+        // Implement edit functionality
+        break;
+      case 'delete':
+        handleDeleteContribution(id);
+        break;
+      default:
+        break;
+    }
+  };
+
   const filteredContributions = contributions.filter(c => {
-    const matchesSearch = (c.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const matchesSearch = !searchQuery || 
+      (c.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.email?.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesStatus = selectedStatus === 'all' || c.status === selectedStatus;
     return matchesSearch && matchesStatus;
@@ -101,16 +130,20 @@ export default function ContributionsManager() {
   const completedCount = contributions.filter(c => c.status === 'completed').length;
   const pendingAmount = contributions.filter(c => c.status === 'pending').reduce((sum, c) => sum + c.amount, 0);
 
-  const handleAction = (action, id) => {
-    console.log(`${action} contribution ${id}`);
-    setShowActionMenu(null);
+  const formatCurrency = (amount: number): string => {
+    return new Intl.NumberFormat('en-UG', {
+      style: 'currency',
+      currency: 'UGX',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
   };
 
-  const getInitials = (name) => {
+  const getInitials = (name: string = 'U') => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
-  const getAvatarColor = (id) => {
+  const getAvatarColor = (id: string) => {
     const colors = [
       'from-rose-500 to-pink-500',
       'from-blue-500 to-indigo-500',
@@ -119,7 +152,8 @@ export default function ContributionsManager() {
       'from-purple-500 to-violet-500',
       'from-cyan-500 to-sky-500',
     ];
-    return colors[id % colors.length];
+    const index = parseInt(id.replace(/[^0-9]/g, '')) || 0;
+    return colors[index % colors.length];
   };
 
   return (
@@ -161,7 +195,7 @@ export default function ContributionsManager() {
               </div>
             </div>
             <p className="text-sm font-medium text-slate-600 mb-1">Total Amount</p>
-            <p className="text-2xl sm:text-3xl font-bold text-slate-900">${totalAmount.toLocaleString()}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-slate-900">{formatCurrency(totalAmount)}</p>
           </div>
 
           <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
@@ -185,7 +219,7 @@ export default function ContributionsManager() {
               </div>
             </div>
             <p className="text-sm font-medium text-slate-600 mb-1">Avg Contribution</p>
-            <p className="text-2xl sm:text-3xl font-bold text-slate-900">${avgContribution.toFixed(0)}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-slate-900">{formatCurrency(avgContribution)}</p>
             <p className="text-xs text-slate-500 mt-2">{completedCount} completed</p>
           </div>
 
@@ -196,7 +230,7 @@ export default function ContributionsManager() {
               </div>
             </div>
             <p className="text-sm font-medium text-slate-600 mb-1">Pending Amount</p>
-            <p className="text-2xl sm:text-3xl font-bold text-slate-900">${pendingAmount.toLocaleString()}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-slate-900">{formatCurrency(pendingAmount)}</p>
             <p className="text-xs text-slate-500 mt-2">{contributions.length - completedCount} pending</p>
           </div>
         </div>
@@ -290,6 +324,9 @@ export default function ContributionsManager() {
                       Contributor
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">
+                      Contact
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">
                       Amount
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider hidden sm:table-cell">
@@ -315,24 +352,34 @@ export default function ContributionsManager() {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${getAvatarColor(contribution.id)} flex items-center justify-center text-white font-bold text-sm shadow-lg group-hover:scale-110 transition-transform duration-200`}>
-                            {getInitials(contribution.name)}
+                            {getInitials(contribution.contributor_name || contribution.name)}
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-slate-900">{contribution.name}</p>
-                            <p className="text-xs text-slate-500">{contribution.email}</p>
+                            <p className="text-sm font-bold text-slate-900">{contribution.contributor_name || contribution.name || 'Anonymous'}</p>
+                            <p className="text-xs text-slate-500">{contribution.message || 'No message'}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-base font-bold text-slate-900">${contribution.amount}</span>
+                        <div className="text-sm text-slate-600">
+                          {contribution.contributor_email || contribution.email || contribution.contributor_phone || 'No contact'}
+                        </div>
+                        {(contribution.contributor_phone && contribution.contributor_phone !== (contribution.contributor_email || contribution.email)) ? (
+                          <div className="text-xs text-slate-500">
+                            {contribution.contributor_phone}
+                          </div>
+                        ) : null}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-base font-bold text-slate-900">{formatCurrency(contribution.amount)}</span>
                       </td>
                       <td className="px-6 py-4 hidden sm:table-cell">
                         <div className="flex items-center gap-2 text-sm text-slate-600">
                           <Calendar className="h-4 w-4 text-slate-400" />
-                          {new Date(contribution.date).toLocaleDateString('en-US', {
+                          {contribution.created_at ? new Date(contribution.created_at).toLocaleDateString('en-US', {
                             month: 'short',
                             day: 'numeric'
-                          })}
+                          }) : 'N/A'}
                         </div>
                       </td>
                       <td className="px-6 py-4 hidden md:table-cell">

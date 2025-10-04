@@ -11,7 +11,7 @@ const contributionSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   phone: z.string().min(10, 'Please enter a valid phone number'),
   email: z.string().email('Please enter a valid email').optional().or(z.literal('')),
-  amount: z.number().min(1000, 'Minimum contribution is 1,000 UGX'),
+  amount: z.number().min(500, 'Minimum contribution is 500 UGX'),
   message: z.string().optional(),
 });
 
@@ -93,6 +93,10 @@ export function ContributeSection({ totalContributions }: ContributeSectionProps
           pesapal_reference: pesapalReference, // Using correct column name
           status: 'pending',
           metadata: { name: data.name, phone: normalizedPhone },
+          contributor_name: data.name,
+          contributor_email: data.email || null,
+          contributor_phone: normalizedPhone,
+          message: data.message || null,
         })
         .select()
         .single();
@@ -111,6 +115,10 @@ export function ContributeSection({ totalContributions }: ContributeSectionProps
       );
 
       if (paymentResult.error) {
+        // Check if it's a network/API error
+        if (paymentResult.error.includes('404') || paymentResult.error.includes('Failed to fetch')) {
+          throw new Error('Payment service is currently unavailable. Please try again later or contact the site administrator.');
+        }
         throw new Error(paymentResult.error);
       }
 
@@ -118,7 +126,7 @@ export function ContributeSection({ totalContributions }: ContributeSectionProps
       if (paymentResult.redirectUrl) {
         window.location.href = paymentResult.redirectUrl;
       } else {
-        throw new Error('Failed to get payment redirect URL');
+        throw new Error('Failed to get payment redirect URL. Please try again.');
       }
 
       setSubmitMessage({

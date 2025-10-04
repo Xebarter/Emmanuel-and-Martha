@@ -29,29 +29,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // In offline mode, provide default auth state
-  if (!isSupabaseConnected) {
-    console.log("[AuthProvider] Running in offline mode - skipping auth setup");
-    return (
-      <AuthContext.Provider
-        value={{
-          user: {
-            id: 'offline-user',
-            email: 'offline@example.com',
-            name: 'Offline User',
-            role: 'user',
-          },
-          loading: false,
-          login: async () => {},
-          logout: async () => {},
-          isAuthenticated: true,
-        }}
-      >
-        {children}
-      </AuthContext.Provider>
-    );
-  }
-
   // Log state changes
   useEffect(() => {
     console.log("[AuthProvider] State:", { user, loading });
@@ -116,8 +93,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let isMounted = true;
     
+    // Handle both online and offline modes
     if (!isSupabaseConnected) {
-      console.log("[AuthProvider] Running in offline mode, skipping auth setup");
+      console.log("[AuthProvider] Running in offline mode, setting default user");
+      setUser({
+        id: 'offline-user',
+        email: 'offline@example.com',
+        name: 'Offline User',
+        role: 'user',
+      });
       setLoading(false);
       return () => {
         isMounted = false;
@@ -227,11 +211,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const value: AuthContextType = {
-    user,
+    user: isSupabaseConnected ? user : {
+      id: 'offline-user',
+      email: 'offline@example.com',
+      name: 'Offline User',
+      role: 'user',
+    },
     loading,
     login,
     logout,
-    isAuthenticated: !!user,
+    isAuthenticated: isSupabaseConnected ? !!user : true,
   };
 
   return (

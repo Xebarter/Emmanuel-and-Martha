@@ -52,11 +52,31 @@ async function submitOrderToPesapal(
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to submit order');
+      // Try to parse error response as JSON, fallback to text if that fails
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorMessage;
+      } catch (jsonError) {
+        // If JSON parsing fails, try to get text
+        try {
+          const errorText = await response.text();
+          if (errorText) {
+            errorMessage = errorText;
+          }
+        } catch (textError) {
+          // If both fail, we'll use the generic error message
+        }
+      }
+      throw new Error(errorMessage);
     }
 
-    return await response.json();
+    // Try to parse success response as JSON
+    try {
+      return await response.json();
+    } catch (jsonError) {
+      throw new Error('Invalid response format from server');
+    }
   } catch (error) {
     console.error('Pesapal order submission error:', error);
     return {
@@ -80,13 +100,34 @@ async function getPesapalAuthToken() {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to authenticate with Pesapal');
+      // Try to parse error response as JSON, fallback to text if that fails
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorMessage;
+      } catch (jsonError) {
+        // If JSON parsing fails, try to get text
+        try {
+          const errorText = await response.text();
+          if (errorText) {
+            errorMessage = errorText;
+          }
+        } catch (textError) {
+          // If both fail, we'll use the generic error message
+        }
+      }
+      throw new Error(errorMessage);
     }
 
-    return await response.json();
+    // Try to parse success response as JSON
+    try {
+      return await response.json();
+    } catch (jsonError) {
+      throw new Error('Invalid response format from authentication service');
+    }
   } catch (error) {
     console.error('Pesapal authentication error:', error);
-    return { error: 'Failed to authenticate with Pesapal' };
+    return { error: error instanceof Error ? error.message : 'Failed to authenticate with Pesapal' };
   }
 }
 

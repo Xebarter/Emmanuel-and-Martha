@@ -6,13 +6,31 @@ export async function getContributions() {
   return data;
 }
 
-export async function addContribution(contribution: { guest_id?: string; amount: number; currency: string; status: string; metadata?: any }) {
+export async function addContribution(contribution: { 
+  guest_id?: string; 
+  amount: number; 
+  currency: string; 
+  status: string; 
+  metadata?: any;
+  contributor_name?: string;
+  contributor_email?: string;
+  contributor_phone?: string;
+  message?: string;
+}) {
   const { data, error } = await supabase.from('contributions').insert([contribution]).select();
   if (error) throw error;
   return data?.[0];
 }
 
-export async function updateContribution(id: string, updates: Partial<{ amount: number; status: string; metadata?: any }>) {
+export async function updateContribution(id: string, updates: Partial<{ 
+  amount: number; 
+  status: string; 
+  metadata?: any;
+  contributor_name?: string;
+  contributor_email?: string;
+  contributor_phone?: string;
+  message?: string;
+}>) {
   const { data, error } = await supabase.from('contributions').update(updates).eq('id', id).select();
   if (error) throw error;
   return data?.[0];

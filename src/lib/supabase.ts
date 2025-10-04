@@ -134,6 +134,10 @@ export type Database = {
           status: 'pending' | 'completed' | 'failed';
           metadata: Record<string, unknown>;
           created_at: string;
+          contributor_name: string | null;
+          contributor_email: string | null;
+          contributor_phone: string | null;
+          message: string | null;
         };
         Insert: Omit<Database['public']['Tables']['contributions']['Row'], 'id' | 'created_at'>;
         Update: Partial<Database['public']['Tables']['contributions']['Insert']>;
