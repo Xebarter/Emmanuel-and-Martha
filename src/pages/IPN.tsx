@@ -36,7 +36,7 @@ export default function IPNPage() {
               payment_date: paymentDetails.date
             }
           })
-          .eq('pesapal_reference', orderTrackingId);
+          .eq('pesapal_tracking_id', orderTrackingId);
 
         if (error) {
           console.error('Failed to update contribution status via IPN:', error);

@@ -34,7 +34,7 @@ export default function CallbackPage() {
         const { error: updateError } = await supabase
           .from('contributions')
           .update({ status: paymentDetails.status.toLowerCase() })
-          .eq('pesapal_reference', orderTrackingId);
+          .eq('pesapal_tracking_id', orderTrackingId);
 
         if (updateError) {
           console.error('Failed to update contribution status:', updateError);
@@ -71,9 +71,11 @@ export default function CallbackPage() {
           <div className="flex flex-col items-center justify-center space-y-6">
             {status === 'loading' && (
               <>
-                <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-rose-500"></div>
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-rose-600"></div>
                 <h2 className="text-2xl font-bold text-gray-800">Processing Payment</h2>
-                <p className="text-gray-600 text-center">Please wait while we confirm your payment...</p>
+                <p className="text-gray-600 text-center">
+                  Please wait while we confirm your payment details...
+                </p>
               </>
             )}
 
@@ -87,10 +89,10 @@ export default function CallbackPage() {
                 <h2 className="text-2xl font-bold text-gray-800">Payment Processed</h2>
                 <p className="text-gray-600 text-center">{message}</p>
                 <button
-                  onClick={handleReturnHome}
-                  className="mt-4 bg-rose-500 hover:bg-rose-600 text-white font-bold py-2 px-6 rounded-lg transition duration-200"
+                  onClick={() => navigate('/')}
+                  className="mt-4 px-6 py-3 bg-rose-600 text-white rounded-lg font-semibold hover:bg-rose-700 transition-colors"
                 >
-                  Return to Home
+                  Return to Homepage
                 </button>
               </>
             )}
@@ -105,10 +107,10 @@ export default function CallbackPage() {
                 <h2 className="text-2xl font-bold text-gray-800">Payment Error</h2>
                 <p className="text-gray-600 text-center">{message}</p>
                 <button
-                  onClick={handleReturnHome}
-                  className="mt-4 bg-rose-500 hover:bg-rose-600 text-white font-bold py-2 px-6 rounded-lg transition duration-200"
+                  onClick={() => navigate('/')}
+                  className="mt-4 px-6 py-3 bg-rose-600 text-white rounded-lg font-semibold hover:bg-rose-700 transition-colors"
                 >
-                  Return to Home
+                  Return to Homepage
                 </button>
               </>
             )}
