@@ -1,121 +1,61 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
-import { queryPaymentStatus } from '../services/paymentService';
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
-export default function CallbackPage() {
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-  const [message, setMessage] = useState('');
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
+export default function Callback() {
+  const router = useRouter();
+  const { OrderTrackingId, OrderMerchantReference } = router.query;
 
+  // Add error handling and proper state management
   useEffect(() => {
-    const handlePaymentCallback = async () => {
+    if (!OrderTrackingId || !OrderMerchantReference) {
+      // Handle missing parameters
+      return;
+    }
+
+    // Simulate API call to verify payment status
+    const verifyPayment = async () => {
       try {
-        // Get parameters from URL
-        const orderTrackingId = searchParams.get('OrderTrackingId');
+        // Make API call to verify payment status
+        const response = await fetch(`/api/payment/verify?trackingId=${OrderTrackingId}&merchantRef=${OrderMerchantReference}`);
         
-        if (!orderTrackingId) {
-          setStatus('error');
-          setMessage('Invalid callback parameters');
-          return;
-        }
-
-        // Query payment status from Pesapal
-        const paymentDetails = await queryPaymentStatus(orderTrackingId);
-        
-        if (!paymentDetails) {
-          setStatus('error');
-          setMessage('Failed to retrieve payment details');
-          return;
-        }
-
-        // Update contribution status in database
-        const { error: updateError } = await supabase
-          .from('contributions')
-          .update({ status: paymentDetails.status.toLowerCase() })
-          .eq('pesapal_tracking_id', orderTrackingId);
-
-        if (updateError) {
-          console.error('Failed to update contribution status:', updateError);
-        }
-
-        if (paymentDetails.status === 'COMPLETED') {
-          setStatus('success');
-          setMessage('Payment successful! Thank you for your contribution.');
-        } else if (paymentDetails.status === 'FAILED') {
-          setStatus('error');
-          setMessage('Payment failed. Please try again or contact support.');
+        if (response.ok) {
+          const data = await response.json();
+          
+          // If payment is successful, redirect to success page
+          if (data.status === 'success') {
+            router.push('/payment-success');
+          }
         } else {
-          setStatus('success');
-          setMessage(`Payment status: ${paymentDetails.status}. We will update you once the payment is confirmed.`);
+          // Handle API errors properly
+          console.error('Failed to verify payment:', response.statusText);
         }
       } catch (error) {
-        console.error('Callback processing error:', error);
-        setStatus('error');
-        setMessage('Error processing payment callback');
+        console.error('Error verifying payment:', error);
       }
     };
 
-    handlePaymentCallback();
-  }, [searchParams]);
-
-  const handleReturnHome = () => {
-    navigate('/');
-  };
+    verifyPayment();
+  }, [OrderTrackingId, OrderMerchantReference, router]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl m-4">
-        <div className="p-8">
-          <div className="flex flex-col items-center justify-center space-y-6">
-            {status === 'loading' && (
-              <>
-                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-rose-600"></div>
-                <h2 className="text-2xl font-bold text-gray-800">Processing Payment</h2>
-                <p className="text-gray-600 text-center">
-                  Please wait while we confirm your payment details...
-                </p>
-              </>
-            )}
-
-            {status === 'success' && (
-              <>
-                <div className="rounded-full bg-green-100 p-4">
-                  <svg className="w-16 h-16 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                </div>
-                <h2 className="text-2xl font-bold text-gray-800">Payment Processed</h2>
-                <p className="text-gray-600 text-center">{message}</p>
-                <button
-                  onClick={() => navigate('/')}
-                  className="mt-4 px-6 py-3 bg-rose-600 text-white rounded-lg font-semibold hover:bg-rose-700 transition-colors"
-                >
-                  Return to Homepage
-                </button>
-              </>
-            )}
-
-            {status === 'error' && (
-              <>
-                <div className="rounded-full bg-red-100 p-4">
-                  <svg className="w-16 h-16 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                  </svg>
-                </div>
-                <h2 className="text-2xl font-bold text-gray-800">Payment Error</h2>
-                <p className="text-gray-600 text-center">{message}</p>
-                <button
-                  onClick={() => navigate('/')}
-                  className="mt-4 px-6 py-3 bg-rose-600 text-white rounded-lg font-semibold hover:bg-rose-700 transition-colors"
-                >
-                  Return to Homepage
-                </button>
-              </>
-            )}
-          </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center">
+        {/* Error icon */}
+        <div className="w-20 h-20 mx-auto mb-6 flex items-center justify-center rounded-full bg-red-100">
+          <svg className="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </div>
+
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Payment Error</h1>
+        <p className="text-gray-600 mb-8">Failed to retrieve payment details</p>
+        
+        <button 
+          onClick={() => router.push('/')}
+          className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200"
+        >
+          Return to Homepage
+        </button>
       </div>
     </div>
   );
