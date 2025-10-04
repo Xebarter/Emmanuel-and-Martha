@@ -101,11 +101,8 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
     });
   };
 
-  // Get names - support both formats
-  const displayNames = coupleInfo.names ||
-    (coupleInfo.bride_name && coupleInfo.groom_name
-      ? `${coupleInfo.groom_name} & ${coupleInfo.bride_name}`
-      : 'John & Priscilla');
+  // Get names - default to 'John & Priscilla' regardless of coupleInfo
+  const displayNames = 'John & Priscilla';
 
   const displayLocation = coupleInfo.location || coupleInfo.venue || 'TBA';
   const displayTagline = coupleInfo.tagline || 'Join us as we celebrate our love';
