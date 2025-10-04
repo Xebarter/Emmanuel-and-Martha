@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, Plus, Edit2, Trash2, X, Clock } from 'lucide-react';
+import { 
+  Calendar, 
+  Clock, 
+  Plus, 
+  Edit2, 
+  Trash2, 
+  X,
+  Heart
+} from 'lucide-react';
 import { getMeetings, addMeeting, updateMeeting, deleteMeeting } from '../../services/meetingsService';
-
-type Meeting = {
-  id: string;
-  title: string;
-  description?: string;
-  location?: string;
-  starts_at?: string;
-  ends_at?: string;
-  created_by?: string;
-};
+import { Meeting } from '../../services/meetingsService';
+import { supabase } from '../../lib/supabase';
 
 export default function MeetingsManager() {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
@@ -20,11 +20,18 @@ export default function MeetingsManager() {
   const [formData, setFormData] = useState({
     title: '',
     date: '',
-    time: ''
+    time: '',
+    location: ''
+  });
+  const [siteSettings, setSiteSettings] = useState({
+    wedding_date: '',
+    wedding_venue: '',
+    wedding_time: ''
   });
 
   useEffect(() => {
     fetchMeetings();
+    fetchSiteSettings();
   }, []);
 
   const fetchMeetings = async (): Promise<void> => {
@@ -38,7 +45,43 @@ export default function MeetingsManager() {
     setLoading(false);
   };
 
-  const handleAddMeeting = async (meeting: Omit<Meeting, 'id'>): Promise<void> => {
+  const fetchSiteSettings = async () => {
+    try {
+      // Fetch wedding settings from site_settings table
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('key, value')
+        .in('key', ['couple_info']);
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        const coupleInfo = data.find(item => item.key === 'couple_info')?.value || {};
+        setSiteSettings({
+          wedding_date: coupleInfo.wedding_date || '',
+          wedding_venue: coupleInfo.location || '',
+          wedding_time: '10:00' // Default time
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching site settings:', err);
+    }
+  };
+
+  const updateSiteSettings = async (settings: any) => {
+    try {
+      const { error } = await supabase
+        .from('site_settings')
+        .update({ value: settings })
+        .eq('key', 'couple_info');
+      
+      if (error) throw error;
+    } catch (err) {
+      console.error('Error updating site settings:', err);
+    }
+  };
+
+  const handleAddMeeting = async (meeting: Omit<Meeting, 'id' | 'created_at'>): Promise<void> => {
     setLoading(true);
     try {
       await addMeeting(meeting);
@@ -49,7 +92,7 @@ export default function MeetingsManager() {
     setLoading(false);
   };
 
-  const handleUpdateMeeting = async (id: string, updates: Partial<Meeting>): Promise<void> => {
+  const handleUpdateMeeting = async (id: string, updates: Partial<Omit<Meeting, 'id' | 'created_at'>>): Promise<void> => {
     setLoading(true);
     try {
       await updateMeeting(id, updates);
@@ -71,33 +114,54 @@ export default function MeetingsManager() {
     setLoading(false);
   };
 
+  const handleSaveWeddingDetails = async () => {
+    const settings = {
+      wedding_date: siteSettings.wedding_date,
+      location: siteSettings.wedding_venue,
+      // We can add more fields as needed
+    };
+    
+    await updateSiteSettings(settings);
+    alert('Wedding details saved successfully!');
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const meetingData: Omit<Meeting, 'id' | 'created_at'> = {
+      title: formData.title,
+      location: formData.location,
+      starts_at: `${formData.date}T${formData.time}:00`,
+      ends_at: `${formData.date}T${formData.time}:00` // For simplicity, using same time
+    };
+
     if (editingMeeting) {
-      setMeetings(meetings.map(m =>
-        m.id === editingMeeting.id
-          ? { ...formData, id: editingMeeting.id }
-          : m
-      ));
+      handleUpdateMeeting(editingMeeting.id, meetingData);
     } else {
-      if (formData.title && formData.date && formData.time) {
-        const newMeeting = {
-          ...formData,
-          id: `${Date.now()}`
-        };
-        setMeetings([...meetings, newMeeting]);
-      }
+      handleAddMeeting(meetingData);
     }
     closeModal();
   };
 
-  const openModal = (meeting = null) => {
+  const openModal = (meeting: Meeting | null = null) => {
     if (meeting) {
       setEditingMeeting(meeting);
-      setFormData(meeting);
+      const [datePart, timePart] = meeting.starts_at.split('T');
+      const time = timePart ? timePart.substring(0, 5) : '';
+      setFormData({
+        title: meeting.title,
+        date: datePart,
+        time: time,
+        location: meeting.location
+      });
     } else {
       setEditingMeeting(null);
-      setFormData({ title: '', date: '', time: '' });
+      const today = new Date().toISOString().split('T')[0];
+      setFormData({ 
+        title: '', 
+        date: today, 
+        time: '10:00',
+        location: ''
+      });
     }
     setShowModal(true);
   };
@@ -105,11 +169,16 @@ export default function MeetingsManager() {
   const closeModal = () => {
     setShowModal(false);
     setEditingMeeting(null);
-    setFormData({ title: '', date: '', time: '' });
+    setFormData({ 
+      title: '', 
+      date: '', 
+      time: '',
+      location: ''
+    });
   };
 
-  const deleteMeeting = (id) => {
-    setMeetings(meetings.filter(m => m.id !== id));
+  const deleteMeeting = (id: string) => {
+    handleDeleteMeeting(id);
   };
 
   const formatTime = (time?: string) => {
@@ -130,6 +199,59 @@ export default function MeetingsManager() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8">
       <div className="max-w-6xl mx-auto">
+        {/* Wedding Details Section */}
+        <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden mb-8">
+          <div className="bg-gradient-to-r from-rose-500 to-pink-600 px-8 py-6">
+            <div className="flex items-center space-x-3">
+              <div className="bg-white bg-opacity-20 p-2 rounded-lg">
+                <Heart className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white">Wedding Details</h2>
+                <p className="text-rose-100 text-sm">Manage the main wedding information</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Wedding Date
+                </label>
+                <input
+                  type="date"
+                  value={siteSettings.wedding_date}
+                  onChange={(e) => setSiteSettings({...siteSettings, wedding_date: e.target.value})}
+                  className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none transition-all"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Wedding Venue
+                </label>
+                <input
+                  type="text"
+                  value={siteSettings.wedding_venue}
+                  onChange={(e) => setSiteSettings({...siteSettings, wedding_venue: e.target.value})}
+                  className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none transition-all"
+                  placeholder="Enter wedding venue"
+                />
+              </div>
+              
+              <div className="flex items-end">
+                <button
+                  onClick={handleSaveWeddingDetails}
+                  className="w-full px-4 py-2.5 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-lg font-semibold hover:from-rose-600 hover:to-pink-700 transition-all shadow-md"
+                >
+                  Save Wedding Details
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-rose-500 to-pink-600 px-8 py-6">
@@ -190,6 +312,9 @@ export default function MeetingsManager() {
                       <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
                         Time
                       </th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                        Location
+                      </th>
                       <th className="px-6 py-4 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider">
                         Actions
                       </th>
@@ -209,12 +334,17 @@ export default function MeetingsManager() {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-slate-900 font-medium">{formatDate(meeting.date)}</div>
+                          <div className="text-sm text-slate-900 font-medium">{formatDate(meeting.starts_at.split('T')[0])}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center text-sm text-slate-600">
                             <Clock className="h-4 w-4 mr-1.5 text-slate-400" />
-                            {formatTime(meeting.time)}
+                            {meeting.starts_at.split('T')[1]?.substring(0, 5) || 'N/A'}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-slate-600">
+                            {meeting.location}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -292,6 +422,19 @@ export default function MeetingsManager() {
                   value={formData.time}
                   onChange={(e) => setFormData({ ...formData, time: e.target.value })}
                   className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Location
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none transition-all"
+                  placeholder="Enter meeting location"
                 />
               </div>
               <div className="flex space-x-3 pt-4">
