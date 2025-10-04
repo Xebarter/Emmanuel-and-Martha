@@ -12,6 +12,15 @@ interface OrderRequest {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Add CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -22,17 +31,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const PESAPAL_CANCEL_URL = process.env.PESAPAL_CANCEL_URL;
     const PESAPAL_IPN_ID = process.env.PESAPAL_IPN_ID;
 
+    console.log('Environment variables check:', {
+      PESAPAL_API_URL: !!PESAPAL_API_URL,
+      PESAPAL_CALLBACK_URL: !!PESAPAL_CALLBACK_URL,
+      PESAPAL_CANCEL_URL: !!PESAPAL_CANCEL_URL,
+      PESAPAL_IPN_ID: !!PESAPAL_IPN_ID
+    });
+
     if (!PESAPAL_API_URL || !PESAPAL_CALLBACK_URL || !PESAPAL_CANCEL_URL || !PESAPAL_IPN_ID) {
       throw new Error('Missing required environment variables for Pesapal order submission');
     }
 
     // Get auth token first
-    const authResponse = await fetch(`${req.headers.origin}/api/payments/auth`, {
+    const authUrl = `${req.headers.origin || 'https://priscillaandjohn.vercel.app'}/api/payments/auth`;
+    console.log('Authenticating with:', authUrl);
+    
+    const authResponse = await fetch(authUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
     });
+
+    console.log('Auth response status:', authResponse.status);
 
     if (!authResponse.ok) {
       const errorData = await authResponse.json().catch(() => ({}));
@@ -41,6 +62,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const { token } = await authResponse.json();
+    console.log('Authentication token received');
     
     const {
       amount,
@@ -84,6 +106,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     );
 
+    console.log('Pesapal order submission response status:', response.status);
+
     if (!response.ok) {
       const errorData = await response.text();
       console.error('Pesapal order submission failed with status:', response.status);
@@ -92,6 +116,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const data = await response.json();
+    console.log('Pesapal order submission successful');
     res.status(200).json({
       order_tracking_id: data.order_tracking_id,
       redirect_url: data.redirect_url,
