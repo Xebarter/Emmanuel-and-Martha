@@ -42,6 +42,7 @@ const defaultMetadata: Metadata = {
 export function useMetadata() {
   const [metadata, setMetadata] = useState<Metadata | null>(null);
   const [loading, setLoading] = useState(!isSupabaseConnected);
+  const [error, setError] = useState<string | null>(null);
   
   // If not connected to Supabase, return default metadata immediately
   if (!isSupabaseConnected) {
@@ -57,6 +58,11 @@ export function useMetadata() {
 
     const loadMetadata = async () => {
       console.log("[useMetadata] Loading metadata...");
+      
+      // Reset error state
+      if (isMounted) {
+        setError(null);
+      }
       
       // If not connected to Supabase, use default metadata
       if (!isSupabaseConnected) {
@@ -99,6 +105,7 @@ export function useMetadata() {
       } catch (error) {
         console.warn("[useMetadata] Using default metadata due to error:", error);
         if (isMounted) {
+          setError(error instanceof Error ? error.message : 'Failed to load metadata');
           setMetadata({
             couple: {
               bride_name: 'Bride',
