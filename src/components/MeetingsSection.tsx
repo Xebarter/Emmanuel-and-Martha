@@ -1,9 +1,9 @@
-import { Calendar, MapPin, Clock, Users, Loader2, X } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, Loader2, X, Heart } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { format, formatDistanceToNow, differenceInDays, differenceInHours, differenceInMinutes } from 'date-fns';
+import { format, formatDistanceToNow, differenceInDays, differenceInHours, differenceInMinutes, isAfter } from 'date-fns';
 import { supabase } from '../lib/supabase';
 import { normalizePhone, formatDateTime } from '../lib/utils';
 import { Meeting } from '../lib/types';
@@ -18,6 +18,12 @@ type RegistrationForm = z.infer<typeof registrationSchema>;
 
 export function MeetingsSection() {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
+  const [weddingDetails, setWeddingDetails] = useState<{
+    wedding_date?: string;
+    wedding_time?: string;
+    location?: string;
+    venue?: string;
+  }>({});
   const [loading, setLoading] = useState(true);
   const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,11 +39,69 @@ export function MeetingsSection() {
   });
 
   useEffect(() => {
-    fetchMeetings();
+    const fetchData = async () => {
+      await Promise.all([
+        fetchMeetings(),
+        fetchWeddingDetails()
+      ]);
+    };
+    
+    fetchData();
+    
+    // Set up real-time subscription to wedding details
+    const subscription = supabase
+      .channel('wedding-details-changes')
+      .on('postgres_changes', 
+        { 
+          event: 'UPDATE', 
+          schema: 'public', 
+          table: 'site_settings',
+          filter: 'key=eq.couple_info'
+        }, 
+        (payload) => {
+          if (payload.new?.value) {
+            setWeddingDetails({
+              wedding_date: payload.new.value.wedding_date,
+              wedding_time: payload.new.value.wedding_time,
+              location: payload.new.value.location,
+              venue: payload.new.value.venue
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
+  
+  const fetchWeddingDetails = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('value')
+        .eq('key', 'couple_info')
+        .single();
+
+      if (error) throw error;
+      
+      if (data?.value) {
+        setWeddingDetails({
+          wedding_date: data.value.wedding_date,
+          wedding_time: data.value.wedding_time,
+          location: data.value.location,
+          venue: data.value.venue
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching wedding details:', error);
+    }
+  };
 
   const fetchMeetings = async () => {
     try {
+      setLoading(true);
       const { data, error } = await supabase
         .from('meetings')
         .select('*')
@@ -51,6 +115,50 @@ export function MeetingsSection() {
     } finally {
       setLoading(false);
     }
+  };
+  
+  // Get the main wedding event as a meeting
+  const getWeddingEvent = (): Meeting | null => {
+    if (!weddingDetails.wedding_date) return null;
+    
+    // Combine date and time if available
+    let startsAt = weddingDetails.wedding_date;
+    if (weddingDetails.wedding_time) {
+      const [hours, minutes] = weddingDetails.wedding_time.split(':');
+      const date = new Date(weddingDetails.wedding_date);
+      date.setHours(parseInt(hours, 10), parseInt(minutes || '0', 10), 0, 0);
+      startsAt = date.toISOString();
+    }
+    
+    // Only include if the wedding is in the future
+    if (new Date(startsAt) < new Date()) {
+      return null;
+    }
+    
+    return {
+      id: 'wedding',
+      title: 'Wedding Ceremony',
+      description: 'Join us as we celebrate our love and commitment',
+      location: weddingDetails.location || weddingDetails.venue || 'TBA',
+      starts_at: startsAt,
+      ends_at: startsAt, // Same as start time for simplicity
+      created_at: new Date().toISOString(),
+      is_wedding: true
+    };
+  };
+  
+  // Combine wedding event with other meetings and sort by date
+  const getAllEvents = (): Meeting[] => {
+    const events = [...meetings];
+    const weddingEvent = getWeddingEvent();
+    
+    if (weddingEvent) {
+      events.unshift(weddingEvent);
+    }
+    
+    return events.sort((a, b) => 
+      new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime()
+    );
   };
 
   const onSubmit = async (data: RegistrationForm) => {
@@ -167,22 +275,32 @@ export function MeetingsSection() {
           </p>
         </div>
 
-        {meetings.length === 0 ? (
+        {getAllEvents().length === 0 ? (
           <div className="text-center py-12">
             <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 text-lg">No upcoming meetings scheduled</p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {meetings.map((meeting) => (
+            {getAllEvents().map((meeting) => (
               <div
                 key={meeting.id}
-                className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow duration-300"
+                className={`bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border-2 p-6 hover:shadow-xl transition-all duration-300 ${
+                  (meeting as any).is_wedding ? 'border-rose-300 ring-2 ring-rose-100' : 'border-gray-100'
+                }`}
               >
                 <div className="mb-4">
-                  <div className="inline-flex items-center gap-2 bg-rose-100 px-3 py-1 rounded-full text-sm font-medium text-rose-700 mb-3">
-                    <Clock className="w-4 h-4" />
-                    {getTimeUntilMeeting(meeting.starts_at)} away
+                  <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium mb-3 ${
+                    (meeting as any).is_wedding 
+                      ? 'bg-rose-500 text-white' 
+                      : 'bg-rose-100 text-rose-700'
+                  }`}>
+                    {(meeting as any).is_wedding ? (
+                      <Heart className="w-4 h-4" />
+                    ) : (
+                      <Clock className="w-4 h-4" />
+                    )}
+                    {(meeting as any).is_wedding ? 'Wedding Day' : `${getTimeUntilMeeting(meeting.starts_at)} away`}
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">{meeting.title}</h3>
                   {meeting.description && (
