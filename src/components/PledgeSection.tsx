@@ -420,26 +420,27 @@ export function PledgeSection({ totalPledges }: PledgeSectionProps) {
             </form>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">Track Your Pledges</h3>
-            <p className="text-gray-600 mb-6">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-5 sm:p-6 md:p-8 border border-gray-100">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Track Your Pledges</h3>
+            <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
               Enter your phone number to view all pledges you've made
             </p>
 
-            <div className="flex gap-2 mb-6">
+            <div className="flex flex-col sm:flex-row gap-2 mb-4 sm:mb-6">
               <input
                 type="tel"
                 value={trackPhone}
                 onChange={(e) => setTrackPhone(e.target.value)}
-                className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                className="flex-1 px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm sm:text-base"
                 placeholder="+256700000000"
               />
               <button
                 onClick={handleTrackPledges}
                 disabled={isTracking || !trackPhone}
-                className="px-6 py-3 bg-amber-500 text-white rounded-lg font-semibold hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 sm:px-6 sm:py-3 bg-amber-500 text-white rounded-lg font-semibold hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
               >
-                {isTracking ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
+                {isTracking ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : <Search className="w-5 h-5 mx-auto" />}
+                <span className="sm:hidden">Search</span>
               </button>
             </div>
 
@@ -458,14 +459,14 @@ export function PledgeSection({ totalPledges }: PledgeSectionProps) {
                           ) : (
                             <Package className="w-5 h-5 text-amber-600" />
                           )}
-                          <span className="font-semibold text-gray-900">
+                          <span className="font-semibold text-gray-900 text-sm sm:text-base">
                             {pledge.type === 'money'
                               ? formatCurrency(pledge.amount || 0)
                               : pledge.item_description}
                           </span>
                         </div>
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          className={`px-2 py-1 sm:px-3 sm:py-1 rounded-full text-xs font-medium ${
                             pledge.status === 'fulfilled'
                               ? 'bg-green-100 text-green-800'
                               : pledge.status === 'cancelled'
@@ -516,7 +517,7 @@ export function PledgeSection({ totalPledges }: PledgeSectionProps) {
                         </div>
                       )}
                       
-                      <p className="text-xs text-gray-500">Pledged on {formatDate(pledge.created_at)}</p>
+                      <p className="text-xs text-gray-500 mt-2">Pledged on {formatDate(pledge.created_at)}</p>
                       {pledge.fulfilled_at && (
                         <p className="text-xs text-green-600 mt-1">Fulfilled on {formatDate(pledge.fulfilled_at)}</p>
                       )}
@@ -541,7 +542,7 @@ export function PledgeSection({ totalPledges }: PledgeSectionProps) {
                                       setFulfillAmount(value || null);
                                     }
                                   }}
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm"
                                   placeholder="Enter amount"
                                 />
                                 {fulfillAmount && (fulfillAmount < 1000 || fulfillAmount > remainingBalance) && (
@@ -557,11 +558,11 @@ export function PledgeSection({ totalPledges }: PledgeSectionProps) {
                                 <div className="text-red-600 text-sm">{paymentError}</div>
                               )}
                               
-                              <div className="flex gap-2">
+                              <div className="flex flex-col sm:flex-row gap-2">
                                 <button
                                   onClick={() => handleFulfillPledge(pledge)}
                                   disabled={isProcessingPayment || !fulfillAmount || fulfillAmount > remainingBalance || fulfillAmount < 1000}
-                                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                                 >
                                   {isProcessingPayment ? (
                                     <>
@@ -581,7 +582,7 @@ export function PledgeSection({ totalPledges }: PledgeSectionProps) {
                                     setFulfillAmount(null);
                                     setPaymentError(null);
                                   }}
-                                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100"
+                                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 text-sm"
                                 >
                                   Cancel
                                 </button>
@@ -590,7 +591,7 @@ export function PledgeSection({ totalPledges }: PledgeSectionProps) {
                           ) : (
                             <button
                               onClick={() => setFulfillingPledge(pledge.id)}
-                              className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600"
+                              className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600 text-sm"
                             >
                               <CreditCard className="w-4 h-4" />
                               Pay Pledge
@@ -603,7 +604,7 @@ export function PledgeSection({ totalPledges }: PledgeSectionProps) {
                         <div className="mt-3 pt-3 border-t border-gray-200">
                           <button
                             disabled
-                            className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-md cursor-not-allowed"
+                            className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-green-100 text-green-800 rounded-md cursor-not-allowed text-sm"
                           >
                             <CreditCard className="w-4 h-4" />
                             Fully Paid
@@ -615,11 +616,11 @@ export function PledgeSection({ totalPledges }: PledgeSectionProps) {
                 })}
               </div>
             ) : trackPhone && !isTracking ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-gray-500 text-sm sm:text-base">
                 No pledges found for this phone number
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-400">
+              <div className="text-center py-8 text-gray-400 text-sm sm:text-base">
                 Enter your phone number to track pledges
               </div>
             )}
