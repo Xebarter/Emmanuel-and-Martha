@@ -18,6 +18,7 @@ type Contribution = {
   contributor_email?: string;
   contributor_phone?: string;
   message?: string;
+  pesapal_tracking_id?: string;
 };
 
 export default function ContributionsManager() {
@@ -58,6 +59,10 @@ export default function ContributionsManager() {
         currency: contribution.currency,
         status: contribution.status,
         metadata: contribution.metadata ?? {},
+        contributor_name: contribution.contributor_name,
+        contributor_email: contribution.contributor_email,
+        contributor_phone: contribution.contributor_phone,
+        message: contribution.message
       });
       await fetchContributions();
     } catch (err) {
@@ -113,9 +118,12 @@ export default function ContributionsManager() {
 
   const filteredContributions = contributions.filter(c => {
     const matchesSearch = !searchQuery || 
-      (c.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (c.contributor_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.contributor_email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.email?.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesStatus = selectedStatus === 'all' || c.status === selectedStatus;
+    const matchesStatus = selectedStatus === 'all' || c.status === selectedStatus || 
+      (selectedStatus === 'pending' && (c.status === 'pending' || c.status === 'pending_payment'));
     return matchesSearch && matchesStatus;
   });
 
@@ -128,7 +136,9 @@ export default function ContributionsManager() {
   const totalAmount = contributions.reduce((sum, c) => sum + c.amount, 0);
   const avgContribution = contributions.length > 0 ? totalAmount / contributions.length : 0;
   const completedCount = contributions.filter(c => c.status === 'completed').length;
-  const pendingAmount = contributions.filter(c => c.status === 'pending').reduce((sum, c) => sum + c.amount, 0);
+  const pendingAmount = contributions
+    .filter(c => c.status === 'pending' || c.status === 'pending_payment')
+    .reduce((sum, c) => sum + c.amount, 0);
 
   const formatCurrency = (amount: number): string => {
     return new Intl.NumberFormat('en-UG', {
@@ -279,6 +289,8 @@ export default function ContributionsManager() {
                     <option value="all">All Status</option>
                     <option value="completed">Completed</option>
                     <option value="pending">Pending</option>
+                    <option value="pending_payment">Pending Payment</option>
+                    <option value="failed">Failed</option>
                   </select>
                 </div>
 
@@ -388,11 +400,18 @@ export default function ContributionsManager() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm ${contribution.status === 'completed'
-                          ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white'
-                          : 'bg-gradient-to-r from-amber-400 to-orange-400 text-white'
-                          }`}>
-                          {contribution.status === 'completed' ? '✓ Completed' : '⏱ Pending'}
+                        <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm ${
+                          contribution.status === 'completed'
+                            ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white'
+                            : (contribution.status === 'pending' || contribution.status === 'pending_payment')
+                            ? 'bg-gradient-to-r from-amber-400 to-orange-400 text-white'
+                            : 'bg-gradient-to-r from-slate-400 to-slate-500 text-white'
+                        }`}>
+                          {contribution.status === 'completed' 
+                            ? '✓ Completed' 
+                            : (contribution.status === 'pending' || contribution.status === 'pending_payment')
+                            ? '⏱ Pending' 
+                            : contribution.status}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">

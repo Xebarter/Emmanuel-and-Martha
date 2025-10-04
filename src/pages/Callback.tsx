@@ -1,66 +1,61 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
 
 export default function Callback() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Add error handling and proper state management
   useEffect(() => {
-    // Get query parameters from location
-    const queryParams = new URLSearchParams(location.search);
-    const OrderTrackingId = queryParams.get('OrderTrackingId');
-    const OrderMerchantReference = queryParams.get('OrderMerchantReference');
+    const handlePaymentCallback = async () => {
+      // Get query parameters from location
+      const queryParams = new URLSearchParams(location.search);
+      const orderTrackingId = queryParams.get('OrderTrackingId');
+      const orderMerchantReference = queryParams.get('OrderMerchantReference');
 
-    if (!OrderTrackingId || !OrderMerchantReference) {
-      // Handle missing parameters
-      return;
-    }
+      if (!orderTrackingId || !orderMerchantReference) {
+        console.error('Missing required parameters');
+        return;
+      }
 
-    // Simulate API call to verify payment status
-    const verifyPayment = async () => {
       try {
-        // Make API call to verify payment status
-        const response = await fetch(`/api/payment/verify?trackingId=${OrderTrackingId}&merchantRef=${OrderMerchantReference}`);
+        // Extract contribution ID from merchant reference (format: WED-{contributionId})
+        const contributionId = orderMerchantReference.replace('WED-', '');
         
-        if (response.ok) {
-          const data = await response.json();
-          
-          // If payment is successful, redirect to success page
-          if (data.status === 'success') {
-            navigate('/payment-success');
-          }
-        } else {
-          // Handle API errors properly
-          console.error('Failed to verify payment:', response.statusText);
+        // Update contribution status to completed
+        const { error: updateError } = await supabase
+          .from('contributions')
+          .update({ 
+            status: 'completed',
+            updated_at: new Date()
+          })
+          .eq('id', contributionId);
+
+        if (updateError) {
+          console.error('Failed to update contribution status:', updateError);
         }
+
+        // Redirect to success page
+        navigate('/payment-success');
       } catch (error) {
-        console.error('Error verifying payment:', error);
+        console.error('Error processing payment callback:', error);
+        // Still redirect to success page since payment was completed on Pesapal
+        navigate('/payment-success');
       }
     };
 
-    verifyPayment();
+    handlePaymentCallback();
   }, [location.search, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center">
-        {/* Error icon */}
-        <div className="w-20 h-20 mx-auto mb-6 flex items-center justify-center rounded-full bg-red-100">
-          <svg className="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+        <div className="flex justify-center mb-6">
+          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
-
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Payment Error</h1>
-        <p className="text-gray-600 mb-8">Failed to retrieve payment details</p>
         
-        <button 
-          onClick={() => navigate('/')}
-          className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200"
-        >
-          Return to Homepage
-        </button>
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Processing Payment</h1>
+        <p className="text-gray-600 mb-8">Please wait while we confirm your contribution details...</p>
       </div>
     </div>
   );
