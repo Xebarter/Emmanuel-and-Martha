@@ -88,24 +88,22 @@ export async function initiatePesapalPayment(
     // Generate a unique reference
     const reference = `WED-${contributionId}`;
     
-    // First, create a pending contribution record
-    const { error: createError } = await supabase
+    // Update the existing contribution record with payment method
+    const { error: updateError } = await supabase
       .from('contributions')
-      .insert({
-        id: contributionId,
-        amount,
-        currency,
-        status: 'pending_payment',
-        guest_id: null, // You might want to set this if user is logged in
+      .update({
+        payment_method: 'pesapal',
         metadata: {
+          ...(await getContributionMetadata(contributionId))?.metadata || {},
           payment_method: 'pesapal',
           initiated_at: new Date().toISOString(),
         },
-      });
+      })
+      .eq('id', contributionId);
 
-    if (createError) {
-      console.error('Error creating contribution:', createError);
-      throw new Error('Failed to create contribution record');
+    if (updateError) {
+      console.error('Error updating contribution:', updateError);
+      // Continue anyway as this is not critical
     }
     
     // Submit the order to Pesapal via our serverless function
@@ -128,7 +126,7 @@ export async function initiatePesapalPayment(
     }
 
     // Update contribution with tracking ID
-    const { error: updateError } = await supabase
+    const { error: trackingUpdateError } = await supabase
       .from('contributions')
       .update({ 
         pesapal_tracking_id: result.order_tracking_id,
@@ -137,8 +135,8 @@ export async function initiatePesapalPayment(
       })
       .eq('id', contributionId);
 
-    if (updateError) {
-      console.error('Error updating contribution:', updateError);
+    if (trackingUpdateError) {
+      console.error('Error updating contribution tracking ID:', trackingUpdateError);
       // Don't fail the whole process if this update fails
     }
 
@@ -157,6 +155,7 @@ export async function initiatePesapalPayment(
           status: 'failed',
           updated_at: new Date().toISOString(),
           metadata: {
+            ...(await getContributionMetadata(contributionId))?.metadata || {},
             error: error instanceof Error ? error.message : 'Unknown error',
           },
         })
@@ -170,6 +169,22 @@ export async function initiatePesapalPayment(
       error: error instanceof Error ? error.message : 'Failed to initiate payment' 
     };
   }
+}
+
+// Helper function to get contribution metadata
+async function getContributionMetadata(contributionId: string) {
+  const { data, error } = await supabase
+    .from('contributions')
+    .select('metadata')
+    .eq('id', contributionId)
+    .single();
+    
+  if (error) {
+    console.error('Error fetching contribution metadata:', error);
+    return null;
+  }
+  
+  return data;
 }
 
 /**
