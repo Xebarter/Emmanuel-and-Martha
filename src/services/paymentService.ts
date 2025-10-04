@@ -198,9 +198,6 @@ export async function queryPaymentStatus(orderTrackingId: string): Promise<Pesap
       payment_method: 'pesapal',
       date: contribution.updated_at || contribution.created_at,
     };
-      payment_method: data.payment_method,
-      date: data.date,
-    };
   } catch (error) {
     console.error('Payment status query error:', error);
     return null;
