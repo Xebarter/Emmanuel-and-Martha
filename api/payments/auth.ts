@@ -29,15 +29,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       throw new Error('Missing required environment variables for Pesapal');
     }
 
-    const response = await fetch(`${PESAPAL_API_URL}/api/Auth/RequestToken`, {
+    // Ensure the URL ends with the correct path
+    const authEndpoint = PESAPAL_API_URL.endsWith('/Auth/RequestToken') 
+      ? PESAPAL_API_URL 
+      : `${PESAPAL_API_URL.replace(/\/$/, '')}/Auth/RequestToken`;
+
+    const response = await fetch(authEndpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
       body: JSON.stringify({
-        key: PESAPAL_CONSUMER_KEY,
-        secret: PESAPAL_CONSUMER_SECRET,
+        consumer_key: PESAPAL_CONSUMER_KEY,
+        consumer_secret: PESAPAL_CONSUMER_SECRET,
       }),
     });
 

@@ -75,8 +75,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       description,
     } = req.body as OrderRequest;
 
+    // Ensure the URL ends with the correct path
+    const orderEndpoint = PESAPAL_API_URL.endsWith('/Transactions/SubmitOrderRequest') 
+      ? PESAPAL_API_URL 
+      : `${PESAPAL_API_URL.replace(/\/$/, '')}/Transactions/SubmitOrderRequest`;
+
     const response = await fetch(
-      `${PESAPAL_API_URL}/api/Transactions/SubmitOrderRequest`,
+      orderEndpoint,
       {
         method: 'POST',
         headers: {
