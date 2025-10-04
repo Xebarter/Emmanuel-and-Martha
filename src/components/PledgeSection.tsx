@@ -1,11 +1,11 @@
-import { Gift, Search, Loader2, Package, DollarSign } from 'lucide-react';
+import { Gift, Search, Loader2, Package, DollarSign, CreditCard } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { supabase } from '../lib/supabase';
 import { normalizePhone, formatCurrency, formatDate } from '../lib/utils';
-import { Pledge } from '../lib/types';
+import { initiatePesapalPayment } from '../services/paymentService';
 
 const pledgeSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -28,6 +28,25 @@ const pledgeSchema = z.object({
 
 type PledgeForm = z.infer<typeof pledgeSchema>;
 
+interface Pledge {
+  id: string;
+  guest_id: string | null;
+  type: 'money' | 'item';
+  item_description: string | null;
+  amount: number | null;
+  quantity: number | null;
+  status: 'pending' | 'fulfilled' | 'cancelled';
+  phone: string;
+  email: string | null;
+  notes: string | null;
+  created_at: string;
+  fulfilled_at: string | null;
+  fulfilled_amount: number | null;
+  guest?: {
+    full_name: string;
+  } | null;
+}
+
 interface PledgeSectionProps {
   totalPledges: number;
 }
@@ -38,6 +57,10 @@ export function PledgeSection({ totalPledges }: PledgeSectionProps) {
   const [trackPhone, setTrackPhone] = useState('');
   const [trackedPledges, setTrackedPledges] = useState<Pledge[]>([]);
   const [isTracking, setIsTracking] = useState(false);
+  const [fulfillingPledge, setFulfillingPledge] = useState<string | null>(null);
+  const [fulfillAmount, setFulfillAmount] = useState<number | null>(null);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
 
   const {
     register,
@@ -53,6 +76,20 @@ export function PledgeSection({ totalPledges }: PledgeSectionProps) {
   });
 
   const pledgeType = watch('type');
+
+  // Calculate total fulfilled amount for a pledge
+  const calculateFulfilledAmount = (pledgeId: string) => {
+    // In a real implementation, this would query fulfilled contributions linked to this pledge
+    // For now, we'll return 0 as a placeholder
+    return 0;
+  };
+
+  // Calculate remaining balance for a pledge
+  const calculateRemainingBalance = (pledge: Pledge) => {
+    if (pledge.type !== 'money' || !pledge.amount) return 0;
+    const fulfilledAmount = pledge.fulfilled_amount || 0;
+    return Math.max(0, (pledge.amount || 0) - fulfilledAmount);
+  };
 
   const onSubmit = async (data: PledgeForm) => {
     setIsSubmitting(true);
@@ -124,7 +161,10 @@ export function PledgeSection({ totalPledges }: PledgeSectionProps) {
       const normalizedPhone = normalizePhone(trackPhone);
       const { data, error } = await supabase
         .from('pledges')
-        .select('*')
+        .select(`
+          *,
+          guest:guests(full_name)
+        `)
         .eq('phone', normalizedPhone)
         .order('created_at', { ascending: false });
 
@@ -135,6 +175,83 @@ export function PledgeSection({ totalPledges }: PledgeSectionProps) {
       setTrackedPledges([]);
     } finally {
       setIsTracking(false);
+    }
+  };
+
+  const handleFulfillPledge = async (pledge: Pledge) => {
+    if (!pledge.amount) return;
+    
+    setFulfillingPledge(pledge.id);
+    setPaymentError(null);
+    
+    try {
+      const remainingBalance = calculateRemainingBalance(pledge);
+      const amountToPay = fulfillAmount && fulfillAmount <= remainingBalance ? fulfillAmount : remainingBalance;
+      
+      // Validate amount
+      if (amountToPay <= 0) {
+        throw new Error('Invalid amount');
+      }
+      
+      // Create a contribution record for this pledge fulfillment
+      const { data: contributionData, error: contributionError } = await supabase
+        .from('contributions')
+        .insert({
+          amount: amountToPay,
+          currency: 'UGX',
+          status: 'pending',
+          metadata: {
+            pledge_id: pledge.id,
+            fulfillment: true
+          }
+        })
+        .select()
+        .single();
+
+      if (contributionError) throw contributionError;
+
+      // Update the pledge with the fulfilled amount
+      const newFulfilledAmount = (pledge.fulfilled_amount || 0) + amountToPay;
+      const newStatus = newFulfilledAmount >= (pledge.amount || 0) ? 'fulfilled' : 'pending';
+      const fulfilledAt = newStatus === 'fulfilled' ? new Date().toISOString() : pledge.fulfilled_at;
+
+      const { error: pledgeUpdateError } = await supabase
+        .from('pledges')
+        .update({
+          fulfilled_amount: newFulfilledAmount,
+          status: newStatus,
+          fulfilled_at: fulfilledAt,
+          updated_at: new Date()
+        })
+        .eq('id', pledge.id);
+
+      if (pledgeUpdateError) throw pledgeUpdateError;
+
+      // Initiate payment
+      setIsProcessingPayment(true);
+      const result = await initiatePesapalPayment(
+        contributionData.id,
+        amountToPay,
+        'UGX',
+        pledge.guest?.full_name || 'Anonymous',
+        pledge.email || '',
+        pledge.phone,
+        `Fulfillment for pledge: ${pledge.type === 'money' ? formatCurrency(pledge.amount) : pledge.item_description}`
+      );
+
+      if (result.error) {
+        throw new Error(result.error);
+      }
+
+      if (result.redirectUrl) {
+        // Redirect to payment page
+        window.location.href = result.redirectUrl;
+      }
+    } catch (error) {
+      console.error('Payment initiation error:', error);
+      setPaymentError(error instanceof Error ? error.message : 'Failed to initiate payment');
+    } finally {
+      setIsProcessingPayment(false);
     }
   };
 
@@ -330,45 +447,174 @@ export function PledgeSection({ totalPledges }: PledgeSectionProps) {
 
             {trackedPledges.length > 0 ? (
               <div className="space-y-4">
-                {trackedPledges.map((pledge) => (
-                  <div key={pledge.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        {pledge.type === 'money' ? (
-                          <DollarSign className="w-5 h-5 text-amber-600" />
-                        ) : (
-                          <Package className="w-5 h-5 text-amber-600" />
-                        )}
-                        <span className="font-semibold text-gray-900">
-                          {pledge.type === 'money'
-                            ? formatCurrency(pledge.amount || 0)
-                            : pledge.item_description}
+                {trackedPledges.map((pledge) => {
+                  const remainingBalance = calculateRemainingBalance(pledge);
+                  const hasBalance = remainingBalance > 0 && pledge.type === 'money';
+                  
+                  return (
+                    <div key={pledge.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          {pledge.type === 'money' ? (
+                            <DollarSign className="w-5 h-5 text-amber-600" />
+                          ) : (
+                            <Package className="w-5 h-5 text-amber-600" />
+                          )}
+                          <span className="font-semibold text-gray-900">
+                            {pledge.type === 'money'
+                              ? formatCurrency(pledge.amount || 0)
+                              : pledge.item_description}
+                          </span>
+                        </div>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            pledge.status === 'fulfilled'
+                              ? 'bg-green-100 text-green-800'
+                              : pledge.status === 'cancelled'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}
+                        >
+                          {pledge.status}
                         </span>
                       </div>
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          pledge.status === 'fulfilled'
-                            ? 'bg-green-100 text-green-800'
-                            : pledge.status === 'cancelled'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}
-                      >
-                        {pledge.status}
-                      </span>
+                      
+                      {pledge.quantity && (
+                        <p className="text-sm text-gray-600 mb-1">Quantity: {pledge.quantity}</p>
+                      )}
+                      {pledge.notes && (
+                        <p className="text-sm text-gray-600 mb-2">{pledge.notes}</p>
+                      )}
+                      
+                      {hasBalance && (
+                        <div className="mt-2 p-2 bg-amber-50 rounded border border-amber-200">
+                          <p className="text-sm text-amber-800">
+                            Remaining balance: <strong>{formatCurrency(remainingBalance)}</strong>
+                          </p>
+                          {pledge.fulfilled_amount && pledge.fulfilled_amount > 0 && (
+                            <p className="text-xs text-amber-700 mt-1">
+                              Already paid: {formatCurrency(pledge.fulfilled_amount)}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                      
+                      {pledge.fulfilled_amount && pledge.fulfilled_amount > 0 && !hasBalance && (
+                        <div className="mt-2 p-2 bg-green-50 rounded border border-green-200">
+                          <p className="text-sm text-green-800">
+                            Fully paid! Thank you for your contribution.
+                          </p>
+                          <p className="text-xs text-green-700 mt-1">
+                            Total paid: {formatCurrency(pledge.fulfilled_amount)}
+                          </p>
+                        </div>
+                      )}
+                      
+                      {!pledge.fulfilled_amount && (
+                        <div className="mt-2 p-2 bg-gray-50 rounded border border-gray-200">
+                          <p className="text-sm text-gray-600">
+                            Not yet fulfilled
+                          </p>
+                        </div>
+                      )}
+                      
+                      <p className="text-xs text-gray-500">Pledged on {formatDate(pledge.created_at)}</p>
+                      {pledge.fulfilled_at && (
+                        <p className="text-xs text-green-600 mt-1">Fulfilled on {formatDate(pledge.fulfilled_at)}</p>
+                      )}
+                      
+                      {hasBalance && (
+                        <div className="mt-3 pt-3 border-t border-gray-200">
+                          {fulfillingPledge === pledge.id ? (
+                            <div className="space-y-3">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                  Amount to pay ({formatCurrency(remainingBalance)} available)
+                                </label>
+                                <input
+                                  type="number"
+                                  min="1000"
+                                  max={remainingBalance}
+                                  step="1000"
+                                  value={fulfillAmount || ''}
+                                  onChange={(e) => {
+                                    const value = Number(e.target.value);
+                                    if (!isNaN(value) && value >= 0 && value <= remainingBalance) {
+                                      setFulfillAmount(value || null);
+                                    }
+                                  }}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                  placeholder="Enter amount"
+                                />
+                                {fulfillAmount && (fulfillAmount < 1000 || fulfillAmount > remainingBalance) && (
+                                  <p className="text-red-500 text-xs mt-1">
+                                    {fulfillAmount < 1000 
+                                      ? 'Minimum amount is UGX 1,000' 
+                                      : `Maximum amount is ${formatCurrency(remainingBalance)}`}
+                                  </p>
+                                )}
+                              </div>
+                              
+                              {paymentError && (
+                                <div className="text-red-600 text-sm">{paymentError}</div>
+                              )}
+                              
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleFulfillPledge(pledge)}
+                                  disabled={isProcessingPayment || !fulfillAmount || fulfillAmount > remainingBalance || fulfillAmount < 1000}
+                                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  {isProcessingPayment ? (
+                                    <>
+                                      <Loader2 className="w-4 h-4 animate-spin" />
+                                      Processing...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <CreditCard className="w-4 h-4" />
+                                      Pay Now
+                                    </>
+                                  )}
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setFulfillingPledge(null);
+                                    setFulfillAmount(null);
+                                    setPaymentError(null);
+                                  }}
+                                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setFulfillingPledge(pledge.id)}
+                              className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600"
+                            >
+                              <CreditCard className="w-4 h-4" />
+                              Pay Pledge
+                            </button>
+                          )}
+                        </div>
+                      )}
+                      
+                      {!hasBalance && pledge.type === 'money' && (
+                        <div className="mt-3 pt-3 border-t border-gray-200">
+                          <button
+                            disabled
+                            className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-md cursor-not-allowed"
+                          >
+                            <CreditCard className="w-4 h-4" />
+                            Fully Paid
+                          </button>
+                        </div>
+                      )}
                     </div>
-                    {pledge.quantity && (
-                      <p className="text-sm text-gray-600 mb-1">Quantity: {pledge.quantity}</p>
-                    )}
-                    {pledge.notes && (
-                      <p className="text-sm text-gray-600 mb-2">{pledge.notes}</p>
-                    )}
-                    <p className="text-xs text-gray-500">Pledged on {formatDate(pledge.created_at)}</p>
-                    {pledge.fulfilled_at && (
-                      <p className="text-xs text-green-600 mt-1">Fulfilled on {formatDate(pledge.fulfilled_at)}</p>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : trackPhone && !isTracking ? (
               <div className="text-center py-8 text-gray-500">

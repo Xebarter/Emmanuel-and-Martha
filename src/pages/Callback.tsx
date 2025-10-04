@@ -22,6 +22,19 @@ export default function Callback() {
         // Extract contribution ID from merchant reference (format: WED-{contributionId})
         const contributionId = orderMerchantReference.replace('WED-', '');
         
+        // Get the contribution details
+        const { data: contribution, error: contributionError } = await supabase
+          .from('contributions')
+          .select('*')
+          .eq('id', contributionId)
+          .single();
+
+        if (contributionError) {
+          console.error('Failed to fetch contribution:', contributionError);
+          navigate('/payment-success');
+          return;
+        }
+        
         // Update contribution status to completed
         const { error: updateError } = await supabase
           .from('contributions')
@@ -33,6 +46,40 @@ export default function Callback() {
 
         if (updateError) {
           console.error('Failed to update contribution status:', updateError);
+        }
+
+        // If this contribution is for fulfilling a pledge, update the pledge
+        if (contribution.metadata && contribution.metadata.pledge_id) {
+          const pledgeId = contribution.metadata.pledge_id;
+          
+          // Get current pledge details
+          const { data: pledge, error: pledgeError } = await supabase
+            .from('pledges')
+            .select('amount, fulfilled_amount')
+            .eq('id', pledgeId)
+            .single();
+
+          if (!pledgeError && pledge) {
+            // Calculate new fulfilled amount
+            const newFulfilledAmount = (pledge.fulfilled_amount || 0) + contribution.amount;
+            const newStatus = newFulfilledAmount >= (pledge.amount || 0) ? 'fulfilled' : 'pending';
+            const fulfilledAt = newStatus === 'fulfilled' ? new Date().toISOString() : null;
+
+            // Update pledge
+            const { error: pledgeUpdateError } = await supabase
+              .from('pledges')
+              .update({
+                fulfilled_amount: newFulfilledAmount,
+                status: newStatus,
+                fulfilled_at: fulfilledAt,
+                updated_at: new Date()
+              })
+              .eq('id', pledgeId);
+
+            if (pledgeUpdateError) {
+              console.error('Failed to update pledge:', pledgeUpdateError);
+            }
+          }
         }
 
         // Redirect to success page

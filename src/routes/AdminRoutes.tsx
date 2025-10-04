@@ -7,6 +7,7 @@ import ContributionsManager from '../pages/admin/ContributionsManager';
 import MessagesManager from '../pages/admin/MessagesManager';
 import DashboardHome from '../pages/DashboardHome';
 import { SupabaseTest } from '../pages/SupabaseTest';
+import PledgesManager from '../pages/admin/PledgesManager';
 
 export function AdminRoutes() {
   return (
@@ -19,6 +20,7 @@ export function AdminRoutes() {
           <Route path="guests" element={<GuestsManager />} />
           <Route path="meetings" element={<MeetingsManager />} />
           <Route path="contributions" element={<ContributionsManager />} />
+          <Route path="pledges" element={<PledgesManager />} />
           <Route path="messages" element={<MessagesManager />} />
           <Route path="supabase-test" element={<SupabaseTest />} />
         </Route>

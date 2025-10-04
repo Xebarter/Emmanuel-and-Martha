@@ -25,13 +25,16 @@ import {
   ChevronRight,
   ArrowUp,
   ArrowDown,
-  Wrench
+  Wrench,
+  Package
 } from 'lucide-react';
 import { GalleryManager } from './admin/GalleryManager';
 import { default as GuestsManager } from './admin/GuestsManager';
 import MeetingsManager from './admin/MeetingsManager';
 import { default as ContributionsManager } from './admin/ContributionsManager';
 import MessagesManager from './admin/MessagesManager';
+import PledgesManager from './admin/PledgesManager';
+import { SupabaseTest } from './SupabaseTest';
 
 type NavItem = {
   name: string;
@@ -45,6 +48,7 @@ const navigation: NavItem[] = [
   { name: 'Guests', icon: <Users className="w-5 h-5" />, path: '/guests' },
   { name: 'Meetings', icon: <Calendar className="w-5 h-5" />, path: '/meetings' },
   { name: 'Contributions', icon: <Gift className="w-5 h-5" />, path: '/contributions' },
+  { name: 'Pledges', icon: <Package className="w-5 h-5" />, path: '/pledges' },
   { name: 'Messages', icon: <MessageSquare className="w-5 h-5" />, path: '/messages' },
   { name: 'Supabase Test', icon: <Wrench className="w-5 h-5" />, path: '/supabase-test' },
   { name: 'Analytics', icon: <BarChart2 className="w-5 h-5" />, path: '/analytics' },
@@ -205,7 +209,9 @@ function DashboardContent() {
               <Route path="/guests" element={<GuestsManager />} />
               <Route path="/meetings" element={<MeetingsManager />} />
               <Route path="/contributions" element={<ContributionsManager />} />
+              <Route path="/pledges" element={<PledgesManager />} />
               <Route path="/messages" element={<MessagesManager />} />
+              <Route path="/supabase-test" element={<SupabaseTest />} />
               <Route path="/analytics" element={<AnalyticsPlaceholder />} />
               <Route path="/" element={<DashboardHome />} />
               <Route path="*" element={<Navigate to="/" replace />} />
