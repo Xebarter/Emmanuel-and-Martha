@@ -35,6 +35,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     if (!authResponse.ok) {
+      const errorData = await authResponse.json().catch(() => ({}));
+      console.error('Auth service error details:', errorData);
       throw new Error('Failed to authenticate with Pesapal');
     }
 
@@ -84,6 +86,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!response.ok) {
       const errorData = await response.text();
+      console.error('Pesapal order submission failed with status:', response.status);
+      console.error('Pesapal order submission error details:', errorData);
       throw new Error(`Pesapal order submission failed: ${response.status} - ${errorData}`);
     }
 

@@ -28,6 +28,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!response.ok) {
       const errorData = await response.text();
+      console.error('Pesapal auth failed with status:', response.status);
+      console.error('Pesapal auth error details:', errorData);
       throw new Error(`Pesapal auth failed: ${response.status} - ${errorData}`);
     }
 
