@@ -339,7 +339,7 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
 
       {/* Floating elements - hearts and sparkles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(10)].map((_, i) => ( // Reduced from 20 to 10 for better mobile performance
+        {[...Array(6)].map((_, i) => ( // Reduced from 10 to 6 for better mobile performance
           <div
             key={i}
             className={`absolute ${i % 3 === 0 ? 'animate-float-slow' : i % 2 === 0 ? 'animate-float-medium' : 'animate-float-fast'}`}
@@ -352,31 +352,31 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
             {i % 4 === 0 ? (
               <div className="w-1 h-1 bg-white rounded-full animate-twinkle" />
             ) : (
-              <Heart className={`${i % 3 === 0 ? 'w-4 h-4' : 'w-3 h-3'} text-rose-200/30 fill-rose-200/20`} /> // Smaller hearts on mobile
+              <Heart className={`${i % 3 === 0 ? 'w-4 h-4' : 'w-3 h-3'} text-rose-200/30 fill-rose-200/20`} />
             )}
           </div>
         ))}
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-20 text-center"> {/* Adjusted padding for mobile */}
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-20 text-center"> {/* Adjusted padding for mobile */}
         {/* Luxury heart icon with advanced effects */}
-        <div className="mb-8 md:mb-12 flex justify-center animate-float-gentle"> {/* Reduced margin on mobile */}
+        <div className="mb-6 md:mb-12 flex justify-center animate-float-gentle"> {/* Reduced margin on mobile */}
           <div className="relative group">
             {/* Outer glow rings */}
             <div className="absolute inset-0 bg-gradient-to-r from-rose-400 to-fuchsia-500 blur-3xl opacity-50 rounded-full animate-pulse-glow"></div>
             <div className="absolute -inset-2 bg-gradient-to-r from-rose-300 to-pink-400 blur-2xl opacity-30 rounded-full animate-spin-slow"></div>
             
             {/* Main icon container */}
-            <div className="relative p-4 md:p-6 bg-gradient-to-br from-white/95 to-rose-50/95 backdrop-blur-xl rounded-full shadow-2xl border-2 border-white/50 group-hover:scale-110 transition-all duration-500">
+            <div className="relative p-2 sm:p-3 md:p-6 bg-gradient-to-br from-white/95 to-rose-50/95 backdrop-blur-xl rounded-full shadow-2xl border-2 border-white/50 group-hover:scale-110 transition-all duration-500">
               <div className="absolute inset-0 bg-gradient-to-br from-rose-100/50 to-fuchsia-100/50 rounded-full animate-pulse-subtle"></div>
-              <Heart className="relative w-12 h-12 md:w-16 md:h-16 text-rose-500 fill-rose-500 drop-shadow-lg group-hover:scale-110 transition-transform duration-300" />
+              <Heart className="relative w-8 h-8 sm:w-10 sm:h-10 md:w-16 md:h-16 text-rose-500 fill-rose-500 drop-shadow-lg group-hover:scale-110 transition-transform duration-300" />
             </div>
           </div>
         </div>
 
         {/* Main heading with ultra-modern typography */}
-        <div className="mb-6 md:mb-8 animate-fade-in-up">
-          <h1 className="text-5xl xs:text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold mb-4 leading-none tracking-tight" 
+        <div className="mb-4 md:mb-8 animate-fade-in-up">
+          <h1 className="text-4xl xs:text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-bold mb-3 md:mb-4 leading-none tracking-tight" 
             style={{ 
               fontFamily: 'Tangerine, cursive',
               background: 'linear-gradient(135deg, #ffffff 0%, #fecdd3 20%, #fda4af 40%, #fb7185 60%, #f43f5e 80%, #ffffff 100%)',
@@ -389,24 +389,24 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
             {displayNames}
           </h1>
           {/* Decorative line under names */}
-          <div className="flex items-center justify-center gap-2 md:gap-3 mt-4 md:mt-6">
-            <div className="h-[1px] md:h-[2px] w-12 xs:w-16 sm:w-20 md:w-20 bg-gradient-to-r from-transparent via-white to-rose-300"></div>
+          <div className="flex items-center justify-center gap-2 md:gap-3 mt-3 md:mt-6">
+            <div className="h-[1px] md:h-[2px] w-8 xs:w-10 sm:w-14 md:w-20 bg-gradient-to-r from-transparent via-white to-rose-300"></div>
             <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-white rounded-full shadow-lg shadow-rose-300/50"></div>
-            <div className="h-[1px] md:h-[2px] w-12 xs:w-16 sm:w-20 md:w-20 bg-gradient-to-l from-transparent via-white to-rose-300"></div>
+            <div className="h-[1px] md:h-[2px] w-8 xs:w-10 sm:w-14 md:w-20 bg-gradient-to-l from-transparent via-white to-rose-300"></div>
           </div>
         </div>
 
         {/* Tagline with elegant styling */}
-        <p className="text-xl sm:text-2xl md:text-3xl text-white/95 mb-8 md:mb-12 font-light italic max-w-3xl mx-auto leading-relaxed drop-shadow-lg animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+        <p className="text-sm xs:text-base sm:text-xl md:text-3xl text-white/95 mb-6 md:mb-12 font-light italic max-w-3xl mx-auto leading-relaxed drop-shadow-lg animate-fade-in-up px-2" style={{ animationDelay: '0.2s' }}>
           "{weddingDetails.tagline || 'Join us as we celebrate our love'}"
         </p>
                   
         {/* Enhanced loading state */}
         {loading && (
           <div className="flex justify-center items-center py-6 md:py-8">
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-xl px-6 py-3 rounded-xl">
-              <Loader2 className="w-5 h-5 md:w-6 md:h-6 animate-spin text-white" />
-              <span className="text-white/80 text-sm md:text-base">Loading wedding details...</span>
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-xl px-4 py-2 rounded-xl sm:px-6 sm:py-3">
+              <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 animate-spin text-white" />
+              <span className="text-white/80 text-xs sm:text-sm md:text-base">Loading wedding details...</span>
             </div>
           </div>
         )}
@@ -414,39 +414,39 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
         {/* Wedding details with modern glassmorphic cards */}
           {loading ? (
             <div className="flex justify-center items-center py-6 md:py-8">
-              <Loader2 className="w-8 h-8 md:w-10 md:h-10 animate-spin text-white drop-shadow-lg" />
+              <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 animate-spin text-white drop-shadow-lg" />
             </div>
           ) : null}
 
         {/* Ultra-modern countdown timer */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8 max-w-4xl mx-auto mb-12 md:mb-16 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 md:gap-8 max-w-4xl mx-auto mb-6 sm:mb-8 md:mb-16 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
           {[
             { label: 'Days', value: timeRemaining.days },
-            { label: 'Hours', value: timeRemaining.hours }, // Added missing Hours item
+            { label: 'Hours', value: timeRemaining.hours },
             { label: 'Minutes', value: timeRemaining.minutes },
             { label: 'Seconds', value: timeRemaining.seconds },
-          ].map((item, index) => (
+          ].map((item) => (
             <div
               key={item.label}
-              className={`${index >= 2 ? 'hidden md:block' : ''} group relative overflow-hidden`} // Show only first 2 items on mobile
+              className="group relative overflow-hidden"
             >
               {/* Animated gradient background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-rose-500/20 to-fuchsia-600/20 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-rose-500/20 to-fuchsia-600/20 rounded-2xl sm:rounded-3xl blur-lg sm:blur-xl group-hover:blur-2xl transition-all duration-500"></div>
               
               {/* Main card */}
-              <div className="relative bg-white/15 backdrop-blur-2xl rounded-2xl md:rounded-3xl shadow-2xl p-6 md:p-8 md:p-10 border border-white/30 group-hover:border-white/50 group-hover:bg-white/25 group-hover:scale-110 group-hover:-translate-y-2 transition-all duration-500">
+              <div className="relative bg-white/15 backdrop-blur-2xl rounded-2xl sm:rounded-3xl shadow-2xl p-2 sm:p-3 md:p-8 border border-white/30 group-hover:border-white/50 group-hover:bg-white/25 group-hover:scale-105 transition-all duration-500">
                 {/* Shimmer effect */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
                 </div>
                 
                 <div className="relative">
-                  <div className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl font-black text-white mb-2 md:mb-3 drop-shadow-2xl group-hover:scale-110 transition-transform duration-300" style={{
-                    textShadow: '0 0 30px rgba(251, 113, 133, 0.8), 0 0 60px rgba(236, 72, 153, 0.5)'
+                  <div className="text-2xl xs:text-3xl sm:text-4xl md:text-7xl font-black text-white mb-0.5 sm:mb-1 md:mb-3 drop-shadow-2xl group-hover:scale-110 transition-transform duration-300" style={{
+                    textShadow: '0 0 20px rgba(251, 113, 133, 0.8), 0 0 40px rgba(236, 72, 153, 0.5)'
                   }}>
                     {item.value.toString().padStart(2, '0')}
                   </div>
-                  <div className="text-xs sm:text-sm md:text-base text-white/90 font-bold uppercase tracking-[0.1em] md:tracking-[0.2em] drop-shadow-lg">
+                  <div className="text-[0.5rem] xs:text-[0.6rem] sm:text-xs md:text-base text-white/90 font-bold uppercase tracking-wider drop-shadow-lg">
                     {item.label}
                   </div>
                 </div>
@@ -456,14 +456,14 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
         </div>
 
         {/* Call to action with premium styling */}
-        <div className="max-w-3xl mx-auto mb-10 md:mb-12 animate-fade-in-up" style={{ animationDelay: '0.8s' }}>
+        <div className="max-w-3xl mx-auto mb-6 sm:mb-8 md:mb-12 animate-fade-in-up px-2" style={{ animationDelay: '0.8s' }}>
           <div className="relative group">
             {/* Glow effect */}
-            <div className="absolute -inset-2 md:-inset-4 bg-gradient-to-r from-rose-400 to-fuchsia-500 rounded-2xl md:rounded-3xl blur-xl opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
+            <div className="absolute -inset-1 sm:-inset-2 md:-inset-4 bg-gradient-to-r from-rose-400 to-fuchsia-500 rounded-lg sm:rounded-xl md:rounded-3xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
             
             {/* Content card */}
-            <div className="relative bg-white/10 backdrop-blur-2xl rounded-2xl md:rounded-3xl p-6 md:p-8 border border-white/20 shadow-2xl">
-              <p className="text-white/95 leading-relaxed text-lg sm:text-xl md:text-2xl font-light drop-shadow-lg">
+            <div className="relative bg-white/10 backdrop-blur-2xl rounded-lg sm:rounded-xl md:rounded-3xl p-3 sm:p-4 md:p-8 border border-white/20 shadow-2xl">
+              <p className="text-white/95 leading-relaxed text-xs sm:text-sm md:text-xl lg:text-2xl font-light drop-shadow-lg">
                 Your presence and support mean the world to us as we begin this beautiful journey together.
               </p>
             </div>
@@ -471,13 +471,13 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
         </div>
 
         {/* Elegant decorative divider */}
-        <div className="flex items-center justify-center gap-4 md:gap-6 animate-fade-in-up" style={{ animationDelay: '1s' }}>
-          <div className="h-[1px] w-16 xs:w-24 sm:w-32 bg-gradient-to-r from-transparent via-white/40 to-white/60"></div>
+        <div className="flex items-center justify-center gap-2 sm:gap-3 md:gap-6 animate-fade-in-up" style={{ animationDelay: '1s' }}>
+          <div className="h-[1px] w-8 xs:w-12 sm:w-20 md:w-32 bg-gradient-to-r from-transparent via-white/40 to-white/60"></div>
           <div className="relative">
-            <div className="absolute inset-0 bg-white blur-lg opacity-50"></div>
-            <Heart className="relative w-4 h-4 md:w-5 md:h-5 text-white fill-white drop-shadow-lg animate-pulse-gentle" />
+            <div className="absolute inset-0 bg-white blur-sm opacity-50"></div>
+            <Heart className="relative w-2 h-2 sm:w-3 sm:h-3 md:w-5 md:h-5 text-white fill-white drop-shadow-lg animate-pulse-gentle" />
           </div>
-          <div className="h-[1px] w-16 xs:w-24 sm:w-32 bg-gradient-to-l from-transparent via-white/40 to-white/60"></div>
+          <div className="h-[1px] w-8 xs:w-12 sm:w-20 md:w-32 bg-gradient-to-l from-transparent via-white/40 to-white/60"></div>
         </div>
       </div>
 
@@ -539,7 +539,7 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
             transform: translateY(0px);
           }
           50% {
-            transform: translateY(-20px);
+            transform: translateY(-10px);
           }
         }
         
@@ -606,7 +606,7 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
         @keyframes fade-in-up {
           from {
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(20px);
           }
           to {
             opacity: 1;
@@ -701,9 +701,23 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
         
         /* Responsive text sizes */
         @media (min-width: 480px) {
-          .xs\\:text-6xl {
-            font-size: 3.75rem;
+          .xs\\:text-5xl {
+            font-size: 3rem;
             line-height: 1;
+          }
+          
+          .xs\\:text-3xl {
+            font-size: 1.875rem;
+            line-height: 2.25rem;
+          }
+        }
+        
+        /* Hide floating elements on small screens for better performance */
+        @media (max-width: 640px) {
+          .animate-float-slow,
+          .animate-float-medium,
+          .animate-float-fast {
+            animation: none;
           }
         }
       `}</style>

@@ -185,13 +185,18 @@ export function GallerySection() {
     .map(index => images[index]);
 
   return (
-    <section id="gallery" className="py-20 bg-gray-50">
+    <section id="gallery" className="py-16 md:py-20 relative bg-gradient-to-br from-rose-50 via-white to-amber-50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-serif font-bold text-gray-900 mb-4">
+        <div className="text-center mb-12 md:mb-16">
+          <h2 className="text-3xl md:text-5xl font-serif font-bold text-gray-900 mb-3 md:mb-4">
             Our Gallery
           </h2>
-          <p className="text-lg text-gray-600">
+          <div className="flex items-center justify-center gap-2 md:gap-3 mb-3">
+            <div className="h-px w-8 md:w-16 bg-gradient-to-r from-transparent via-rose-300 to-transparent"></div>
+            <ImageIcon className="w-4 h-4 text-rose-500" />
+            <div className="h-px w-8 md:w-16 bg-gradient-to-l from-transparent via-rose-300 to-transparent"></div>
+          </div>
+          <p className="text-base md:text-lg text-gray-600">
             Beautiful moments from our journey together
           </p>
         </div>
@@ -254,11 +259,11 @@ export function GallerySection() {
             </>
           )}
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
             {displayedImages.map((image, index) => (
               <div
                 key={`${image.id}-${displayedIndices[index]}`} // Key includes position to trigger animation
-                className={`relative group aspect-square overflow-hidden rounded-lg bg-gray-100 cursor-pointer hover:opacity-90 transition-opacity shadow-md hover:shadow-lg ${
+                className={`relative group aspect-square overflow-hidden rounded-2xl bg-white/60 backdrop-blur-sm border border-white/50 cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl hover:-translate-y-1 ${
                   animatingIndex === index ? 'animate-fadeIn' : ''
                 }`}
                 onClick={() => setSelectedImage(image)}
@@ -266,13 +271,13 @@ export function GallerySection() {
                 <img
                   src={image.url}
                   alt={image.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
-                  <div className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 text-center p-4">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center">
+                  <div className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 text-center p-3 md:p-4">
                     {image.description && (
-                      <p className="text-white text-xs opacity-80 line-clamp-2">{image.description}</p>
+                      <p className="text-white text-xs md:text-sm opacity-90 line-clamp-2">{image.description}</p>
                     )}
                   </div>
                 </div>
@@ -299,11 +304,11 @@ export function GallerySection() {
 
         {selectedImage && (
           <div 
-            className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 backdrop-blur-sm" 
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" 
             onClick={() => setSelectedImage(null)}
           >
             <div 
-              className="relative max-w-6xl w-full max-h-[90vh] flex flex-col" 
+              className="relative max-w-6xl w-full max-h-[90vh] flex flex-col rounded-2xl border border-white/10 shadow-2xl" 
               onClick={e => e.stopPropagation()}
             >
               {/* Navigation arrows */}
@@ -312,7 +317,7 @@ export function GallerySection() {
                   e.stopPropagation();
                   prevImage();
                 }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-rose-300 transition-colors p-3 z-10 bg-black/30 rounded-full backdrop-blur-sm hover:bg-black/50"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-white/90 hover:text-white transition-colors p-3 z-10 bg-black/30 rounded-full backdrop-blur-sm hover:bg-black/50 border border-white/10"
                 aria-label="Previous image"
               >
                 <ChevronLeft className="w-8 h-8" />
@@ -323,7 +328,7 @@ export function GallerySection() {
                   e.stopPropagation();
                   nextImage();
                 }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-rose-300 transition-colors p-3 z-10 bg-black/30 rounded-full backdrop-blur-sm hover:bg-black/50"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/90 hover:text-white transition-colors p-3 z-10 bg-black/30 rounded-full backdrop-blur-sm hover:bg-black/50 border border-white/10"
                 aria-label="Next image"
               >
                 <ChevronRight className="w-8 h-8" />
@@ -332,14 +337,14 @@ export function GallerySection() {
               {/* Close button at the top right */}
               <button
                 onClick={() => setSelectedImage(null)}
-                className="absolute -top-12 right-0 text-white hover:text-rose-300 transition-colors p-2 z-10"
+                className="absolute -top-12 right-0 text-white/80 hover:text-white transition-colors p-2 z-10"
                 aria-label="Close"
               >
                 <X className="w-10 h-10" />
               </button>
               
               {/* Image container with premium styling */}
-              <div className="flex-1 flex items-center justify-center rounded-2xl overflow-hidden bg-black/20 backdrop-blur-sm border border-white/10 shadow-2xl">
+              <div className="flex-1 flex items-center justify-center rounded-2xl overflow-hidden bg-black/30 backdrop-blur md:backdrop-blur-sm border border-white/10 shadow-2xl">
                 <img
                   src={selectedImage.url}
                   alt="Gallery image preview"
@@ -350,7 +355,7 @@ export function GallerySection() {
               {/* Image details with premium styling */}
               <div className="mt-6 text-center">
                 {selectedImage.description && (
-                  <p className="text-gray-300 text-lg max-w-3xl mx-auto">{selectedImage.description}</p>
+                  <p className="text-gray-300 text-base md:text-lg max-w-3xl mx-auto">{selectedImage.description}</p>
                 )}
                 {/* Image counter */}
                 <div className="mt-4 text-gray-400 text-sm">

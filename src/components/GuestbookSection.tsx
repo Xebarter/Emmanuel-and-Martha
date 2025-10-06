@@ -87,19 +87,24 @@ export function GuestbookSection() {
   };
 
   return (
-    <section id="guestbook" className="py-20 bg-gradient-to-br from-rose-50 via-white to-amber-50">
+    <section id="guestbook" className="py-16 md:py-20 bg-gradient-to-br from-rose-50 via-white to-amber-50">
       <div className="max-w-6xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-serif font-bold text-gray-900 mb-4">
+        <div className="text-center mb-12 md:mb-16">
+          <h2 className="text-3xl md:text-5xl font-serif font-bold text-gray-900 mb-3 md:mb-4">
             Guest Book
           </h2>
-          <p className="text-lg text-gray-600">
+          <div className="flex items-center justify-center gap-2 md:gap-3 mb-3">
+            <div className="h-px w-8 md:w-16 bg-gradient-to-r from-transparent via-rose-300 to-transparent"></div>
+            <Heart className="w-4 h-4 text-rose-500" />
+            <div className="h-px w-8 md:w-16 bg-gradient-to-l from-transparent via-rose-300 to-transparent"></div>
+          </div>
+          <p className="text-base md:text-lg text-gray-600">
             Share your wishes and blessings for our special day
           </p>
         </div>
 
         <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+          <div className="bg-white/80 backdrop-blur rounded-2xl shadow-xl p-6 md:p-8 border border-white/60">
             <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
               <MessageCircle className="w-6 h-6 text-rose-500" />
               Leave a Message
@@ -114,7 +119,7 @@ export function GuestbookSection() {
                   {...register('name')}
                   type="text"
                   id="gb-name"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent bg-white/70"
                   placeholder="John Doe"
                 />
                 {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
@@ -128,7 +133,7 @@ export function GuestbookSection() {
                   {...register('phone')}
                   type="tel"
                   id="gb-phone"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent bg-white/70"
                   placeholder="+256700000000"
                 />
                 {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
@@ -142,7 +147,7 @@ export function GuestbookSection() {
                   {...register('message')}
                   id="gb-message"
                   rows={4}
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent bg-white/70"
                   placeholder="Share your wishes for the happy couple..."
                 />
                 {errors.message && <p className="text-red-500 text-sm mt-1">{errors.message.message}</p>}
@@ -163,7 +168,7 @@ export function GuestbookSection() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-rose-500 to-rose-600 text-white py-4 rounded-lg font-semibold hover:from-rose-600 hover:to-rose-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-rose-500 via-fuchsia-500 to-rose-600 text-white py-4 rounded-lg font-semibold hover:from-rose-600 hover:to-fuchsia-600 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>

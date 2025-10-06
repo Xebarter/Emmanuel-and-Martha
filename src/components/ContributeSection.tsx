@@ -146,18 +146,23 @@ export function ContributeSection({ totalContributions }: ContributeSectionProps
   };
 
   return (
-    <section id="contribute" className="py-20 bg-white">
+    <section id="contribute" className="py-16 md:py-20 bg-gradient-to-br from-white via-rose-50 to-amber-50">
       <div className="max-w-4xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-serif font-bold text-gray-900 mb-4">
+        <div className="text-center mb-12 md:mb-16">
+          <h2 className="text-3xl md:text-5xl font-serif font-bold text-gray-900 mb-3 md:mb-4">
             Contribute to Our Celebration
           </h2>
-          <p className="text-lg text-gray-600">
+          <div className="flex items-center justify-center gap-2 md:gap-3 mb-3">
+            <div className="h-px w-8 md:w-16 bg-gradient-to-r from-transparent via-rose-300 to-transparent"></div>
+            <DollarSign className="w-4 h-4 text-rose-500" />
+            <div className="h-px w-8 md:w-16 bg-gradient-to-l from-transparent via-rose-300 to-transparent"></div>
+          </div>
+          <p className="text-base md:text-lg text-gray-600">
             Your generous contribution helps us start our journey together
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="bg-gray-50 rounded-2xl shadow-lg p-8 border border-gray-100">
+        <form onSubmit={handleSubmit(onSubmit)} className="bg-white/80 backdrop-blur rounded-2xl shadow-xl p-6 md:p-8 border border-white/60">
           <div className="grid md:grid-cols-2 gap-6 mb-6">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -167,7 +172,7 @@ export function ContributeSection({ totalContributions }: ContributeSectionProps
                 {...register('name')}
                 type="text"
                 id="name"
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent bg-white/70"
                 placeholder="John Doe"
               />
               {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
@@ -181,7 +186,7 @@ export function ContributeSection({ totalContributions }: ContributeSectionProps
                 {...register('phone')}
                 type="tel"
                 id="phone"
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent bg-white/70"
                 placeholder="+256700000000"
               />
               {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
@@ -196,7 +201,7 @@ export function ContributeSection({ totalContributions }: ContributeSectionProps
               {...register('email')}
               type="email"
               id="email"
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent bg-white/70"
               placeholder="john@example.com"
             />
             {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
@@ -210,7 +215,7 @@ export function ContributeSection({ totalContributions }: ContributeSectionProps
               {...register('amount', { valueAsNumber: true })}
               type="number"
               id="amount"
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent bg-white/70"
               placeholder="50000"
               step="1000"
             />
@@ -225,7 +230,7 @@ export function ContributeSection({ totalContributions }: ContributeSectionProps
               {...register('message')}
               id="message"
               rows={3}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent bg-white/70"
               placeholder="Best wishes for your wedding..."
             />
           </div>
@@ -245,7 +250,7 @@ export function ContributeSection({ totalContributions }: ContributeSectionProps
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-gradient-to-r from-rose-500 to-rose-600 text-white py-4 rounded-lg font-semibold hover:from-rose-600 hover:to-rose-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-gradient-to-r from-rose-500 via-fuchsia-500 to-rose-600 text-white py-4 rounded-lg font-semibold hover:from-rose-600 hover:to-fuchsia-600 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isSubmitting ? (
               <>

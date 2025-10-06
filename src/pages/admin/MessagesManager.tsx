@@ -32,13 +32,20 @@ export default function MessagesManager() {
   const fetchMessages = async (): Promise<void> => {
     setLoading(true);
     try {
+      console.log('Fetching messages...');
+      
       // First, get all messages
       const { data: messagesData, error: messagesError } = await supabase
         .from('guest_messages')
         .select('id, guest_id, message, is_approved, created_at')
         .order('created_at', { ascending: false });
       
-      if (messagesError) throw messagesError;
+      if (messagesError) {
+        console.error('Error fetching messages:', messagesError);
+        throw messagesError;
+      }
+      
+      console.log('Messages fetched:', messagesData);
       
       // Then get guest information for each message
       const guestIds = messagesData
@@ -52,8 +59,12 @@ export default function MessagesManager() {
           .select('id, full_name, phone')
           .in('id', guestIds);
         
-        if (guestsError) throw guestsError;
+        if (guestsError) {
+          console.error('Error fetching guests:', guestsError);
+          throw guestsError;
+        }
         guestsData = data || [];
+        console.log('Guests fetched:', guestsData);
       }
       
       // Combine messages with guest data
@@ -65,9 +76,10 @@ export default function MessagesManager() {
         };
       });
       
+      console.log('Combined data:', combinedData);
       setMessages(combinedData);
     } catch (err) {
-      console.error('Error fetching messages:', err);
+      console.error('Error in fetchMessages:', err);
     }
     setLoading(false);
   };

@@ -5,6 +5,8 @@ import GuestsManager from '../pages/admin/GuestsManager';
 import MeetingsManager from '../pages/admin/MeetingsManager';
 import ContributionsManager from '../pages/admin/ContributionsManager';
 import MessagesManager from '../pages/admin/MessagesManager';
+import MessagesTest from '../pages/admin/MessagesTest';
+import AuthDiagnostic from '../pages/admin/AuthDiagnostic';
 import DashboardHome from '../pages/DashboardHome';
 import { SupabaseTest } from '../pages/SupabaseTest';
 import PledgesManager from '../pages/admin/PledgesManager';
@@ -22,6 +24,8 @@ export function AdminRoutes() {
           <Route path="contributions" element={<ContributionsManager />} />
           <Route path="pledges" element={<PledgesManager />} />
           <Route path="messages" element={<MessagesManager />} />
+          <Route path="messages-test" element={<MessagesTest />} />
+          <Route path="auth-diag" element={<AuthDiagnostic />} />
           <Route path="supabase-test" element={<SupabaseTest />} />
         </Route>
         <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
