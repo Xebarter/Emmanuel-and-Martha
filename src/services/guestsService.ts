@@ -6,6 +6,23 @@ export async function getGuests() {
   return data;
 }
 
+export async function getMeetingRegisteredGuests() {
+  const { data, error } = await supabase
+    .from('guests')
+    .select(`
+      *,
+      attendances (
+        id,
+        meeting_id,
+        status
+      )
+    `)
+    .neq('attendances.id', null);
+    
+  if (error) throw error;
+  return data;
+}
+
 export async function addGuest(guest: { full_name: string; phone: string; email?: string; message?: string }) {
   const { data, error } = await supabase.from('guests').insert([guest]).select();
   if (error) throw error;

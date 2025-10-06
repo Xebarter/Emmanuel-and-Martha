@@ -1,160 +1,113 @@
-// src/hooks/useMetadata.ts
 import { useEffect, useState } from 'react';
-import { supabase, isSupabaseConnected } from '../lib/supabase';
-
-interface CoupleInfo {
-  bride_name: string;
-  groom_name: string;
-  wedding_date: string;
-  venue: string;
-  tagline?: string;
-}
-
-interface Counts {
-  total_contributions: number;
-  total_pledges: number;
-  total_meetings: number;
-  total_guests: number;
-}
-
-interface Metadata {
-  couple: CoupleInfo;
-  counts: Counts;
-}
-
-// Default metadata for offline mode
-const defaultMetadata: Metadata = {
-  couple: {
-    bride_name: 'Bride',
-    groom_name: 'Groom',
-    wedding_date: new Date().toISOString(),
-    venue: 'Wedding Venue',
-    tagline: 'Celebrating Our Love'
-  },
-  counts: {
-    total_contributions: 0,
-    total_pledges: 0,
-    total_meetings: 0,
-    total_guests: 0
-  }
-};
+import { supabase } from '../lib/supabase';
+import { SiteMetadata } from '../lib/types';
 
 export function useMetadata() {
-  const [metadata, setMetadata] = useState<Metadata | null>(null);
-  const [loading, setLoading] = useState(!isSupabaseConnected);
+  const [metadata, setMetadata] = useState<SiteMetadata | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
-  // If not connected to Supabase, return default metadata immediately
-  if (!isSupabaseConnected) {
-    return { 
-      metadata: defaultMetadata, 
-      loading: false,
-      error: null 
-    };
-  }
 
   useEffect(() => {
-    let isMounted = true;
-
-    const loadMetadata = async () => {
-      console.log("[useMetadata] Loading metadata...");
-      
-      // Reset error state
-      if (isMounted) {
-        setError(null);
-      }
-      
-      // If not connected to Supabase, use default metadata
-      if (!isSupabaseConnected) {
-        console.log("[useMetadata] Using default metadata (offline mode)");
-        if (isMounted) {
-          setMetadata({
-            couple: {
-              bride_name: 'Bride',
-              groom_name: 'Groom',
-              wedding_date: new Date().toISOString(),
-              venue: 'Wedding Venue',
-              tagline: 'Celebrating Our Love'
-            },
-            counts: {
-              total_contributions: 0,
-              total_pledges: 0,
-              total_meetings: 0,
-              total_guests: 0
-            }
-          });
-          setLoading(false);
-        }
-        return;
-      }
-
-      // Try to fetch from Supabase if online
+    async function fetchMetadata() {
       try {
-        console.log("[useMetadata] Fetching metadata from Supabase.");
+        console.log('[useMetadata] Starting fetch...');
         
-        // Fetch site settings
-        const { data: settings, error: settingsError } = await supabase
-          .from("site_settings")
-          .select("*");
-
-        if (settingsError) throw settingsError;
-
-        // Process the settings into the metadata structure
-        const metadataSettings: Record<string, any> = {};
-        settings.forEach((setting: any) => {
-          metadataSettings[setting.key] = setting.value;
-        });
-
-        if (isMounted) {
-          console.log("[useMetadata] Data fetched from Supabase:", settings);
-          setMetadata({
-            couple: {
-              bride_name: 'Bride', // Will be updated from settings
-              groom_name: 'Groom', // Will be updated from settings
-              wedding_date: metadataSettings['wedding_date'] || new Date().toISOString(),
-              venue: metadataSettings['wedding_location']?.name || 'Wedding Venue',
-              tagline: 'Celebrating Our Love'
-            },
-            counts: {
-              total_contributions: 0,
-              total_pledges: 0,
-              total_meetings: 0,
-              total_guests: 0
-            }
-          });
-        }
-      } catch (error) {
-        console.warn("[useMetadata] Using default metadata due to error:", error);
-        if (isMounted) {
-          setError(error instanceof Error ? error.message : 'Failed to load metadata');
-          setMetadata({
-            couple: {
-              bride_name: 'Bride',
-              groom_name: 'Groom',
-              wedding_date: new Date().toISOString(),
-              venue: 'Wedding Venue',
-              tagline: 'Celebrating Our Love'
-            },
-            counts: {
-              total_contributions: 0,
-              total_pledges: 0,
-              total_meetings: 0,
-              total_guests: 0
-            }
-          });
-        }
-      } finally {
-        if (isMounted) {
+        // Set a timeout to prevent infinite loading
+        const timeoutId = setTimeout(() => {
+          console.warn('[useMetadata] Fetch timeout - using fallback data');
+          setMetadata(getFallbackMetadata());
           setLoading(false);
-        }
+        }, 5000);
+
+        // Fetch data with proper error handling
+        const results = await Promise.allSettled([
+          supabase.from('meetings')
+            .select('*')
+            .gte('starts_at', new Date().toISOString())
+            .order('starts_at', { ascending: true })
+            .limit(1),
+          supabase.from('contributions')
+            .select('amount')
+            .eq('status', 'completed'),
+          supabase.from('pledges')
+            .select('id', { count: 'exact', head: true }),
+          supabase.from('guests')
+            .select('id', { count: 'exact', head: true })
+        ]);
+
+        clearTimeout(timeoutId);
+
+        console.log('[useMetadata] Results:', results);
+
+        // Extract data with fallbacks
+        const meetingsData = results[0].status === 'fulfilled' ? results[0].value : null;
+        const contributionsData = results[1].status === 'fulfilled' ? results[1].value : null;
+        const pledgesData = results[2].status === 'fulfilled' ? results[2].value : null;
+        const guestsData = results[3].status === 'fulfilled' ? results[3].value : null;
+
+        // Calculate totals with fallbacks
+        const totalContributions = contributionsData?.data?.reduce((sum, c: any) =>
+          sum + (c.amount || 0), 0) || 0;
+
+        const metadata: SiteMetadata = {
+          couple: {
+            bride_name: 'Priscilla',
+            groom_name: 'John',
+            names: 'John & Priscilla',
+            wedding_date: '2026-02-14',
+            location: 'Kampala, Uganda',
+            venue: 'Kampala, Uganda',
+            tagline: 'Join us as we celebrate our love'
+          },
+          next_meeting: meetingsData?.data?.[0] || null,
+          counts: {
+            total_contributions: totalContributions,
+            total_pledges: pledgesData?.count || 0,
+            total_guests: guestsData?.count || 0,
+            total_meetings: 0
+          },
+          gallery: []
+        };
+
+        console.log('[useMetadata] Metadata loaded:', metadata);
+        setMetadata(metadata);
+        setError(null);
+      } catch (err) {
+        console.error('[useMetadata] Error:', err);
+        // Use fallback data instead of showing error
+        setMetadata(getFallbackMetadata());
+        setError(null); // Don't show error to user, just use fallback
+      } finally {
+        setLoading(false);
+        console.log('[useMetadata] Loading complete');
       }
-    };
+    }
 
-    loadMetadata();
-
-    return () => {
-      isMounted = false;
-    };
+    fetchMetadata();
   }, []);
+
   return { metadata, loading, error };
+}
+
+// Fallback metadata for when database is not accessible
+function getFallbackMetadata(): SiteMetadata {
+  return {
+    couple: {
+      bride_name: 'Priscilla',
+      groom_name: 'John',
+      names: 'John & Priscilla',
+      wedding_date: '2026-02-14',
+      location: 'Kampala, Uganda',
+      venue: 'Kampala, Uganda',
+      tagline: 'Join us as we celebrate our love'
+    },
+    next_meeting: null,
+    counts: {
+      total_contributions: 0,
+      total_pledges: 0,
+      total_guests: 0,
+      total_meetings: 0
+    },
+    gallery: []
+  };
 }

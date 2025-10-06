@@ -1,113 +1,64 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { SiteMetadata } from '../lib/types';
-
-export function useMetadata() {
-  const [metadata, setMetadata] = useState<SiteMetadata | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchMetadata() {
-      try {
-        console.log('[useMetadata] Starting fetch...');
-        
-        // Set a timeout to prevent infinite loading
-        const timeoutId = setTimeout(() => {
-          console.warn('[useMetadata] Fetch timeout - using fallback data');
-          setMetadata(getFallbackMetadata());
-          setLoading(false);
-        }, 5000);
-
-        // Fetch data with proper error handling
-        const results = await Promise.allSettled([
-          supabase.from('meetings')
-            .select('*')
-            .gte('starts_at', new Date().toISOString())
-            .order('starts_at', { ascending: true })
-            .limit(1),
-          supabase.from('contributions')
-            .select('amount')
-            .eq('status', 'completed'),
-          supabase.from('pledges')
-            .select('id', { count: 'exact', head: true }),
-          supabase.from('guests')
-            .select('id', { count: 'exact', head: true })
-        ]);
-
-        clearTimeout(timeoutId);
-
-        console.log('[useMetadata] Results:', results);
-
-        // Extract data with fallbacks
-        const meetingsData = results[0].status === 'fulfilled' ? results[0].value : null;
-        const contributionsData = results[1].status === 'fulfilled' ? results[1].value : null;
-        const pledgesData = results[2].status === 'fulfilled' ? results[2].value : null;
-        const guestsData = results[3].status === 'fulfilled' ? results[3].value : null;
-
-        // Calculate totals with fallbacks
-        const totalContributions = contributionsData?.data?.reduce((sum, c: any) =>
-          sum + (c.amount || 0), 0) || 0;
-
-        const metadata: SiteMetadata = {
-          couple: {
-            bride_name: 'Priscilla',
-            groom_name: 'John',
-            names: 'John & Priscilla',
-            wedding_date: '2026-02-14',
-            location: 'Kampala, Uganda',
-            venue: 'Kampala, Uganda',
-            tagline: 'Join us as we celebrate our love'
-          },
-          next_meeting: meetingsData?.data?.[0] || null,
-          counts: {
-            total_contributions: totalContributions,
-            total_pledges: pledgesData?.count || 0,
-            total_guests: guestsData?.count || 0,
-            total_meetings: 0
-          },
-          gallery: []
-        };
-
-        console.log('[useMetadata] Metadata loaded:', metadata);
-        setMetadata(metadata);
-        setError(null);
-      } catch (err) {
-        console.error('[useMetadata] Error:', err);
-        // Use fallback data instead of showing error
-        setMetadata(getFallbackMetadata());
-        setError(null); // Don't show error to user, just use fallback
-      } finally {
-        setLoading(false);
-        console.log('[useMetadata] Loading complete');
-      }
-    }
-
-    fetchMetadata();
-  }, []);
-
-  return { metadata, loading, error };
+export interface Guest {
+  id: string;
+  full_name: string;
+  phone: string;
+  email?: string;
+  address?: string;
+  is_attending?: boolean;
+  plus_ones?: number;
+  dietary_restrictions?: string[];
+  message?: string;
+  created_at?: string;
+  updated_at?: string;
+  // Properties from dashboard display
+  name?: string;
+  status?: string;
+  rsvp_status?: string;
+  category?: string;
+  plusOne?: boolean;
+  dietary?: string;
+  attendances?: Array<{
+    id: string;
+    meeting_id: string;
+    status: string;
+  }>;
 }
 
-// Fallback metadata for when database is not accessible
-function getFallbackMetadata(): SiteMetadata {
-  return {
-    couple: {
-      bride_name: 'Priscilla',
-      groom_name: 'John',
-      names: 'John & Priscilla',
-      wedding_date: '2026-02-14',
-      location: 'Kampala, Uganda',
-      venue: 'Kampala, Uganda',
-      tagline: 'Join us as we celebrate our love'
-    },
-    next_meeting: null,
-    counts: {
-      total_contributions: 0,
-      total_pledges: 0,
-      total_guests: 0,
-      total_meetings: 0
-    },
-    gallery: []
+export interface SiteMetadata {
+  couple: {
+    bride_name: string;
+    groom_name: string;
+    names: string;
+    wedding_date: string;
+    location: string;
+    venue: string;
+    tagline: string;
   };
+  next_meeting: any;
+  counts: {
+    total_contributions: number;
+    total_pledges: number;
+    total_guests: number;
+    total_meetings: number;
+  };
+  gallery: any[];
+}
+
+export interface Meeting {
+  id: string;
+  title: string;
+  description?: string;
+  location: string;
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+  starts_at: string;
+  ends_at?: string;
+  max_attendees?: number;
+  is_active?: boolean;
+  cover_image_url?: string;
+  created_by?: string;
+  created_at?: string;
+  updated_at?: string;
+  is_wedding?: boolean;
 }

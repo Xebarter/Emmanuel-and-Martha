@@ -1,19 +1,25 @@
-type Guest = {
-  id: string;
-  name?: string;
-  full_name?: string;
-  email?: string;
-  phone?: string;
-  status?: string;
-  rsvp_status?: string;
-  category?: string;
-  plusOne?: boolean;
-  dietary?: string;
-  message?: string;
-};
-import React, { useEffect, useState } from 'react';
-import { Users, Plus, Search, MoreVertical, UserCheck, UserX, Clock, Mail, Phone, Download, Filter, Edit2, Trash2, Eye, CheckCircle, XCircle, MessageSquare } from 'lucide-react';
-import { getGuests, addGuest, updateGuest, deleteGuest } from '../../services/guestsService';
+import { useEffect, useState } from 'react';
+import { 
+  Users, 
+  Search, 
+  Filter, 
+  MoreVertical, 
+  Eye, 
+  Edit2, 
+  MessageSquare, 
+  Trash2, 
+  UserCheck, 
+  Clock, 
+  UserX, 
+  Plus, 
+  Download,
+  Mail,
+  Phone,
+  CheckCircle,
+  XCircle
+} from 'lucide-react';
+import { getGuests, getMeetingRegisteredGuests, addGuest, updateGuest, deleteGuest } from '../../services/guestsService';
+import type { Guest } from '../../lib/types';
 
 export default function GuestsManager() {
   const [guests, setGuests] = useState<Guest[]>([]);
@@ -22,7 +28,7 @@ export default function GuestsManager() {
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [showActionMenu, setShowActionMenu] = useState(null);
+  const [showActionMenu, setShowActionMenu] = useState<string | null>(null);
   const itemsPerPage = 6;
 
   useEffect(() => {
@@ -32,7 +38,7 @@ export default function GuestsManager() {
   const fetchGuests = async (): Promise<void> => {
     setLoading(true);
     try {
-      const data = await getGuests();
+      const data = await getMeetingRegisteredGuests();
       setGuests(data || []);
     } catch (err) {
       // Optionally handle error
@@ -102,7 +108,7 @@ export default function GuestsManager() {
   const declinedCount = guests.filter(g => g.status === 'Declined' || g.rsvp_status === 'declined').length;
   const totalWithPlusOne = guests.filter(g => (g.status === 'Confirmed' || g.rsvp_status === 'confirmed') && g.plusOne).length;
 
-  const handleAction = (action, id) => {
+  const handleAction = (action: string, id: string) => {
     console.log(`${action} guest ${id}`);
     setShowActionMenu(null);
   };
@@ -111,7 +117,7 @@ export default function GuestsManager() {
     return name.split(' ').map((n: string) => n[0]).join('').toUpperCase();
   };
 
-  const getAvatarColor = (id: string | number): string => {
+  const getAvatarColor = (id: string): string => {
     const colors = [
       'from-violet-500 to-purple-500',
       'from-blue-500 to-cyan-500',
@@ -122,7 +128,8 @@ export default function GuestsManager() {
       'from-amber-500 to-yellow-500',
       'from-teal-500 to-green-500',
     ];
-    return colors[id % colors.length];
+    const index = parseInt(id.replace(/\D/g, '')) || 0;
+    return colors[index % colors.length];
   };
 
   const getStatusStyle = (status?: string): string => {
@@ -339,10 +346,10 @@ export default function GuestsManager() {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${getAvatarColor(guest.id)} flex items-center justify-center text-white font-bold text-sm shadow-lg group-hover:scale-110 transition-transform duration-200`}>
-                            {getInitials(guest.name)}
+                            {getInitials(guest.name || guest.full_name || '')}
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-slate-900">{guest.name}</p>
+                            <p className="text-sm font-bold text-slate-900">{guest.name || guest.full_name}</p>
                             <p className="text-xs text-slate-500">{guest.dietary !== 'None' ? `🍽️ ${guest.dietary}` : 'No dietary restrictions'}</p>
                           </div>
                         </div>
