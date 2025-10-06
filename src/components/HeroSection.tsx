@@ -1,5 +1,5 @@
 import { Heart, MapPin, Calendar, Loader2 } from 'lucide-react';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
 
 interface CoupleInfo {
