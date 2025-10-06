@@ -54,17 +54,16 @@ export default function MeetingsManager() {
       const { data, error } = await supabase
         .from('site_settings')
         .select('key, value')
-        .in('key', ['couple_info']);
+        .eq('key', 'couple_info');
 
       if (error) throw error;
 
-      if (data && data.length > 0) {
-        const coupleInfo = data.find(item => item.key === 'couple_info')?.value || {};
+      if (data && data.length > 0 && data[0].value) {
         setSiteSettings({
-          wedding_date: coupleInfo.wedding_date || '',
-          wedding_venue: coupleInfo.location || '',
-          wedding_time: coupleInfo.wedding_time || '',
-          wedding_tagline: coupleInfo.tagline || ''
+          wedding_date: data[0].value.wedding_date || '',
+          wedding_venue: data[0].value.location || '',
+          wedding_time: data[0].value.wedding_time || '',
+          wedding_tagline: data[0].value.tagline || ''
         });
       }
     } catch (err) {

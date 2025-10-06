@@ -123,22 +123,24 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
         const { data, error } = await supabase
           .from('site_settings')
           .select('value')
-          .eq('key', 'couple_info')
-          .single();
+          .eq('key', 'couple_info');
 
         if (error) throw error;
         
-        if (data?.value) {
+        if (data && data.length > 0 && data[0].value) {
           setWeddingDetails(prev => ({
             ...prev,
-            ...data.value,
+            ...data[0].value,
             // Ensure we have a fallback to the prop values
-            wedding_date: data.value.wedding_date || coupleInfo.wedding_date,
-            location: data.value.location || coupleInfo.location,
-            venue: data.value.venue || coupleInfo.venue,
-            tagline: data.value.tagline || coupleInfo.tagline,
-            wedding_time: data.value.wedding_time || coupleInfo.wedding_time // Add wedding_time
+            wedding_date: data[0].value.wedding_date || coupleInfo.wedding_date,
+            location: data[0].value.location || coupleInfo.location,
+            venue: data[0].value.venue || coupleInfo.venue,
+            tagline: data[0].value.tagline || coupleInfo.tagline,
+            wedding_time: data[0].value.wedding_time || coupleInfo.wedding_time
           }));
+        } else {
+          // Fallback to prop values if there's no data or value is null
+          setWeddingDetails(coupleInfo);
         }
       } catch (error) {
         console.error('Error fetching wedding details:', error);
