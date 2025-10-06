@@ -121,7 +121,7 @@ export function GuestbookSection() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
             <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
               <MessageCircle className="w-6 h-6 text-rose-500" />
@@ -201,35 +201,6 @@ export function GuestbookSection() {
                 )}
               </button>
             </form>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">Recent Messages</h3>
-
-            {loading ? (
-              <div className="flex justify-center py-12">
-                <Loader2 className="w-8 h-8 animate-spin text-rose-500" />
-              </div>
-            ) : messages.length === 0 ? (
-              <div className="text-center py-12">
-                <MessageCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500">No messages yet. Be the first to leave one!</p>
-              </div>
-            ) : (
-              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
-                {messages.map((msg) => (
-                  <div key={msg.id} className="p-4 bg-gradient-to-br from-gray-50 to-white rounded-lg border border-gray-200">
-                    <p className="text-gray-800 mb-3 leading-relaxed">{msg.message}</p>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium text-rose-600">
-                        {msg.guests?.full_name ? msg.guests.full_name : 'Anonymous Guest'}
-                      </span>
-                      <span className="text-gray-500">{formatDate(msg.created_at)}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </div>
       </div>
