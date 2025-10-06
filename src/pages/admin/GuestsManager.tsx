@@ -16,7 +16,8 @@ import {
   Mail,
   Phone,
   CheckCircle,
-  XCircle
+  XCircle,
+  Calendar
 } from 'lucide-react';
 import { getGuests, getMeetingRegisteredGuests, addGuest, updateGuest, deleteGuest } from '../../services/guestsService';
 import type { Guest } from '../../lib/types';
@@ -156,6 +157,18 @@ export default function GuestsManager() {
       default:
         return null;
     }
+  };
+
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
@@ -323,13 +336,10 @@ export default function GuestsManager() {
                     <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider hidden lg:table-cell">
                       Contact
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider hidden md:table-cell">
-                      Category
+                    <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">
+                      Registered Meetings
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider hidden sm:table-cell">
-                      Plus One
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">
                       Status
                     </th>
                     <th className="px-6 py-4 text-right text-xs font-bold text-slate-700 uppercase tracking-wider">
@@ -366,18 +376,40 @@ export default function GuestsManager() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 hidden md:table-cell">
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">
-                          {guest.category}
-                        </span>
+                      <td className="px-6 py-4">
+                        <div className="space-y-2">
+                          {guest.attendances && guest.attendances.map((attendance) => (
+                            <div key={attendance.id} className="bg-slate-50 rounded-lg p-3">
+                              <div className="flex items-start justify-between">
+                                <div>
+                                  <p className="text-sm font-semibold text-slate-900">
+                                    {attendance.meetings?.title || 'Meeting'}
+                                  </p>
+                                  <div className="flex items-center gap-2 mt-1 text-xs text-slate-600">
+                                    <Calendar className="h-3 w-3" />
+                                    {attendance.meetings?.starts_at ? formatDate(attendance.meetings.starts_at) : 'Date not set'}
+                                  </div>
+                                  <div className="flex items-center gap-2 mt-1 text-xs text-slate-600">
+                                    <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    {attendance.meetings?.location || 'Location not set'}
+                                  </div>
+                                </div>
+                                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium ${
+                                  attendance.status === 'registered' 
+                                    ? 'bg-blue-100 text-blue-800' 
+                                    : 'bg-slate-100 text-slate-800'
+                                }`}>
+                                  {attendance.status}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </td>
                       <td className="px-6 py-4 hidden sm:table-cell">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold ${guest.plusOne ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'
-                          }`}>
-                          {guest.plusOne ? '✓ Yes' : '✗ No'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
                         <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm ${getStatusStyle(guest.status)}`}>
                           {getStatusIcon(guest.status)}
                           {guest.status}

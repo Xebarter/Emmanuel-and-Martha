@@ -14,7 +14,12 @@ export async function getMeetingRegisteredGuests() {
       attendances (
         id,
         meeting_id,
-        status
+        status,
+        meetings (
+          title,
+          starts_at,
+          location
+        )
       )
     `)
     .neq('attendances.id', null);

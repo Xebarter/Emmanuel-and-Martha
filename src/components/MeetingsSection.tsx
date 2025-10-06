@@ -376,13 +376,15 @@ export function MeetingsSection() {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => setSelectedMeeting(meeting)}
-                  className="w-full bg-gradient-to-r from-rose-500 to-rose-600 text-white py-3 rounded-lg font-semibold hover:from-rose-600 hover:to-rose-700 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
-                >
-                  <Users className="w-5 h-5" />
-                  Register Now
-                </button>
+                {!meeting.is_wedding && (
+                  <button
+                    onClick={() => setSelectedMeeting(meeting)}
+                    className="w-full bg-gradient-to-r from-rose-500 to-rose-600 text-white py-3 rounded-lg font-semibold hover:from-rose-600 hover:to-rose-700 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                  >
+                    <Users className="w-5 h-5" />
+                    Register Now
+                  </button>
+                )}
               </div>
             ))}
           </div>

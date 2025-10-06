@@ -21,6 +21,11 @@ export interface Guest {
     id: string;
     meeting_id: string;
     status: string;
+    meetings?: {
+      title: string;
+      starts_at: string;
+      location: string;
+    };
   }>;
 }
 
