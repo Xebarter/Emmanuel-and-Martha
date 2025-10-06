@@ -32,30 +32,40 @@ export default function MessagesManager() {
   const fetchMessages = async (): Promise<void> => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      // First, get all messages
+      const { data: messagesData, error: messagesError } = await supabase
         .from('guest_messages')
-        .select(`
-          id, 
-          guest_id, 
-          message, 
-          is_approved, 
-          created_at,
-          guests (
-            full_name,
-            phone
-          )
-        `)
+        .select('id, guest_id, message, is_approved, created_at')
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
+      if (messagesError) throw messagesError;
       
-      // Transform the data to match our type
-      const transformedData = data?.map((item: any) => ({
-        ...item,
-        guests: item.guests ? item.guests[0] || null : null
-      })) || [];
+      // Then get guest information for each message
+      const guestIds = messagesData
+        .map(msg => msg.guest_id)
+        .filter((id): id is string => id !== null && id !== undefined);
       
-      setMessages(transformedData);
+      let guestsData: any[] = [];
+      if (guestIds.length > 0) {
+        const { data, error: guestsError } = await supabase
+          .from('guests')
+          .select('id, full_name, phone')
+          .in('id', guestIds);
+        
+        if (guestsError) throw guestsError;
+        guestsData = data || [];
+      }
+      
+      // Combine messages with guest data
+      const combinedData = messagesData.map(message => {
+        const guest = guestsData.find(g => g.id === message.guest_id) || null;
+        return {
+          ...message,
+          guests: guest ? { full_name: guest.full_name, phone: guest.phone } : null
+        };
+      });
+      
+      setMessages(combinedData);
     } catch (err) {
       console.error('Error fetching messages:', err);
     }
