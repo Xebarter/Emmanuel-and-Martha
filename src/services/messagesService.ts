@@ -1,7 +1,10 @@
 import { supabase } from '../lib/supabase';
 
 export async function getMessages() {
-  const { data, error } = await supabase.from('guest_messages').select('*');
+  const { data, error } = await supabase
+    .from('guest_messages')
+    .select('id, guest_id, message, is_approved, created_at, guests(full_name, phone)')
+    .order('created_at', { ascending: false });
   if (error) throw error;
   return data;
 }

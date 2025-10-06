@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { MessageSquare, Plus, X, Send, User, Clock, Trash2, Search } from 'lucide-react';
 import { getMessages, addMessage, updateMessage, deleteMessage } from '../../services/messagesService';
+import { supabase } from '../../lib/supabase';
 
 type Message = {
   id: string;
-  sender?: string;
   guest_id?: string;
-  content: string;
-  message?: string;
-  timestamp?: string;
-  created_at?: string;
-  read?: boolean;
-  is_approved?: boolean;
+  message: string;
+  is_approved: boolean;
+  created_at: string;
+  guests?: {
+    full_name: string;
+    phone: string;
+  } | null;
 };
 
 export default function MessagesManager() {
@@ -31,10 +32,15 @@ export default function MessagesManager() {
   const fetchMessages = async (): Promise<void> => {
     setLoading(true);
     try {
-      const data = await getMessages();
+      const { data, error } = await supabase
+        .from('guest_messages')
+        .select('id, guest_id, message, is_approved, created_at, guests(full_name, phone)')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
       setMessages(data || []);
     } catch (err) {
-      // Optionally handle error
+      console.error('Error fetching messages:', err);
     }
     setLoading(false);
   };
@@ -53,7 +59,7 @@ export default function MessagesManager() {
       });
       await fetchMessages();
     } catch (err) {
-      // Optionally handle error
+      console.error('Error adding message:', err);
     }
     setLoading(false);
   };
@@ -64,7 +70,7 @@ export default function MessagesManager() {
       await updateMessage(id, updates);
       await fetchMessages();
     } catch (err) {
-      // Optionally handle error
+      console.error('Error updating message:', err);
     }
     setLoading(false);
   };
@@ -75,7 +81,7 @@ export default function MessagesManager() {
       await deleteMessage(id);
       await fetchMessages();
     } catch (err) {
-      // Optionally handle error
+      console.error('Error deleting message:', err);
     }
     setLoading(false);
   };
@@ -128,12 +134,12 @@ export default function MessagesManager() {
   };
 
   const getInitials = (name) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    return name ? name.split(' ').map(n => n[0]).join('').toUpperCase() : 'A';
   };
 
   const filteredMessages = messages.filter(msg =>
-  (msg.sender?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    msg.content?.toLowerCase().includes(searchTerm.toLowerCase()))
+  (msg.guests?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    msg.message?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const unreadCount = messages.filter(m => !m.read).length;
@@ -152,7 +158,7 @@ export default function MessagesManager() {
                 <div>
                   <h1 className="text-2xl font-bold text-white">Messages</h1>
                   <p className="text-indigo-100 text-sm">
-                    {unreadCount > 0 ? `${unreadCount} unread message${unreadCount > 1 ? 's' : ''}` : 'All messages read'}
+                    {messages.length > 0 ? `${messages.length} messages` : 'No messages yet'}
                   </p>
                 </div>
               </div>
@@ -198,7 +204,7 @@ export default function MessagesManager() {
                   {searchTerm ? 'No messages found' : 'No messages yet'}
                 </h3>
                 <p className="text-slate-500 mb-6">
-                  {searchTerm ? 'Try a different search term' : 'Start a conversation by sending a message'}
+                  {searchTerm ? 'Try a different search term' : 'Messages from guests will appear here'}
                 </p>
                 {!searchTerm && (
                   <button
@@ -214,16 +220,15 @@ export default function MessagesManager() {
                 {filteredMessages.map(message => (
                   <div
                     key={message.id}
-                    className={`group relative bg-white border rounded-xl p-5 transition-all hover:shadow-md ${message.read ? 'border-slate-200' : 'border-indigo-200 bg-indigo-50 bg-opacity-30'
+                    className={`group relative bg-white border rounded-xl p-5 transition-all hover:shadow-md ${message.is_approved ? 'border-slate-200' : 'border-amber-200 bg-amber-50 bg-opacity-30'
                       }`}
-                    onClick={() => !message.read && markAsRead(message.id)}
                   >
                     <div className="flex items-start space-x-4">
                       {/* Avatar */}
                       <div className="flex-shrink-0">
                         <div className="h-12 w-12 bg-gradient-to-br from-indigo-400 to-blue-500 rounded-full flex items-center justify-center">
                           <span className="text-white font-semibold text-sm">
-                            {getInitials(message.sender)}
+                            {getInitials(message.guests?.full_name || 'Anonymous')}
                           </span>
                         </div>
                       </div>
@@ -232,22 +237,22 @@ export default function MessagesManager() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
                           <h3 className="text-base font-semibold text-slate-900 flex items-center">
-                            {message.sender}
-                            {!message.read && (
-                              <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-indigo-600 text-white rounded-full">
-                                New
+                            {message.guests?.full_name || 'Anonymous Guest'}
+                            {!message.is_approved && (
+                              <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-amber-600 text-white rounded-full">
+                                Pending Approval
                               </span>
                             )}
                           </h3>
                           <div className="flex items-center space-x-2">
                             <div className="flex items-center text-xs text-slate-500">
                               <Clock className="h-3.5 w-3.5 mr-1" />
-                              {formatTimestamp(message.timestamp)}
+                              {formatTimestamp(message.created_at)}
                             </div>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                deleteMessage(message.id);
+                                handleDeleteMessage(message.id);
                               }}
                               className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-600 transition-all p-1 rounded hover:bg-red-50"
                             >
@@ -256,8 +261,21 @@ export default function MessagesManager() {
                           </div>
                         </div>
                         <p className="text-slate-600 text-sm leading-relaxed">
-                          {message.content}
+                          {message.message}
                         </p>
+                        <div className="flex items-center mt-3 space-x-3">
+                          <span className="text-xs text-slate-500">
+                            {message.guests?.phone || 'No phone provided'}
+                          </span>
+                          <button
+                            onClick={() => handleUpdateMessage(message.id, { is_approved: !message.is_approved })}
+                            className={`text-xs px-2 py-1 rounded ${message.is_approved 
+                              ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                              : 'bg-amber-100 text-amber-800 hover:bg-amber-200'}`}
+                          >
+                            {message.is_approved ? 'Approved' : 'Approve Message'}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -287,44 +305,40 @@ export default function MessagesManager() {
             <div className="p-6 space-y-5">
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Sender Name
+                  Recipient
                 </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
-                  <input
-                    type="text"
-                    value={formData.sender}
-                    onChange={(e) => setFormData({ ...formData, sender: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-                    placeholder="Enter sender name"
-                  />
-                </div>
+                <input
+                  type="text"
+                  placeholder="Enter recipient name"
+                  value={formData.sender}
+                  onChange={(e) => setFormData({ ...formData, sender: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
+                />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">
                   Message
                 </label>
                 <textarea
+                  placeholder="Type your message here..."
+                  rows={4}
                   value={formData.content}
                   onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                  rows={5}
                   className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-none"
-                  placeholder="Type your message here..."
-                />
+                ></textarea>
               </div>
-              <div className="flex space-x-3 pt-4">
+              <div className="flex justify-end space-x-3 pt-2">
                 <button
                   onClick={closeModal}
-                  className="flex-1 px-4 py-2.5 border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition-colors"
+                  className="px-5 py-2.5 text-sm font-semibold text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSubmit}
-                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-blue-700 transition-all shadow-md flex items-center justify-center"
+                  className="px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
                 >
-                  <Send className="mr-2 h-4 w-4" />
-                  Send
+                  Send Message
                 </button>
               </div>
             </div>

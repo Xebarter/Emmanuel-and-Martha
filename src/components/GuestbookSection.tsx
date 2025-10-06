@@ -88,7 +88,7 @@ export function GuestbookSection() {
         .insert({
           guest_id: guestId,
           message: data.message,
-          approved: false,
+          is_approved: false,
         });
 
       if (messageError) throw messageError;
@@ -164,9 +164,9 @@ export function GuestbookSection() {
                 <textarea
                   {...register('message')}
                   id="gb-message"
-                  rows={5}
+                  rows={4}
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-                  placeholder="Share your wishes and blessings..."
+                  placeholder="Share your wishes for the happy couple..."
                 />
                 {errors.message && <p className="text-red-500 text-sm mt-1">{errors.message.message}</p>}
               </div>
@@ -221,7 +221,9 @@ export function GuestbookSection() {
                   <div key={msg.id} className="p-4 bg-gradient-to-br from-gray-50 to-white rounded-lg border border-gray-200">
                     <p className="text-gray-800 mb-3 leading-relaxed">{msg.message}</p>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium text-rose-600">Anonymous Guest</span>
+                      <span className="font-medium text-rose-600">
+                        {msg.guests?.full_name ? msg.guests.full_name : 'Anonymous Guest'}
+                      </span>
                       <span className="text-gray-500">{formatDate(msg.created_at)}</span>
                     </div>
                   </div>
