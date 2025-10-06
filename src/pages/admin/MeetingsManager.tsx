@@ -26,7 +26,8 @@ export default function MeetingsManager() {
   const [siteSettings, setSiteSettings] = useState({
     wedding_date: '',
     wedding_venue: '',
-    wedding_time: ''
+    wedding_time: '',
+    wedding_tagline: ''
   });
 
   useEffect(() => {
@@ -60,7 +61,8 @@ export default function MeetingsManager() {
         setSiteSettings({
           wedding_date: coupleInfo.wedding_date || '',
           wedding_venue: coupleInfo.location || '',
-          wedding_time: coupleInfo.wedding_time || '' // Updated to get wedding_time
+          wedding_time: coupleInfo.wedding_time || '',
+          wedding_tagline: coupleInfo.tagline || ''
         });
       }
     } catch (err) {
@@ -76,8 +78,10 @@ export default function MeetingsManager() {
         .eq('key', 'couple_info');
       
       if (error) throw error;
+      return true;
     } catch (err) {
       console.error('Error updating site settings:', err);
+      return false;
     }
   };
 
@@ -118,11 +122,16 @@ export default function MeetingsManager() {
     const settings = {
       wedding_date: siteSettings.wedding_date,
       location: siteSettings.wedding_venue,
-      wedding_time: siteSettings.wedding_time // Include wedding_time in the settings
+      wedding_time: siteSettings.wedding_time,
+      tagline: siteSettings.wedding_tagline
     };
     
-    await updateSiteSettings(settings);
-    alert('Wedding details saved successfully!');
+    const success = await updateSiteSettings(settings);
+    if (success) {
+      alert('Wedding details saved successfully!');
+    } else {
+      alert('Failed to save wedding details. Please try again.');
+    }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -177,8 +186,17 @@ export default function MeetingsManager() {
     });
   };
 
-  const deleteMeeting = (id: string) => {
-    handleDeleteMeeting(id);
+  const handleDeleteMeeting = async (id: string): Promise<void> => {
+    if (!window.confirm('Are you sure you want to delete this meeting?')) return;
+    
+    setLoading(true);
+    try {
+      await deleteMeeting(id);
+      await fetchMeetings();
+    } catch (err) {
+      console.error('Error deleting meeting:', err);
+    }
+    setLoading(false);
   };
 
   const formatTime = (time?: string) => {
@@ -249,6 +267,19 @@ export default function MeetingsManager() {
                   onChange={(e) => setSiteSettings({...siteSettings, wedding_venue: e.target.value})}
                   className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none transition-all"
                   placeholder="Enter wedding venue"
+                />
+              </div>
+              
+              <div className="md:col-span-3">
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Wedding Tagline
+                </label>
+                <input
+                  type="text"
+                  value={siteSettings.wedding_tagline}
+                  onChange={(e) => setSiteSettings({...siteSettings, wedding_tagline: e.target.value})}
+                  className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none transition-all"
+                  placeholder="Enter wedding tagline"
                 />
               </div>
               
@@ -367,7 +398,7 @@ export default function MeetingsManager() {
                             <Edit2 className="h-4 w-4" />
                           </button>
                           <button
-                            onClick={() => deleteMeeting(meeting.id)}
+                            onClick={() => handleDeleteMeeting(meeting.id)}
                             className="text-slate-400 hover:text-red-600 transition-colors"
                           >
                             <Trash2 className="h-4 w-4" />

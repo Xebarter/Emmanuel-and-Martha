@@ -50,6 +50,71 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
   const [loading, setLoading] = useState(true);
   const carouselIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Fetch site settings including hero section configuration
+  useEffect(() => {
+    const fetchSiteSettings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('site_settings')
+          .select('value')
+          .eq('key', 'hero_section')
+          .single();
+
+        if (error) throw error;
+        
+        if (data?.value) {
+          setSiteSettings(prev => ({
+            ...prev,
+            heroSection: {
+              ...prev.heroSection,
+              ...data.value,
+              // Ensure we have a fallback to default values if needed
+              backgroundImageUrl: data.value.backgroundImageUrl || prev.heroSection?.backgroundImageUrl,
+              backgroundOverlayOpacity: data.value.backgroundOverlayOpacity ?? prev.heroSection?.backgroundOverlayOpacity ?? 0.4,
+              heartIconColor: data.value.heartIconColor || prev.heroSection?.heartIconColor || '#F43F5E',
+              headingText: data.value.headingText || prev.heroSection?.headingText || 'John & Priscilla',
+              taglineText: data.value.taglineText || prev.heroSection?.taglineText || 'Join us as we celebrate our love',
+              ctaText: data.value.ctaText || prev.heroSection?.ctaText || 'View Our Story'
+            }
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching site settings:', error);
+        // Continue with default values if there's an error
+      }
+    };
+
+    fetchSiteSettings();
+
+    // Set up real-time subscription to site settings changes
+    const subscription = supabase
+      .channel('site-settings-changes')
+      .on('postgres_changes', 
+        { 
+          event: 'UPDATE', 
+          schema: 'public', 
+          table: 'site_settings',
+          filter: 'key=eq.hero_section'
+        }, 
+        (payload) => {
+          if (payload.new?.value) {
+            setSiteSettings(prev => ({
+              ...prev,
+              heroSection: {
+                ...prev.heroSection,
+                ...payload.new.value
+              }
+            }));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+  
   // Fetch wedding details from site settings
   useEffect(() => {
     const fetchWeddingDetails = async () => {
