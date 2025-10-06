@@ -29,6 +29,8 @@ export default function MeetingsManager() {
     wedding_time: '',
     wedding_tagline: ''
   });
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingMeetingId, setDeletingMeetingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchMeetings();
@@ -41,7 +43,7 @@ export default function MeetingsManager() {
       const data = await getMeetings();
       setMeetings(data || []);
     } catch (err) {
-      // Optionally handle error
+      console.error('Error fetching meetings:', err);
     }
     setLoading(false);
   };
@@ -91,7 +93,7 @@ export default function MeetingsManager() {
       await addMeeting(meeting);
       await fetchMeetings();
     } catch (err) {
-      // Optionally handle error
+      console.error('Error adding meeting:', err);
     }
     setLoading(false);
   };
@@ -102,7 +104,7 @@ export default function MeetingsManager() {
       await updateMeeting(id, updates);
       await fetchMeetings();
     } catch (err) {
-      // Optionally handle error
+      console.error('Error updating meeting:', err);
     }
     setLoading(false);
   };
@@ -113,9 +115,16 @@ export default function MeetingsManager() {
       await deleteMeeting(id);
       await fetchMeetings();
     } catch (err) {
-      // Optionally handle error
+      console.error('Error deleting meeting:', err);
     }
     setLoading(false);
+    setShowDeleteConfirm(false);
+    setDeletingMeetingId(null);
+  };
+
+  const confirmDeleteMeeting = (id: string) => {
+    setDeletingMeetingId(id);
+    setShowDeleteConfirm(true);
   };
 
   const handleSaveWeddingDetails = async () => {
@@ -184,19 +193,6 @@ export default function MeetingsManager() {
       time: '',
       location: ''
     });
-  };
-
-  const handleDeleteMeeting = async (id: string): Promise<void> => {
-    if (!window.confirm('Are you sure you want to delete this meeting?')) return;
-    
-    setLoading(true);
-    try {
-      await deleteMeeting(id);
-      await fetchMeetings();
-    } catch (err) {
-      console.error('Error deleting meeting:', err);
-    }
-    setLoading(false);
   };
 
   const formatTime = (time?: string) => {
@@ -398,7 +394,7 @@ export default function MeetingsManager() {
                             <Edit2 className="h-4 w-4" />
                           </button>
                           <button
-                            onClick={() => handleDeleteMeeting(meeting.id)}
+                            onClick={() => confirmDeleteMeeting(meeting.id)}
                             className="text-slate-400 hover:text-red-600 transition-colors"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -414,7 +410,7 @@ export default function MeetingsManager() {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Add/Edit Meeting Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
@@ -496,6 +492,43 @@ export default function MeetingsManager() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
+            <div className="bg-gradient-to-r from-red-500 to-red-600 px-6 py-4">
+              <h3 className="text-xl font-semibold text-white">Confirm Delete</h3>
+            </div>
+            <div className="p-6">
+              <p className="text-slate-700 mb-6">
+                Are you sure you want to delete this meeting? This action cannot be undone.
+              </p>
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => {
+                    setShowDeleteConfirm(false);
+                    setDeletingMeetingId(null);
+                  }}
+                  className="flex-1 px-4 py-2.5 border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    if (deletingMeetingId) {
+                      handleDeleteMeeting(deletingMeetingId);
+                    }
+                  }}
+                  className="flex-1 px-4 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg font-semibold hover:from-red-600 hover:to-red-700 transition-all shadow-md"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
