@@ -95,8 +95,7 @@ export function useMetadata() {
         // Fetch site settings
         const { data: settings, error: settingsError } = await supabase
           .from("site_settings")
-          .select("*")
-          .eq("is_public", true);
+          .select("*");
 
         if (settingsError) throw settingsError;
 

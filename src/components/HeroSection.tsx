@@ -50,43 +50,30 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
   const [loading, setLoading] = useState(true);
   const carouselIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Fetch site settings including hero section configuration
+  // Fetch site settings for hero section customization
   useEffect(() => {
     const fetchSiteSettings = async () => {
       try {
         const { data, error } = await supabase
           .from('site_settings')
           .select('value')
-          .eq('key', 'hero_section')
-          .single();
+          .eq('key', 'hero_section');
 
         if (error) throw error;
         
-        if (data?.value) {
-          setSiteSettings(prev => ({
-            ...prev,
-            heroSection: {
-              ...prev.heroSection,
-              ...data.value,
-              // Ensure we have a fallback to default values if needed
-              backgroundImageUrl: data.value.backgroundImageUrl || prev.heroSection?.backgroundImageUrl,
-              backgroundOverlayOpacity: data.value.backgroundOverlayOpacity ?? prev.heroSection?.backgroundOverlayOpacity ?? 0.4,
-              heartIconColor: data.value.heartIconColor || prev.heroSection?.heartIconColor || '#F43F5E',
-              headingText: data.value.headingText || prev.heroSection?.headingText || 'John & Priscilla',
-              taglineText: data.value.taglineText || prev.heroSection?.taglineText || 'Join us as we celebrate our love',
-              ctaText: data.value.ctaText || prev.heroSection?.ctaText || 'View Our Story'
-            }
-          }));
+        // Check if we have data and it's not empty
+        if (data && data.length > 0 && data[0].value) {
+          setSiteSettings(data[0].value);
         }
       } catch (error) {
         console.error('Error fetching site settings:', error);
-        // Continue with default values if there's an error
+        // Continue with default settings if there's an error
       }
     };
 
     fetchSiteSettings();
 
-    // Set up real-time subscription to site settings changes
+    // Set up real-time subscription to site settings
     const subscription = supabase
       .channel('site-settings-changes')
       .on('postgres_changes', 
@@ -98,13 +85,7 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
         }, 
         (payload) => {
           if (payload.new?.value) {
-            setSiteSettings(prev => ({
-              ...prev,
-              heroSection: {
-                ...prev.heroSection,
-                ...payload.new.value
-              }
-            }));
+            setSiteSettings(payload.new.value);
           }
         }
       )
