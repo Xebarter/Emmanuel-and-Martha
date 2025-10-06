@@ -73,9 +73,27 @@ export default function MeetingsManager() {
 
   const updateSiteSettings = async (settings: any) => {
     try {
+      // Get the current couple_info to preserve existing fields
+      const { data: currentData, error: fetchError } = await supabase
+        .from('site_settings')
+        .select('value')
+        .eq('key', 'couple_info')
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Merge the existing data with new settings
+      const updatedSettings = {
+        ...(currentData?.value || {}),
+        ...settings
+      };
+
       const { error } = await supabase
         .from('site_settings')
-        .update({ value: settings })
+        .update({ 
+          value: updatedSettings,
+          updated_at: new Date().toISOString()
+        })
         .eq('key', 'couple_info');
       
       if (error) throw error;

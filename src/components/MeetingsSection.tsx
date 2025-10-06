@@ -23,7 +23,12 @@ export function MeetingsSection() {
     wedding_time?: string;
     location?: string;
     venue?: string;
-  }>({});
+  }>({
+    wedding_date: undefined,
+    wedding_time: undefined,
+    location: undefined,
+    venue: undefined,
+  });
   const [loading, setLoading] = useState(true);
   const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -249,6 +254,7 @@ export function MeetingsSection() {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
+      timeZone: 'Africa/Kampala' // Add explicit time zone
     });
   };
 
@@ -277,7 +283,8 @@ export function MeetingsSection() {
         {getAllEvents().length === 0 ? (
           <div className="text-center py-12">
             <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg">No upcoming meetings scheduled</p>
+            <p className="text-gray-500 text-lg">No upcoming meetings or wedding events found</p>
+            <p className="text-sm text-gray-400 mt-2">Check back later for updates</p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -310,7 +317,15 @@ export function MeetingsSection() {
                 <div className="space-y-3 mb-6">
                   <div className="flex items-start gap-3 text-gray-700">
                     <Calendar className="w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">{formatDateTime(meeting.starts_at)}</span>
+                    <span className="text-sm">
+                      {formatDateTime(meeting.starts_at)}
+                      {(meeting as any).is_wedding && (
+                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-white text-rose-500 border border-rose-500">
+                          <Heart className="w-3 h-3 mr-1" />
+                          Save the Date
+                        </span>
+                      )}
+                    </span>
                   </div>
                   <div className="flex items-start gap-3 text-gray-700">
                     <MapPin className="w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5" />

@@ -246,14 +246,20 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
     });
   };
 
+  // Get names - use wedding details from site settings, fallback to prop values
   // Get names - default to 'John and Priscilla' if not specified
-  const displayNames = 'John & Priscilla';
+  const displayNames = useMemo(() => {
+    if (weddingDetails.bride_name && weddingDetails.groom_name) {
+      return `${weddingDetails.bride_name} & ${weddingDetails.groom_name}`;
+    }
+    if (weddingDetails.names) {
+      return weddingDetails.names;
+    }
+    return 'John & Priscilla'; // Final fallback
+  }, [weddingDetails.bride_name, weddingDetails.groom_name, weddingDetails.names]);
 
-  const displayLocation = weddingDetails.location || weddingDetails.venue || 'TBA';
-  const displayTagline = weddingDetails.tagline || 'Join us as we celebrate our love';
-  
   // Format the wedding date with time if available
-  const formatWeddingDateTime = () => {
+  const formatWeddingDateTime = useCallback(() => {
     if (!weddingDetails.wedding_date) return 'TBA';
     
     const date = new Date(weddingDetails.wedding_date);
@@ -279,7 +285,19 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
     }
     
     return formattedDate;
-  };
+  }, [weddingDetails.wedding_date, weddingDetails.wedding_time]);
+
+  // Display location with improved venue handling
+  const displayLocation = useMemo(() => {
+    if (weddingDetails.venue && weddingDetails.location) {
+      return `${weddingDetails.venue}, ${weddingDetails.location}`;
+    }
+    return weddingDetails.venue || weddingDetails.location || 'TBA';
+  }, [weddingDetails.venue, weddingDetails.location]);
+  
+  const displayTagline = useMemo(() => {
+    return weddingDetails.tagline || 'Join us as we celebrate our love';
+  }, [weddingDetails.tagline]);
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50 wedding-font">
@@ -378,6 +396,16 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
         <p className="text-xl sm:text-2xl md:text-3xl text-white/95 mb-8 md:mb-12 font-light italic max-w-3xl mx-auto leading-relaxed drop-shadow-lg animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           "{weddingDetails.tagline || 'Join us as we celebrate our love'}"
         </p>
+                  
+        {/* Enhanced loading state */}
+        {loading && (
+          <div className="flex justify-center items-center py-6 md:py-8">
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-xl px-6 py-3 rounded-xl">
+              <Loader2 className="w-5 h-5 md:w-6 md:h-6 animate-spin text-white" />
+              <span className="text-white/80 text-sm md:text-base">Loading wedding details...</span>
+            </div>
+          </div>
+        )}
 
         {/* Wedding details with modern glassmorphic cards */}
           {loading ? (
