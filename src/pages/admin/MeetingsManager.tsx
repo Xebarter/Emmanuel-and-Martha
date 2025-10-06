@@ -53,17 +53,18 @@ export default function MeetingsManager() {
       // Fetch wedding settings from site_settings table
       const { data, error } = await supabase
         .from('site_settings')
-        .select('key, value')
-        .eq('key', 'couple_info');
+        .select('value')
+        .eq('key', 'couple_info')
+        .maybeSingle();
 
       if (error) throw error;
 
-      if (data && data.length > 0 && data[0].value) {
+      if (data && data.value) {
         setSiteSettings({
-          wedding_date: data[0].value.wedding_date || '',
-          wedding_venue: data[0].value.location || '',
-          wedding_time: data[0].value.wedding_time || '',
-          wedding_tagline: data[0].value.tagline || ''
+          wedding_date: data.value.wedding_date || '',
+          wedding_venue: data.value.location || '',
+          wedding_time: data.value.wedding_time || '',
+          wedding_tagline: data.value.tagline || ''
         });
       }
     } catch (err) {
@@ -73,34 +74,26 @@ export default function MeetingsManager() {
 
   const updateSiteSettings = async (settings: any) => {
     try {
-      // Get the current couple_info to preserve existing fields
-      const { data: currentData, error: fetchError } = await supabase
-        .from('site_settings')
-        .select('value')
-        .eq('key', 'couple_info')
-        .single();
-
-      if (fetchError) throw fetchError;
-
-      // Merge the existing data with new settings
-      const updatedSettings = {
-        ...(currentData?.value || {}),
-        ...settings
-      };
-
+      // Use upsert to insert or update the record
       const { error } = await supabase
         .from('site_settings')
-        .update({ 
-          value: updatedSettings,
+        .upsert({ 
+          key: 'couple_info',
+          value: {
+            names: "John & Priscilla", // Always include default names
+            hero_image: "", // Always include default hero image
+            ...settings
+          },
           updated_at: new Date().toISOString()
-        })
-        .eq('key', 'couple_info');
+        }, {
+          onConflict: 'key'
+        });
       
       if (error) throw error;
-      return true;
-    } catch (err) {
+      return { success: true };
+    } catch (err: any) {
       console.error('Error updating site settings:', err);
-      return false;
+      return { success: false, error: err.message || 'Unknown error occurred' };
     }
   };
 
@@ -152,11 +145,11 @@ export default function MeetingsManager() {
       tagline: siteSettings.wedding_tagline
     };
     
-    const success = await updateSiteSettings(settings);
-    if (success) {
+    const result = await updateSiteSettings(settings);
+    if (result.success) {
       alert('Wedding details saved successfully!');
     } else {
-      alert('Failed to save wedding details. Please try again.');
+      alert(`Failed to save wedding details: ${result.error}. Please try again.`);
     }
   };
 

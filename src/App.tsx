@@ -175,9 +175,9 @@ function AppContent() {
       <Route path="/unauthorized" element={<Unauthorized />} />
 
       {/* Admin routes - accessible via both /admin and /dashboard */}
-      <Route path="/admin/*" element={<AdminRoutes />} />
+      <Route path="/admin/*" element={<ProtectedRoute requiredRole="admin"><AdminRoutes /></ProtectedRoute>} />
       
-      <Route path="/dashboard/*" element={<AdminRoutes />} />
+      <Route path="/dashboard/*" element={<ProtectedRoute requiredRole="admin"><AdminRoutes /></ProtectedRoute>} />
 
       {/* Catch all other routes */}
       <Route path="*" element={<Navigate to="/" replace />} />
