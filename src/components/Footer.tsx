@@ -44,13 +44,13 @@ export function Footer() {
           <div>
             <h3 className="text-xl font-bold mb-4">Contact</h3>
             <div className="space-y-3">
-              <a href="mailto:contact@example.com" className="flex items-center gap-2 text-gray-400 hover:text-rose-400 transition-colors">
+              <a href="mailto:sebenock027@example.com" className="flex items-center gap-2 text-gray-400 hover:text-rose-400 transition-colors">
                 <Mail className="w-5 h-5" />
-                contact@example.com
+                sebenock027@gmail.com
               </a>
-              <a href="tel:+256700000000" className="flex items-center gap-2 text-gray-400 hover:text-rose-400 transition-colors">
+              <a href="tel:+256783676313" className="flex items-center gap-2 text-gray-400 hover:text-rose-400 transition-colors">
                 <Phone className="w-5 h-5" />
-                +256 700 000 000
+                +256 783 676 313
               </a>
             </div>
           </div>
