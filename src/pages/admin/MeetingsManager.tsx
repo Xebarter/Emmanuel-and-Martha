@@ -60,7 +60,7 @@ export default function MeetingsManager() {
         setSiteSettings({
           wedding_date: coupleInfo.wedding_date || '',
           wedding_venue: coupleInfo.location || '',
-          wedding_time: '10:00' // Default time
+          wedding_time: coupleInfo.wedding_time || '' // Updated to get wedding_time
         });
       }
     } catch (err) {
@@ -118,7 +118,7 @@ export default function MeetingsManager() {
     const settings = {
       wedding_date: siteSettings.wedding_date,
       location: siteSettings.wedding_venue,
-      // We can add more fields as needed
+      wedding_time: siteSettings.wedding_time // Include wedding_time in the settings
     };
     
     await updateSiteSettings(settings);
@@ -229,6 +229,18 @@ export default function MeetingsManager() {
               
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Wedding Time
+                </label>
+                <input
+                  type="time"
+                  value={siteSettings.wedding_time}
+                  onChange={(e) => setSiteSettings({...siteSettings, wedding_time: e.target.value})}
+                  className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none transition-all"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
                   Wedding Venue
                 </label>
                 <input
@@ -240,10 +252,10 @@ export default function MeetingsManager() {
                 />
               </div>
               
-              <div className="flex items-end">
+              <div className="md:col-span-3 flex items-end">
                 <button
                   onClick={handleSaveWeddingDetails}
-                  className="w-full px-4 py-2.5 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-lg font-semibold hover:from-rose-600 hover:to-pink-700 transition-all shadow-md"
+                  className="w-full md:w-auto px-6 py-2.5 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-lg font-semibold hover:from-rose-600 hover:to-pink-700 transition-all shadow-md"
                 >
                   Save Wedding Details
                 </button>

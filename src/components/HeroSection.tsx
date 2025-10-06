@@ -72,6 +72,7 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
             location: data.value.location || coupleInfo.location,
             venue: data.value.venue || coupleInfo.venue,
             tagline: data.value.tagline || coupleInfo.tagline,
+            wedding_time: data.value.wedding_time || coupleInfo.wedding_time // Add wedding_time
           }));
         }
       } catch (error) {
