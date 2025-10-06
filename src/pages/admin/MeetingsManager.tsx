@@ -37,6 +37,22 @@ export default function MeetingsManager() {
     fetchSiteSettings();
   }, []);
 
+  // Initialize form data with the first meeting's data once meetings are fetched
+  useEffect(() => {
+    if (meetings.length > 0) {
+      const firstMeeting = meetings[0];
+      const [datePart, timePart] = firstMeeting.starts_at.split('T');
+      const time = timePart ? timePart.substring(0, 5) : '';
+
+      setFormData({
+        title: firstMeeting.title,
+        date: datePart,
+        time: time,
+        location: firstMeeting.location
+      });
+    }
+  }, [meetings]);
+
   const fetchMeetings = async (): Promise<void> => {
     setLoading(true);
     try {
@@ -74,26 +90,88 @@ export default function MeetingsManager() {
 
   const updateSiteSettings = async (settings: any) => {
     try {
-      // Use upsert to insert or update the record
-      const { error } = await supabase
+      // First, get the current data to preserve existing fields
+      const { data: currentData, error: fetchError } = await supabase
         .from('site_settings')
-        .upsert({ 
-          key: 'couple_info',
-          value: {
-            names: "John & Priscilla", // Always include default names
-            hero_image: "", // Always include default hero image
-            ...settings
-          },
+        .select('value')
+        .eq('key', 'couple_info')
+        .maybeSingle();
+
+      if (fetchError) {
+        console.error('Error fetching current settings:', fetchError);
+        // Try to insert if we can't fetch
+        const defaultSettings = {
+          names: "John & Priscilla",
+          hero_image: "",
+          ...settings
+        };
+        
+        const { error: insertError } = await supabase
+          .from('site_settings')
+          .upsert({ 
+            key: 'couple_info',
+            value: defaultSettings,
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'key'
+          });
+          
+        if (insertError) {
+          console.error('Error inserting settings:', insertError);
+          return { 
+            success: false, 
+            error: `Failed to insert settings: ${insertError.message}` 
+          };
+        }
+        return { success: true };
+      }
+
+      // Merge the existing data with new settings
+      const updatedSettings = {
+        ...(currentData?.value || {
+          names: "John & Priscilla",
+          hero_image: ""
+        }),
+        ...settings
+      };
+
+      // Try to update the record
+      const { error: updateError } = await supabase
+        .from('site_settings')
+        .update({ 
+          value: updatedSettings,
           updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'key'
-        });
+        })
+        .eq('key', 'couple_info');
       
-      if (error) throw error;
+      // Handle update errors
+      if (updateError) {
+        console.error('Error updating settings:', updateError);
+        
+        // Try upsert as fallback
+        const { error: upsertError } = await supabase
+          .from('site_settings')
+          .upsert({ 
+            key: 'couple_info',
+            value: updatedSettings,
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'key'
+          });
+          
+        if (upsertError) {
+          console.error('Error upserting settings:', upsertError);
+          return { 
+            success: false, 
+            error: `Failed to update settings: ${upsertError.message}` 
+          };
+        }
+      }
+      
       return { success: true };
     } catch (err: any) {
-      console.error('Error updating site settings:', err);
-      return { success: false, error: err.message || 'Unknown error occurred' };
+      console.error('Unexpected error updating site settings:', err);
+      return { success: false, error: `Unexpected error: ${err.message || 'Unknown error occurred'}` };
     }
   };
 
@@ -138,18 +216,29 @@ export default function MeetingsManager() {
   };
 
   const handleSaveWeddingDetails = async () => {
+    // Validate that at least one field is filled
+    if (!siteSettings.wedding_date && 
+        !siteSettings.wedding_venue && 
+        !siteSettings.wedding_time && 
+        !siteSettings.wedding_tagline) {
+      alert('Please fill in at least one field before saving.');
+      return;
+    }
+
     const settings = {
-      wedding_date: siteSettings.wedding_date,
-      location: siteSettings.wedding_venue,
-      wedding_time: siteSettings.wedding_time,
-      tagline: siteSettings.wedding_tagline
+      wedding_date: siteSettings.wedding_date || null,
+      location: siteSettings.wedding_venue || null,
+      wedding_time: siteSettings.wedding_time || null,
+      tagline: siteSettings.wedding_tagline || null
     };
     
     const result = await updateSiteSettings(settings);
     if (result.success) {
+      // Refresh the settings to show the updated values
+      await fetchSiteSettings();
       alert('Wedding details saved successfully!');
     } else {
-      alert(`Failed to save wedding details: ${result.error}. Please try again.`);
+      alert(`Failed to save wedding details: ${result.error}`);
     }
   };
 
