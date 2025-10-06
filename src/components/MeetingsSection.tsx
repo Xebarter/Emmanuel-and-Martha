@@ -81,17 +81,16 @@ export function MeetingsSection() {
       const { data, error } = await supabase
         .from('site_settings')
         .select('value')
-        .eq('key', 'couple_info')
-        .single();
+        .eq('key', 'couple_info');
 
       if (error) throw error;
       
-      if (data?.value) {
+      if (data && data.length > 0 && data[0].value) {
         setWeddingDetails({
-          wedding_date: data.value.wedding_date,
-          wedding_time: data.value.wedding_time,
-          location: data.value.location,
-          venue: data.value.venue
+          wedding_date: data[0].value.wedding_date,
+          wedding_time: data[0].value.wedding_time,
+          location: data[0].value.location,
+          venue: data[0].value.venue
         });
       }
     } catch (error) {
