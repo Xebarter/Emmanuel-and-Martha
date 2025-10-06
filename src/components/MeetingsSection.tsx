@@ -191,6 +191,7 @@ export function MeetingsSection() {
     try {
       const normalizedPhone = normalizePhone(data.phone);
 
+      // Check if guest already exists
       let guestId = null;
       const { data: existingGuest } = await supabase
         .from('guests')
@@ -201,6 +202,7 @@ export function MeetingsSection() {
       if (existingGuest) {
         guestId = existingGuest.id;
       } else {
+        // Insert new guest record
         const { data: newGuest, error: guestError } = await supabase
           .from('guests')
           .insert({
@@ -220,7 +222,7 @@ export function MeetingsSection() {
         .from('attendances')
         .select('id')
         .eq('meeting_id', selectedMeeting.id)
-        .eq('phone', normalizedPhone)
+        .eq('guest_id', guestId)
         .maybeSingle();
 
       // If attendance already exists, show success message
