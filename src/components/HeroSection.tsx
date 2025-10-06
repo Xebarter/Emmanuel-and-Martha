@@ -250,12 +250,12 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
   // Get names - default to 'John and Priscilla' if not specified
   const displayNames = useMemo(() => {
     if (weddingDetails.bride_name && weddingDetails.groom_name) {
-      return `${weddingDetails.bride_name} & ${weddingDetails.groom_name}`;
+      return `${weddingDetails.bride_name} and ${weddingDetails.groom_name}`;
     }
     if (weddingDetails.names) {
       return weddingDetails.names;
     }
-    return 'John & Priscilla'; // Final fallback
+    return 'John and Priscilla'; // Final fallback
   }, [weddingDetails.bride_name, weddingDetails.groom_name, weddingDetails.names]);
 
   // Format the wedding date with time if available

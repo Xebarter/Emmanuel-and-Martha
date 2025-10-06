@@ -122,8 +122,8 @@ function AppContent() {
   // Provide default metadata if none exists (fallback for development)
   const safeMetadata = metadata || {
     couple: {
-      bride_name: 'Priscilla',
-      groom_name: 'John',
+      bride_name: 'The Bride',
+      groom_name: 'The Groom',
       wedding_date: new Date().toISOString(),
       venue: 'Beautiful Venue',
       tagline: 'Celebrating Our Love'

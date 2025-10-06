@@ -3,10 +3,26 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { format, formatDistanceToNow, differenceInDays, differenceInHours, differenceInMinutes, isAfter } from 'date-fns';
+import { differenceInDays, differenceInHours, differenceInMinutes } from 'date-fns';
 import { supabase } from '../lib/supabase';
-import { normalizePhone, formatDateTime } from '../lib/utils';
-import { Meeting } from '../lib/types';
+import { normalizePhone } from '../lib/utils';
+
+// Define Meeting type since it's not in types file
+type Meeting = {
+  id: string;
+  title: string;
+  description: string;
+  location: string;
+  starts_at: string;
+  ends_at: string;
+  created_at: string;
+  is_wedding?: boolean;
+  status?: string;
+  is_virtual?: boolean;
+  meeting_link?: string;
+  organizer?: string;
+  updated_at?: string;
+};
 
 const registrationSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -85,7 +101,7 @@ export function MeetingsSection() {
           schema: 'public',
           table: 'meetings'
         },
-        (payload) => {
+        () => {
           // Refresh meetings when any change occurs
           fetchMeetings();
         }
@@ -191,47 +207,31 @@ export function MeetingsSection() {
     try {
       const normalizedPhone = normalizePhone(data.phone);
 
-      let guestId = null;
-      const { data: existingGuest } = await supabase
-        .from('guests')
-        .select('id')
-        .eq('phone', normalizedPhone)
-        .maybeSingle();
-
-      if (existingGuest) {
-        guestId = existingGuest.id;
-      } else {
-        const { data: newGuest, error: guestError } = await supabase
-          .from('guests')
-          .insert({
-            full_name: data.name,
-            phone: normalizedPhone,
-            email: data.email || null,
-          })
-          .select('id')
-          .single();
-
-        if (guestError) throw guestError;
-        guestId = newGuest.id;
-      }
-
-      const { error: attendanceError } = await supabase
-        .from('attendances')
-        .insert({
+      // Insert or update the meeting attendee
+      const { error } = await supabase
+        .from('meeting_attendees')
+        .upsert({
           meeting_id: selectedMeeting.id,
-          guest_id: guestId,
-          name: data.name,
-          phone: normalizedPhone,
-          email: data.email || null,
-          status: 'registered',
+          guest_name: data.name,
+          guest_email: data.email || null,
+          guest_phone: normalizedPhone,
+          rsvp_status: 'confirmed',
+          attendance_status: 'not_attended',
+          registered_at: new Date().toISOString(),
+        }, {
+          onConflict: 'meeting_id,guest_email',
+          ignoreDuplicates: false
         });
 
-      if (attendanceError) throw attendanceError;
+      if (error) throw error;
 
       setSubmitMessage({
         type: 'success',
-        text: 'Successfully registered! We look forward to seeing you.',
+        text: 'Successfully registered for the meeting! We look forward to seeing you.',
       });
+      
+      // Refresh the meetings to show updated attendee count
+      await fetchMeetings();
       reset();
       setSelectedMeeting(null);
     } catch (error) {
