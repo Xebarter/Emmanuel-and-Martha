@@ -22,7 +22,7 @@ export async function getMeetingRegisteredGuests() {
         )
       )
     `)
-    .neq('attendances.id', null);
+    .not('attendances', 'is', null);
     
   if (error) throw error;
   return data;
