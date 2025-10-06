@@ -139,7 +139,7 @@ function AppContent() {
   return (
     <Routes>
       {/* Public routes */}
-      <Route path="/" element={
+      <Route path="*" element={
         <div ref={homeRef} className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-amber-50">
           <HeroSection coupleInfo={safeMetadata.couple} />
           <GallerySection />

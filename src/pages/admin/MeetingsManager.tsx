@@ -198,12 +198,18 @@ export default function MeetingsManager() {
   const handleAddMeeting = async (meeting: Omit<Meeting, 'id' | 'created_at'>): Promise<void> => {
     setLoading(true);
     try {
+      console.log('Adding meeting with data:', meeting);
       await addMeeting(meeting);
       await fetchMeetings();
       alert('Meeting added successfully!');
     } catch (err: any) {
       console.error('Error adding meeting:', err);
-      alert(`Error adding meeting: ${err.message || 'Unknown error occurred'}`);
+      console.error('Error details:', {
+        message: err.message,
+        error: err,
+        stack: err.stack
+      });
+      alert(`Error adding meeting: ${err.message || err.error || 'Unknown error occurred'}`);
     }
     setLoading(false);
   };
@@ -211,12 +217,18 @@ export default function MeetingsManager() {
   const handleUpdateMeeting = async (id: string, updates: Partial<Omit<Meeting, 'id' | 'created_at'>>): Promise<void> => {
     setLoading(true);
     try {
+      console.log('Updating meeting with data:', { id, updates });
       await updateMeeting(id, updates);
       await fetchMeetings();
       alert('Meeting updated successfully!');
     } catch (err: any) {
       console.error('Error updating meeting:', err);
-      alert(`Error updating meeting: ${err.message || 'Unknown error occurred'}`);
+      console.error('Error details:', {
+        message: err.message,
+        error: err,
+        stack: err.stack
+      });
+      alert(`Error updating meeting: ${err.message || err.error || 'Unknown error occurred'}`);
     }
     setLoading(false);
   };
@@ -224,12 +236,18 @@ export default function MeetingsManager() {
   const handleDeleteMeeting = async (id: string): Promise<void> => {
     setLoading(true);
     try {
+      console.log('Deleting meeting with id:', id);
       await deleteMeeting(id);
       await fetchMeetings();
       alert('Meeting deleted successfully!');
     } catch (err: any) {
       console.error('Error deleting meeting:', err);
-      alert(`Error deleting meeting: ${err.message || 'Unknown error occurred'}`);
+      console.error('Error details:', {
+        message: err.message,
+        error: err,
+        stack: err.stack
+      });
+      alert(`Error deleting meeting: ${err.message || err.error || 'Unknown error occurred'}`);
     }
     setLoading(false);
     setShowDeleteConfirm(false);
@@ -270,11 +288,27 @@ export default function MeetingsManager() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    // Validate form data
+    if (!formData.title || !formData.date || !formData.time || !formData.location) {
+      alert('Please fill in all required fields');
+      return;
+    }
+    
+    // Properly format the datetime
+    const startsAt = new Date(`${formData.date}T${formData.time}:00`);
+    
+    // Validate date
+    if (isNaN(startsAt.getTime())) {
+      alert('Invalid date or time format');
+      return;
+    }
+    
     const meetingData: Omit<Meeting, 'id' | 'created_at'> = {
       title: formData.title,
       location: formData.location,
-      starts_at: `${formData.date}T${formData.time}:00`,
-      ends_at: `${formData.date}T${formData.time}:00` // For simplicity, using same time
+      starts_at: startsAt.toISOString(),
+      ends_at: undefined // Make it truly optional
     };
 
     if (editingMeeting) {
