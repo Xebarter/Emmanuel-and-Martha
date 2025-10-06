@@ -1,9 +1,9 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
 import Login, { Unauthorized } from './pages/Login';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { isSupabaseConnected } from './lib/supabase';
 import { AdminRoutes } from './routes/AdminRoutes';
 
@@ -28,6 +28,9 @@ function AppContent() {
   const { metadata, loading, error: metadataError } = useMetadata();
   const { loading: authLoading, isAuthenticated } = useAuth();
   const [offlineMode, setOfflineMode] = useState(!isSupabaseConnected);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const homeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isSupabaseConnected) {
@@ -35,6 +38,35 @@ function AppContent() {
       setOfflineMode(true);
     }
   }, []);
+
+  // Handle scrolling to sections
+  useEffect(() => {
+    // Check if we're on a section route
+    const sectionRoutes = ['/contribute', '/pledge', '/meetings', '/guestbook'];
+    if (sectionRoutes.includes(location.pathname)) {
+      // Navigate to home page with hash
+      const sectionMap: Record<string, string> = {
+        '/contribute': '#contribute',
+        '/pledge': '#pledge',
+        '/meetings': '#meetings',
+        '/guestbook': '#guestbook'
+      };
+      
+      const hash = sectionMap[location.pathname];
+      navigate(`/${hash}`, { replace: true });
+    }
+    
+    // Scroll to section if hash is present
+    if (location.hash) {
+      // Delay to ensure DOM is ready
+      setTimeout(() => {
+        const element = document.querySelector(location.hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  }, [location, navigate]);
 
   console.log('[AppContent] States:', {
     metadataLoading: loading,
@@ -108,16 +140,30 @@ function AppContent() {
     <Routes>
       {/* Public routes */}
       <Route path="/" element={
-        <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-amber-50">
+        <div ref={homeRef} className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-amber-50">
           <HeroSection coupleInfo={safeMetadata.couple} />
           <GallerySection />
-          <ContributeSection totalContributions={safeMetadata.counts.total_contributions} />
-          <PledgeSection totalPledges={safeMetadata.counts.total_pledges} />
-          <MeetingsSection />
-          <GuestbookSection />
+          <div id="contribute">
+            <ContributeSection totalContributions={safeMetadata.counts.total_contributions} />
+          </div>
+          <div id="pledge">
+            <PledgeSection totalPledges={safeMetadata.counts.total_pledges} />
+          </div>
+          <div id="meetings">
+            <MeetingsSection />
+          </div>
+          <div id="guestbook">
+            <GuestbookSection />
+          </div>
           <Footer />
         </div>
       } />
+
+      {/* Section routes that redirect to homepage sections */}
+      <Route path="/contribute" element={<Navigate to="/#contribute" replace />} />
+      <Route path="/pledge" element={<Navigate to="/#pledge" replace />} />
+      <Route path="/meetings" element={<Navigate to="/#meetings" replace />} />
+      <Route path="/guestbook" element={<Navigate to="/#guestbook" replace />} />
 
       {/* Payment routes */}
       <Route path="/callback" element={<CallbackPage />} />
