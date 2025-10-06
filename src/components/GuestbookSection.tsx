@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { supabase } from '../lib/supabase';
-import { normalizePhone, formatDate } from '../lib/utils';
+import { normalizePhone } from '../lib/utils';
 import { GuestMessage } from '../lib/types';
 
 const messageSchema = z.object({
@@ -16,8 +16,6 @@ const messageSchema = z.object({
 type MessageForm = z.infer<typeof messageSchema>;
 
 export function GuestbookSection() {
-  const [messages, setMessages] = useState<GuestMessage[]>([]);
-  const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -30,27 +28,6 @@ export function GuestbookSection() {
     resolver: zodResolver(messageSchema),
   });
 
-  useEffect(() => {
-    fetchMessages();
-  }, []);
-
-  const fetchMessages = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('guest_messages')
-        .select('*')
-        .eq('is_approved', true)
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-      if (error) throw error;
-      setMessages(data || []);
-    } catch (error) {
-      console.error('Failed to fetch messages:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const onSubmit = async (data: MessageForm) => {
     setIsSubmitting(true);

@@ -29,6 +29,20 @@ export interface Guest {
   }>;
 }
 
+export interface GuestMessage {
+  id: string;
+  guest_id?: string;
+  message: string;
+  is_approved: boolean;
+  is_featured?: boolean;
+  created_at: string;
+  updated_at?: string;
+  guests?: {
+    full_name: string;
+    phone: string;
+  } | null;
+}
+
 export interface SiteMetadata {
   couple: {
     bride_name: string;

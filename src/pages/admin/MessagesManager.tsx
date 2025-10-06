@@ -34,11 +34,28 @@ export default function MessagesManager() {
     try {
       const { data, error } = await supabase
         .from('guest_messages')
-        .select('id, guest_id, message, is_approved, created_at, guests(full_name, phone)')
+        .select(`
+          id, 
+          guest_id, 
+          message, 
+          is_approved, 
+          created_at,
+          guests (
+            full_name,
+            phone
+          )
+        `)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      setMessages(data || []);
+      
+      // Transform the data to match our type
+      const transformedData = data?.map((item: any) => ({
+        ...item,
+        guests: item.guests ? item.guests[0] || null : null
+      })) || [];
+      
+      setMessages(transformedData);
     } catch (err) {
       console.error('Error fetching messages:', err);
     }
@@ -89,13 +106,7 @@ export default function MessagesManager() {
   const handleSubmit = () => {
     if (!formData.sender || !formData.content) return;
 
-    const newMessage = {
-      ...formData,
-      id: `${Date.now()}`,
-      timestamp: new Date().toISOString(),
-      read: false
-    };
-    setMessages([newMessage, ...messages]);
+    // This function is for the manual message creation modal, not connected to guest messages
     closeModal();
   };
 
@@ -109,20 +120,10 @@ export default function MessagesManager() {
     setFormData({ sender: '', content: '' });
   };
 
-  const deleteMessage = (id) => {
-    setMessages(messages.filter(m => m.id !== id));
-  };
-
-  const markAsRead = (id) => {
-    setMessages(messages.map(m =>
-      m.id === id ? { ...m, read: true } : m
-    ));
-  };
-
-  const formatTimestamp = (timestamp) => {
+  const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
     const now = new Date();
-    const diffInHours = (now - date) / (1000 * 60 * 60);
+    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
 
     if (diffInHours < 24) {
       return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
@@ -133,16 +134,15 @@ export default function MessagesManager() {
     }
   };
 
-  const getInitials = (name) => {
-    return name ? name.split(' ').map(n => n[0]).join('').toUpperCase() : 'A';
+  const getInitials = (name: string | undefined) => {
+    if (!name) return 'A';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
   const filteredMessages = messages.filter(msg =>
   (msg.guests?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     msg.message?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
-
-  const unreadCount = messages.filter(m => !m.read).length;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-50 p-8">
