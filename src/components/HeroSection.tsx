@@ -250,9 +250,13 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
   // Get names - default to 'John and Priscilla' if not specified
   const displayNames = useMemo(() => {
     if (weddingDetails.bride_name && weddingDetails.groom_name) {
-      return `${weddingDetails.bride_name} and ${weddingDetails.groom_name}`;
+      return `${weddingDetails.groom_name} and ${weddingDetails.bride_name}`;
     }
     if (weddingDetails.names) {
+      // If names contain "Priscilla and John", change to "John and Priscilla"
+      if (weddingDetails.names.includes("Priscilla and John")) {
+        return "John and Priscilla";
+      }
       return weddingDetails.names;
     }
     return 'John and Priscilla'; // Final fallback
@@ -412,22 +416,7 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
             <div className="flex justify-center items-center py-6 md:py-8">
               <Loader2 className="w-8 h-8 md:w-10 md:h-10 animate-spin text-white drop-shadow-lg" />
             </div>
-          ) : (
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 mb-12 md:mb-16 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-              <div className="group flex items-center gap-2 md:gap-3 bg-white/10 backdrop-blur-xl px-6 py-3 md:px-8 md:py-4 rounded-2xl shadow-2xl border border-white/20 hover:bg-white/20 hover:scale-105 transition-all duration-300">
-                <div className="p-1.5 md:p-2 bg-gradient-to-br from-rose-400 to-fuchsia-500 rounded-xl shadow-lg">
-                  <Calendar className="w-5 h-5 md:w-6 md:h-6 text-white" />
-                </div>
-                <span className="font-semibold text-white text-base md:text-lg drop-shadow-md">{formatWeddingDateTime()}</span>
-              </div>
-              <div className="group flex items-center gap-2 md:gap-3 bg-white/10 backdrop-blur-xl px-6 py-3 md:px-8 md:py-4 rounded-2xl shadow-2xl border border-white/20 hover:bg-white/20 hover:scale-105 transition-all duration-300">
-                <div className="p-1.5 md:p-2 bg-gradient-to-br from-fuchsia-400 to-purple-500 rounded-xl shadow-lg">
-                  <MapPin className="w-5 h-5 md:w-6 md:h-6 text-white" />
-                </div>
-                <span className="font-semibold text-white text-base md:text-lg drop-shadow-md">{weddingDetails.location || weddingDetails.venue || 'TBA'}</span>
-              </div>
-            </div>
-          )}
+          ) : null}
 
         {/* Ultra-modern countdown timer */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8 max-w-4xl mx-auto mb-12 md:mb-16 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>

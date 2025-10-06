@@ -23,7 +23,7 @@ export async function getMeetingRegisteredGuests() {
       )
     `)
     .not('attendances', 'is', null);
-    
+
   if (error) throw error;
   return data;
 }
