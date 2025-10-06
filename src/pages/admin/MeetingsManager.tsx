@@ -8,7 +8,7 @@ import {
   X,
   Heart
 } from 'lucide-react';
-import { getMeetings, addMeeting, updateMeeting, deleteMeeting } from '../../services/meetingsService';
+import { getMeetings, getUpcomingMeetings, addMeeting, updateMeeting, deleteMeeting } from '../../services/meetingsService';
 import { Meeting } from '../../services/meetingsService';
 import { supabase } from '../../lib/supabase';
 
@@ -35,6 +35,26 @@ export default function MeetingsManager() {
   useEffect(() => {
     fetchMeetings();
     fetchSiteSettings();
+    
+    // Set up real-time subscription to meetings
+    const subscription = supabase
+      .channel('meetings-changes')
+      .on('postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'meetings'
+        },
+        (payload) => {
+          // Refresh meetings when any change occurs
+          fetchMeetings();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Initialize form data with the first meeting's data once meetings are fetched
@@ -56,7 +76,7 @@ export default function MeetingsManager() {
   const fetchMeetings = async (): Promise<void> => {
     setLoading(true);
     try {
-      const data = await getMeetings();
+      const data = await getUpcomingMeetings();
       setMeetings(data || []);
     } catch (err) {
       console.error('Error fetching meetings:', err);
@@ -180,8 +200,10 @@ export default function MeetingsManager() {
     try {
       await addMeeting(meeting);
       await fetchMeetings();
-    } catch (err) {
+      alert('Meeting added successfully!');
+    } catch (err: any) {
       console.error('Error adding meeting:', err);
+      alert(`Error adding meeting: ${err.message || 'Unknown error occurred'}`);
     }
     setLoading(false);
   };
@@ -191,8 +213,10 @@ export default function MeetingsManager() {
     try {
       await updateMeeting(id, updates);
       await fetchMeetings();
-    } catch (err) {
+      alert('Meeting updated successfully!');
+    } catch (err: any) {
       console.error('Error updating meeting:', err);
+      alert(`Error updating meeting: ${err.message || 'Unknown error occurred'}`);
     }
     setLoading(false);
   };
@@ -202,8 +226,10 @@ export default function MeetingsManager() {
     try {
       await deleteMeeting(id);
       await fetchMeetings();
-    } catch (err) {
+      alert('Meeting deleted successfully!');
+    } catch (err: any) {
       console.error('Error deleting meeting:', err);
+      alert(`Error deleting meeting: ${err.message || 'Unknown error occurred'}`);
     }
     setLoading(false);
     setShowDeleteConfirm(false);

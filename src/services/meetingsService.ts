@@ -17,6 +17,16 @@ export async function getMeetings() {
   return data;
 }
 
+export async function getUpcomingMeetings() {
+  const { data, error } = await supabase
+    .from('meetings')
+    .select('*')
+    .gte('starts_at', new Date().toISOString())
+    .order('starts_at', { ascending: true });
+  if (error) throw error;
+  return data;
+}
+
 export async function addMeeting(meeting: Omit<Meeting, 'id' | 'created_at'>) {
   const { data, error } = await supabase.from('meetings').insert([meeting]).select();
   if (error) throw error;

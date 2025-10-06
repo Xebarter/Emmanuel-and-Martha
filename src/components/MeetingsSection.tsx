@@ -54,7 +54,7 @@ export function MeetingsSection() {
     fetchData();
     
     // Set up real-time subscription to wedding details
-    const subscription = supabase
+    const weddingSubscription = supabase
       .channel('wedding-details-changes')
       .on('postgres_changes', 
         { 
@@ -75,9 +75,26 @@ export function MeetingsSection() {
         }
       )
       .subscribe();
+      
+    // Set up real-time subscription to meetings
+    const meetingsSubscription = supabase
+      .channel('meetings-changes')
+      .on('postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'meetings'
+        },
+        (payload) => {
+          // Refresh meetings when any change occurs
+          fetchMeetings();
+        }
+      )
+      .subscribe();
 
     return () => {
-      subscription.unsubscribe();
+      weddingSubscription.unsubscribe();
+      meetingsSubscription.unsubscribe();
     };
   }, []);
   
