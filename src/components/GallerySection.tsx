@@ -105,7 +105,7 @@ export function GallerySection() {
           {images.map((image) => (
             <div
               key={image.id}
-              className="relative group aspect-square overflow-hidden rounded-lg bg-gray-100 cursor-pointer hover:opacity-90 transition-opacity"
+              className="relative group aspect-square overflow-hidden rounded-lg bg-gray-100 cursor-pointer hover:opacity-90 transition-opacity shadow-md hover:shadow-lg"
               onClick={() => setSelectedImage(image)}
             >
               <img
@@ -128,34 +128,41 @@ export function GallerySection() {
 
         {selectedImage && (
           <div 
-            className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4" 
+            className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 backdrop-blur-sm" 
             onClick={() => setSelectedImage(null)}
           >
             <div 
-              className="relative max-w-4xl w-full max-h-[90vh] flex flex-col" 
+              className="relative max-w-6xl w-full max-h-[90vh] flex flex-col" 
               onClick={e => e.stopPropagation()}
             >
-              <div className="flex justify-between items-center mb-4">
-                <div>
-                  <h3 className="text-xl font-medium text-white">{selectedImage.title}</h3>
-                  {selectedImage.description && (
-                    <p className="text-gray-300">{selectedImage.description}</p>
-                  )}
-                </div>
-                <button
-                  onClick={() => setSelectedImage(null)}
-                  className="text-white hover:text-gray-300 transition-colors p-2"
-                  aria-label="Close"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-              <div className="flex-1 flex items-center justify-center">
+              {/* Close button at the top right */}
+              <button
+                onClick={() => setSelectedImage(null)}
+                className="absolute -top-12 right-0 text-white hover:text-rose-300 transition-colors p-2 z-10"
+                aria-label="Close"
+              >
+                <X className="w-10 h-10" />
+              </button>
+              
+              {/* Image container with premium styling */}
+              <div className="flex-1 flex items-center justify-center rounded-2xl overflow-hidden bg-black/20 backdrop-blur-sm border border-white/10 shadow-2xl">
                 <img
                   src={selectedImage.url}
-                  alt={selectedImage.title}
-                  className="max-w-full max-h-[70vh] object-contain"
+                  alt="Gallery image preview"
+                  className="max-w-full max-h-[80vh] object-contain"
                 />
+              </div>
+              
+              {/* Image details with premium styling */}
+              <div className="mt-6 text-center">
+                {selectedImage.description && (
+                  <p className="text-gray-300 text-lg max-w-3xl mx-auto">{selectedImage.description}</p>
+                )}
+                <div className="mt-4 flex justify-center space-x-2">
+                  <div className="w-3 h-3 bg-rose-500 rounded-full"></div>
+                  <div className="w-3 h-3 bg-white/30 rounded-full"></div>
+                  <div className="w-3 h-3 bg-white/30 rounded-full"></div>
+                </div>
               </div>
             </div>
           </div>
