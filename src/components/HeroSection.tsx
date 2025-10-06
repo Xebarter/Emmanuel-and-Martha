@@ -1,4 +1,4 @@
-import { Heart, MapPin, Calendar, Loader2 } from 'lucide-react';
+import { Heart, MapPin, Calendar, Loader2, DollarSign } from 'lucide-react';
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -478,6 +478,25 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
             <Heart className="relative w-2 h-2 sm:w-3 sm:h-3 md:w-5 md:h-5 text-white fill-white drop-shadow-lg animate-pulse-gentle" />
           </div>
           <div className="h-[1px] w-8 xs:w-12 sm:w-20 md:w-32 bg-gradient-to-l from-transparent via-white/40 to-white/60"></div>
+        </div>
+
+        {/* Contribute button */}
+        <div className="mt-8 animate-fade-in-up" style={{ animationDelay: '1.2s' }}>
+          <button
+            onClick={() => {
+              const contributeSection = document.getElementById('contribute');
+              if (contributeSection) {
+                contributeSection.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+            className="group relative px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out"
+          >
+            <span className="relative z-10 flex items-center gap-2">
+              Contribute
+              <DollarSign className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
+            </span>
+            <div className="absolute inset-0 bg-gradient-to-r from-rose-400 to-pink-400 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+          </button>
         </div>
       </div>
 
