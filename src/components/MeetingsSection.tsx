@@ -215,6 +215,32 @@ export function MeetingsSection() {
         guestId = newGuest.id;
       }
 
+      // Check if attendance record already exists
+      const { data: existingAttendance, error: attendanceCheckError } = await supabase
+        .from('attendances')
+        .select('id')
+        .eq('meeting_id', selectedMeeting.id)
+        .eq('phone', normalizedPhone)
+        .maybeSingle();
+
+      // If attendance already exists, show success message
+      if (existingAttendance) {
+        setSubmitMessage({
+          type: 'success',
+          text: 'You are already registered for this meeting! We look forward to seeing you.',
+        });
+        reset();
+        setSelectedMeeting(null);
+        setIsSubmitting(false);
+        return;
+      }
+
+      // If there was an error checking for existing attendance (other than not found), throw it
+      if (attendanceCheckError && attendanceCheckError.code !== 'PGRST116') {
+        throw attendanceCheckError;
+      }
+
+      // Insert new attendance record
       const { error: attendanceError } = await supabase
         .from('attendances')
         .insert({
