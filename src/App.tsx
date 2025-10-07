@@ -58,13 +58,30 @@ function AppContent() {
     
     // Scroll to section if hash is present
     if (location.hash) {
-      // Delay to ensure DOM is ready
-      setTimeout(() => {
+      // Use requestAnimationFrame to ensure DOM is ready
+      const scrollToIntendedSection = () => {
         const element = document.querySelector(location.hash);
         if (element) {
           element.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          // If element is not found, try again after a short delay
+          setTimeout(() => {
+            const delayedElement = document.querySelector(location.hash);
+            if (delayedElement) {
+              delayedElement.scrollIntoView({ behavior: 'smooth' });
+            }
+          }, 500);
         }
-      }, 100);
+      };
+      
+      // Try to scroll immediately
+      if (document.readyState === 'loading') {
+        // If document is still loading, wait for it to complete
+        window.addEventListener('DOMContentLoaded', scrollToIntendedSection);
+      } else {
+        // If document is already loaded, scroll immediately
+        requestAnimationFrame(scrollToIntendedSection);
+      }
     }
   }, [location, navigate]);
 

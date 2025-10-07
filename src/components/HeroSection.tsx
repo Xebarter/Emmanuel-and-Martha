@@ -50,6 +50,98 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
   const [loading, setLoading] = useState(true);
   const carouselIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Update meta tags for social sharing
+  useEffect(() => {
+    const updateMetaTags = () => {
+      // Update title
+      const title = 'John and Priscilla';
+      document.title = title;
+      
+      // Update meta tags
+      let metaTitle = document.querySelector('meta[name="title"]');
+      if (!metaTitle) {
+        metaTitle = document.createElement('meta');
+        metaTitle.name = 'title';
+        document.head.appendChild(metaTitle);
+      }
+      metaTitle.content = title;
+      
+      // Update Open Graph title
+      let ogTitle = document.querySelector('meta[property="og:title"]');
+      if (!ogTitle) {
+        ogTitle = document.createElement('meta');
+        ogTitle.setAttribute('property', 'og:title');
+        document.head.appendChild(ogTitle);
+      }
+      ogTitle.content = title;
+      
+      // Update Twitter title
+      let twitterTitle = document.querySelector('meta[property="twitter:title"]');
+      if (!twitterTitle) {
+        twitterTitle = document.createElement('meta');
+        twitterTitle.setAttribute('property', 'twitter:title');
+        document.head.appendChild(twitterTitle);
+      }
+      twitterTitle.content = title;
+      
+      // Update description
+      const description = 'Join us as we celebrate our love';
+      let metaDescription = document.querySelector('meta[name="description"]');
+      if (!metaDescription) {
+        metaDescription = document.createElement('meta');
+        metaDescription.name = 'description';
+        document.head.appendChild(metaDescription);
+      }
+      metaDescription.content = description;
+      
+      // Update Open Graph description
+      let ogDescription = document.querySelector('meta[property="og:description"]');
+      if (!ogDescription) {
+        ogDescription = document.createElement('meta');
+        ogDescription.setAttribute('property', 'og:description');
+        document.head.appendChild(ogDescription);
+      }
+      ogDescription.content = description;
+      
+      // Update Twitter description
+      let twitterDescription = document.querySelector('meta[property="twitter:description"]');
+      if (!twitterDescription) {
+        twitterDescription = document.createElement('meta');
+        twitterDescription.setAttribute('property', 'twitter:description');
+        document.head.appendChild(twitterDescription);
+      }
+      twitterDescription.content = description;
+      
+      // Update Open Graph image (use first gallery image if available)
+      let ogImage = document.querySelector('meta[property="og:image"]');
+      if (!ogImage) {
+        ogImage = document.createElement('meta');
+        ogImage.setAttribute('property', 'og:image');
+        document.head.appendChild(ogImage);
+      }
+      
+      // Update Twitter image (use first gallery image if available)
+      let twitterImage = document.querySelector('meta[property="twitter:image"]');
+      if (!twitterImage) {
+        twitterImage = document.createElement('meta');
+        twitterImage.setAttribute('property', 'twitter:image');
+        document.head.appendChild(twitterImage);
+      }
+      
+      // If we have gallery images, use the first one for social previews
+      if (galleryImages.length > 0) {
+        ogImage.content = galleryImages[0].url;
+        twitterImage.content = galleryImages[0].url;
+      } else {
+        // Fallback to default image
+        ogImage.content = 'https://johnandpriscilla.vercel.app/default-og-image.jpg';
+        twitterImage.content = 'https://johnandpriscilla.vercel.app/default-og-image.jpg';
+      }
+    };
+    
+    updateMetaTags();
+  }, [galleryImages]);
+
   // Fetch site settings for hero section customization
   useEffect(() => {
     const fetchSiteSettings = async () => {
@@ -376,7 +468,7 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
 
         {/* Main heading with ultra-modern typography */}
         <div className="mb-4 md:mb-8 animate-fade-in-up">
-          <h1 className="text-4xl xs:text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-bold mb-3 md:mb-4 leading-none tracking-tight" 
+          <h1 className="text-5xl xs:text-6xl sm:text-7xl md:text-9xl lg:text-[12rem] font-bold mb-3 md:mb-4 leading-none tracking-tight" 
             style={{ 
               fontFamily: 'Tangerine, cursive',
               background: 'linear-gradient(135deg, #ffffff 0%, #fecdd3 20%, #fda4af 40%, #fb7185 60%, #f43f5e 80%, #ffffff 100%)',

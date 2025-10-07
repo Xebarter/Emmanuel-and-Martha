@@ -32,7 +32,11 @@ export function useMetadata() {
           supabase.from('pledges')
             .select('id', { count: 'exact', head: true }),
           supabase.from('guests')
-            .select('id', { count: 'exact', head: true })
+            .select('id', { count: 'exact', head: true }),
+          supabase.from('gallery')
+            .select('url')
+            .order('created_at', { ascending: false })
+            .limit(5)
         ]);
 
         clearTimeout(timeoutId);
@@ -44,6 +48,7 @@ export function useMetadata() {
         const contributionsData = results[1].status === 'fulfilled' ? results[1].value : null;
         const pledgesData = results[2].status === 'fulfilled' ? results[2].value : null;
         const guestsData = results[3].status === 'fulfilled' ? results[3].value : null;
+        const galleryData = results[4].status === 'fulfilled' ? results[4].value : null;
 
         // Calculate totals with fallbacks
         const totalContributions = contributionsData?.data?.reduce((sum, c: any) =>
@@ -66,7 +71,7 @@ export function useMetadata() {
             total_guests: guestsData?.count || 0,
             total_meetings: 0
           },
-          gallery: []
+          gallery: galleryData?.data || []
         };
 
         console.log('[useMetadata] Metadata loaded:', metadata);
