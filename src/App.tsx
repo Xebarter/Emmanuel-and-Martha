@@ -32,6 +32,57 @@ function AppContent() {
   const navigate = useNavigate();
   const homeRef = useRef<HTMLDivElement>(null);
 
+  // Update meta tags for SEO and social sharing
+  useEffect(() => {
+    // Update basic meta tags
+    document.title = 'John and Priscilla';
+    
+    // Update or create meta tags
+    const updateMetaTag = (selector: string, attribute: string, value: string, isProperty = false) => {
+      let tag = document.querySelector(selector);
+      if (!tag) {
+        tag = document.createElement('meta');
+        if (isProperty) {
+          tag.setAttribute('property', attribute);
+        } else {
+          tag.setAttribute('name', attribute);
+        }
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute(isProperty ? 'property' : 'name', attribute);
+      tag.content = value;
+    };
+
+    // Update all relevant meta tags
+    updateMetaTag('meta[name="title"]', 'title', 'John and Priscilla');
+    updateMetaTag('meta[name="description"]', 'description', 'Join us as we celebrate our love');
+    
+    // Open Graph tags
+    updateMetaTag('meta[property="og:title"]', 'og:title', 'John and Priscilla', true);
+    updateMetaTag('meta[property="og:description"]', 'og:description', 'Join us as we celebrate our love', true);
+    updateMetaTag('meta[property="og:type"]', 'og:type', 'website', true);
+    updateMetaTag('meta[property="og:url"]', 'og:url', 'https://johnandpriscilla.vercel.app/', true);
+    updateMetaTag('meta[property="og:image"]', 'og:image', 'https://johnandpriscilla.vercel.app/og-image.jpg', true);
+    
+    // Twitter tags
+    updateMetaTag('meta[property="twitter:card"]', 'twitter:card', 'summary_large_image', true);
+    updateMetaTag('meta[property="twitter:title"]', 'twitter:title', 'John and Priscilla', true);
+    updateMetaTag('meta[property="twitter:description"]', 'twitter:description', 'Join us as we celebrate our love', true);
+    updateMetaTag('meta[property="twitter:image"]', 'twitter:image', 'https://johnandpriscilla.vercel.app/og-image.jpg', true);
+    
+    // Update image tags if we have gallery data
+    if (metadata?.gallery && metadata.gallery.length > 0) {
+      const imageUrl = metadata.gallery[0].url;
+      updateMetaTag('meta[property="og:image"]', 'og:image', imageUrl, true);
+      updateMetaTag('meta[property="twitter:image"]', 'twitter:image', imageUrl, true);
+    } else {
+      // Fallback image
+      const fallbackImageUrl = 'https://johnandpriscilla.vercel.app/og-image.svg';
+      updateMetaTag('meta[property="og:image"]', 'og:image', fallbackImageUrl, true);
+      updateMetaTag('meta[property="twitter:image"]', 'twitter:image', fallbackImageUrl, true);
+    }
+  }, [metadata]);
+
   useEffect(() => {
     if (!isSupabaseConnected) {
       console.warn('Running in offline mode - Supabase is not connected');

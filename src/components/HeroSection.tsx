@@ -134,8 +134,8 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
         twitterImage.content = galleryImages[0].url;
       } else {
         // Fallback to default image
-        ogImage.content = 'https://johnandpriscilla.vercel.app/default-og-image.jpg';
-        twitterImage.content = 'https://johnandpriscilla.vercel.app/default-og-image.jpg';
+        ogImage.content = 'https://johnandpriscilla.vercel.app/og-image.jpg';
+        twitterImage.content = 'https://johnandpriscilla.vercel.app/og-image.jpg';
       }
     };
     
