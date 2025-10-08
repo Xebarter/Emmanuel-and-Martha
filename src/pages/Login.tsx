@@ -16,9 +16,18 @@ export default function Login() {
     setError('');
 
     try {
+      // Simple local credential gate (bypasses Supabase)
+      const emailNorm = email.trim().toLowerCase();
+      if (emailNorm === 'admin@muwanguzis.com' && password === 'Admin123') {
+        localStorage.setItem('simple_admin_authed', '1');
+        // Redirect to dashboard after successful login
+        navigate('/muwanguzis/dashboard');
+        return;
+      }
+
       await login(email, password);
-      // Redirect to admin dashboard after successful login
-      navigate('/admin/dashboard');
+      // Redirect to dashboard after successful login
+      navigate('/muwanguzis/dashboard');
     } catch (err: any) {
       console.error('Login failed:', err);
       setError(err.message || 'Failed to sign in. Please check your credentials and try again.');

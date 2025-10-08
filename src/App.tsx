@@ -1,7 +1,5 @@
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
-import { ProtectedRoute } from './components/auth/ProtectedRoute';
-import Dashboard from './pages/Dashboard';
 import Login, { Unauthorized } from './pages/Login';
 import { useState, useEffect, useRef } from 'react';
 import { isSupabaseConnected } from './lib/supabase';
@@ -31,13 +29,12 @@ function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
   const homeRef = useRef<HTMLDivElement>(null);
-
   // Update meta tags for SEO and social sharing
   useEffect(() => {
     // Update basic meta tags
     document.title = 'John and Priscilla';
     
-    // Update or create meta tags
+    // Open Graph tags
     const updateMetaTag = (selector: string, attribute: string, value: string, isProperty = false) => {
       let tag = document.querySelector(selector);
       if (!tag) {
@@ -50,10 +47,10 @@ function AppContent() {
         document.head.appendChild(tag);
       }
       tag.setAttribute(isProperty ? 'property' : 'name', attribute);
-      tag.content = value;
+      (tag as HTMLMetaElement).content = value;
     };
 
-    // Update all relevant meta tags
+    // Update or create meta tags
     updateMetaTag('meta[name="title"]', 'title', 'John and Priscilla');
     updateMetaTag('meta[name="description"]', 'description', 'Join us as we celebrate our love');
     
@@ -61,20 +58,10 @@ function AppContent() {
     updateMetaTag('meta[property="og:title"]', 'og:title', 'John and Priscilla', true);
     updateMetaTag('meta[property="og:description"]', 'og:description', 'Join us as we celebrate our love', true);
     updateMetaTag('meta[property="og:type"]', 'og:type', 'website', true);
-    updateMetaTag('meta[property="og:url"]', 'og:url', 'https://johnandpriscilla.vercel.app/', true);
-    updateMetaTag('meta[property="og:image"]', 'og:image', 'https://johnandpriscilla.vercel.app/og-image.jpg', true);
-    
-    // Twitter tags
-    updateMetaTag('meta[property="twitter:card"]', 'twitter:card', 'summary_large_image', true);
-    updateMetaTag('meta[property="twitter:title"]', 'twitter:title', 'John and Priscilla', true);
-    updateMetaTag('meta[property="twitter:description"]', 'twitter:description', 'Join us as we celebrate our love', true);
-    updateMetaTag('meta[property="twitter:image"]', 'twitter:image', 'https://johnandpriscilla.vercel.app/og-image.jpg', true);
-    
-    // Update image tags if we have gallery data
-    if (metadata?.gallery && metadata.gallery.length > 0) {
-      const imageUrl = metadata.gallery[0].url;
-      updateMetaTag('meta[property="og:image"]', 'og:image', imageUrl, true);
-      updateMetaTag('meta[property="twitter:image"]', 'twitter:image', imageUrl, true);
+    updateMetaTag('meta[property="og:url"]', 'og:url', window.location.href, true);
+    if ((metadata as any)?.image_url) {
+      updateMetaTag('meta[property="og:image"]', 'og:image', (metadata as any).image_url, true);
+      updateMetaTag('meta[property="twitter:image"]', 'twitter:image', (metadata as any).image_url, true);
     } else {
       // Fallback image
       const fallbackImageUrl = 'https://johnandpriscilla.vercel.app/og-image.svg';
@@ -82,69 +69,6 @@ function AppContent() {
       updateMetaTag('meta[property="twitter:image"]', 'twitter:image', fallbackImageUrl, true);
     }
   }, [metadata]);
-
-  useEffect(() => {
-    if (!isSupabaseConnected) {
-      console.warn('Running in offline mode - Supabase is not connected');
-      setOfflineMode(true);
-    }
-  }, []);
-
-  // Handle scrolling to sections
-  useEffect(() => {
-    // Check if we're on a section route
-    const sectionRoutes = ['/contribute', '/pledge', '/meetings', '/guestbook'];
-    if (sectionRoutes.includes(location.pathname)) {
-      // Navigate to home page with hash
-      const sectionMap: Record<string, string> = {
-        '/contribute': '#contribute',
-        '/pledge': '#pledge',
-        '/meetings': '#meetings',
-        '/guestbook': '#guestbook'
-      };
-      
-      const hash = sectionMap[location.pathname];
-      navigate(`/${hash}`, { replace: true });
-    }
-    
-    // Scroll to section if hash is present
-    if (location.hash) {
-      // Use requestAnimationFrame to ensure DOM is ready
-      const scrollToIntendedSection = () => {
-        const element = document.querySelector(location.hash);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        } else {
-          // If element is not found, try again after a short delay
-          setTimeout(() => {
-            const delayedElement = document.querySelector(location.hash);
-            if (delayedElement) {
-              delayedElement.scrollIntoView({ behavior: 'smooth' });
-            }
-          }, 500);
-        }
-      };
-      
-      // Try to scroll immediately
-      if (document.readyState === 'loading') {
-        // If document is still loading, wait for it to complete
-        window.addEventListener('DOMContentLoaded', scrollToIntendedSection);
-      } else {
-        // If document is already loaded, scroll immediately
-        requestAnimationFrame(scrollToIntendedSection);
-      }
-    }
-  }, [location, navigate]);
-
-  console.log('[AppContent] States:', {
-    metadataLoading: loading,
-    authLoading,
-    hasError: !!metadataError,
-    hasMetadata: !!metadata,
-    isAuthenticated,
-    offlineMode,
-    timestamp: new Date().toISOString()
-  });
 
   // Show loading state while initializing (only if we're not in offline mode)
   if ((loading || authLoading) && !offlineMode) {
@@ -173,7 +97,7 @@ function AppContent() {
             <p className="text-gray-600 mb-4 text-sm">
               {typeof metadataError === 'string'
                 ? metadataError
-                : metadataError?.message || 'An error occurred while loading the application'}
+                : (metadataError as any)?.message || 'An error occurred while loading the application'}
             </p>
             <button
               onClick={() => window.location.reload()}
@@ -242,10 +166,10 @@ function AppContent() {
       <Route path="/login" element={<Login />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
 
-      {/* Admin routes - accessible via both /admin and /dashboard */}
-      <Route path="/admin/*" element={<AdminRoutes />} />
-      
-      <Route path="/dashboard/*" element={<AdminRoutes />} />
+      {/* Admin routes - primary at /muwanguzis; legacy paths redirect */}
+      <Route path="/muwanguzis/*" element={<AdminRoutes />} />
+      <Route path="/admin/*" element={<Navigate to="/muwanguzis/dashboard" replace />} />
+      <Route path="/dashboard/*" element={<Navigate to="/muwanguzis/dashboard" replace />} />
 
       {/* Catch all other routes */}
       <Route path="*" element={<Navigate to="/" replace />} />

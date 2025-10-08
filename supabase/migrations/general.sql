@@ -291,7 +291,7 @@ BEGIN
   VALUES (
     NEW.id,
     NEW.email,
-    NEW.raw_user_meta_data->>'full_name',
+    COALESCE(NEW.raw_user_meta_data->>'full_name', SPLIT_PART(NEW.email, '@', 1)),
     NEW.phone,
     COALESCE((NEW.raw_user_meta_data->>'role')::user_role, 'viewer'::user_role)
   )

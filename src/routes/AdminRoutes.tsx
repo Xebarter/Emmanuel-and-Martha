@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import type { ReactNode } from 'react';
 import Dashboard from '../pages/Dashboard';
 import { GalleryManager } from '../pages/admin/GalleryManager';
 import GuestsManager from '../pages/admin/GuestsManager';
@@ -14,7 +15,7 @@ import PledgesManager from '../pages/admin/PledgesManager';
 export function AdminRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Dashboard />}>
+      <Route path="/" element={<RequireSimpleAuth><Dashboard /></RequireSimpleAuth>}>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<DashboardContent />}>
           <Route index element={<DashboardHome />} />
@@ -28,7 +29,7 @@ export function AdminRoutes() {
           <Route path="auth-diag" element={<AuthDiagnostic />} />
           <Route path="supabase-test" element={<SupabaseTest />} />
         </Route>
-        <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/muwanguzis/dashboard" replace />} />
       </Route>
     </Routes>
   );
@@ -37,4 +38,13 @@ export function AdminRoutes() {
 // This component will be rendered inside the Dashboard layout
 function DashboardContent() {
   return <Outlet />;
+}
+
+// Simple localStorage-based auth guard
+function RequireSimpleAuth({ children }: { children: ReactNode }) {
+  const authed = typeof window !== 'undefined' && localStorage.getItem('simple_admin_authed') === '1';
+  if (!authed) {
+    return <Navigate to="/login" replace />;
+  }
+  return <>{children}</>;
 }

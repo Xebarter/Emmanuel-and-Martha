@@ -185,7 +185,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem("supabase.auth.token", data.session.access_token);
 
       // Redirect after login
-      const from = location.state?.from?.pathname || "/dashboard";
+      const from = location.state?.from?.pathname || "/muwanguzis/dashboard";
       navigate(from, { replace: true });
     } catch (err: any) {
       console.error("[AuthProvider] Login failed:", err.message);
@@ -206,6 +206,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     // Always clear local state
     localStorage.removeItem("supabase.auth.token");
+    localStorage.removeItem('simple_admin_authed');
     setUser(null);
     navigate("/login");
   };

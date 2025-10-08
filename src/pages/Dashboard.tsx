@@ -35,6 +35,7 @@ import { default as ContributionsManager } from './admin/ContributionsManager';
 import MessagesManager from './admin/MessagesManager';
 import PledgesManager from './admin/PledgesManager';
 import { SupabaseTest } from './SupabaseTest';
+import Analytics from './dashboard/Analytics';
 
 type NavItem = {
   name: string;
@@ -44,6 +45,7 @@ type NavItem = {
 
 const navigation: NavItem[] = [
   { name: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" />, path: '/' },
+  { name: 'Analytics', icon: <BarChart2 className="w-5 h-5" />, path: '/analytics' },
   { name: 'Gallery', icon: <Image className="w-5 h-5" />, path: '/gallery' },
   { name: 'Guests', icon: <Users className="w-5 h-5" />, path: '/guests' },
   { name: 'Meetings', icon: <Calendar className="w-5 h-5" />, path: '/meetings' },
@@ -204,14 +206,14 @@ function DashboardContent() {
         <main className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 to-slate-100">
           <div className="p-6">
             <Routes>
-              <Route path="/gallery" element={<GalleryManager />} />
+              <Route path="/gallery/*" element={<GalleryManager />} />
               <Route path="/guests" element={<GuestsManager />} />
               <Route path="/meetings" element={<MeetingsManager />} />
               <Route path="/contributions" element={<ContributionsManager />} />
               <Route path="/pledges" element={<PledgesManager />} />
               <Route path="/messages" element={<MessagesManager />} />
               <Route path="/supabase-test" element={<SupabaseTest />} />
-              <Route path="/analytics" element={<AnalyticsPlaceholder />} />
+              <Route path="/analytics" element={<Analytics />} />
               <Route path="/" element={<DashboardHome />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
