@@ -36,6 +36,7 @@ import MessagesManager from './admin/MessagesManager';
 import PledgesManager from './admin/PledgesManager';
 import { SupabaseTest } from './SupabaseTest';
 import Analytics from './dashboard/Analytics';
+import { useAuth } from '../contexts/AuthContext';
 
 type NavItem = {
   name: string;
@@ -58,10 +59,19 @@ const navigation: NavItem[] = [
 function DashboardContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const { logout } = useAuth();
 
   const isNavItemActive = (path: string) => {
     return location.pathname === `/dashboard${path}` ||
       (path !== '/' && location.pathname.startsWith(`/dashboard${path}`));
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   const currentNav = navigation.find((nav) => isNavItemActive(nav.path)) || navigation[0];
@@ -119,7 +129,10 @@ function DashboardContent() {
             })}
           </nav>
           <div className="p-4 border-t border-slate-200">
-            <button className="flex items-center w-full px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+            <button 
+              onClick={handleLogout}
+              className="flex items-center w-full px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
+            >
               <LogOut className="w-4 h-4 mr-3" />
               Logout
             </button>
@@ -162,7 +175,10 @@ function DashboardContent() {
             })}
           </nav>
           <div className="p-4 border-t border-slate-200">
-            <button className="flex items-center w-full px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+            <button 
+              onClick={handleLogout}
+              className="flex items-center w-full px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
+            >
               <LogOut className="w-4 h-4 mr-3" />
               Logout
             </button>

@@ -29,7 +29,7 @@ export function AdminRoutes() {
           <Route path="auth-diag" element={<AuthDiagnostic />} />
           <Route path="supabase-test" element={<SupabaseTest />} />
         </Route>
-        <Route path="*" element={<Navigate to="/muwanguzis/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
       </Route>
     </Routes>
   );
