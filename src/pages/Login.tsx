@@ -21,13 +21,13 @@ export default function Login() {
       if (emailNorm === 'admin@muwanguzis.com' && password === 'Admin123') {
         localStorage.setItem('simple_admin_authed', '1');
         // Redirect to dashboard after successful login
-        navigate('/muwanguzis/dashboard');
+        navigate('/dashboard');
         return;
       }
 
       await login(email, password);
       // Redirect to dashboard after successful login
-      navigate('/muwanguzis/dashboard');
+      navigate('/dashboard');
     } catch (err: any) {
       console.error('Login failed:', err);
       setError(err.message || 'Failed to sign in. Please check your credentials and try again.');
