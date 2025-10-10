@@ -1,4 +1,4 @@
-import { Heart, Mail, Phone } from 'lucide-react';
+import { Heart, Mail, Phone, MessageCircle } from 'lucide-react';
 
 export function Footer() {
   return (
@@ -52,6 +52,10 @@ export function Footer() {
               <a href="tel:+256783676313" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
                 <Phone className="w-5 h-5" />
                 <span className="text-sm md:text-base">+256 783 676 313</span>
+              </a>
+              <a href="https://chat.whatsapp.com/FdZrxOZFq8Y6ahLcgebRjW?mode=ems_copy_t" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
+                <MessageCircle className="w-5 h-5" />
+                <span className="text-sm md:text-base">Join our WhatsApp group</span>
               </a>
             </div>
           </div>
