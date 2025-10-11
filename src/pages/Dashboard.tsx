@@ -53,7 +53,6 @@ const navigation: NavItem[] = [
   { name: 'Contributions', icon: <Gift className="w-5 h-5" />, path: '/contributions' },
   { name: 'Pledges', icon: <Package className="w-5 h-5" />, path: '/pledges' },
   { name: 'Messages', icon: <MessageSquare className="w-5 h-5" />, path: '/messages' },
-  { name: 'Analytics', icon: <BarChart2 className="w-5 h-5" />, path: '/analytics' },
 ];
 
 function DashboardContent() {

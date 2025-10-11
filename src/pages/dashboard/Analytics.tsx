@@ -143,8 +143,16 @@ export default function Analytics() {
         contributionsByMonth[month] = { count: 0, amount: 0 };
       }
       contributionsByMonth[month].count += 1;
+      
+      // Convert all currencies to UGX for display
       if (contribution.currency === 'UGX') {
         contributionsByMonth[month].amount += contribution.amount;
+      } else if (contribution.currency === 'USD') {
+        // Convert USD to UGX
+        contributionsByMonth[month].amount += (contribution.amount * 3700);
+      } else {
+        // Default conversion for other currencies
+        contributionsByMonth[month].amount += (contribution.amount * 3700);
       }
     });
 
@@ -175,24 +183,42 @@ export default function Analytics() {
   };
 
   const getContributionCurrencyData = () => {
-    const currencyCount: Record<string, number> = {};
-    
-    contributions.filter(c => c.status === 'completed').forEach(contribution => {
-      currencyCount[contribution.currency] = (currencyCount[contribution.currency] || 0) + contribution.amount;
-    });
+    // We'll aggregate all contributions in UGX value
+    const totalUGX = contributions
+      .filter(c => c.status === 'completed')
+      .reduce((sum, contribution) => {
+        if (contribution.currency === 'UGX') {
+          return sum + contribution.amount;
+        } else if (contribution.currency === 'USD') {
+          return sum + (contribution.amount * 3700);
+        }
+        // Default conversion for other currencies
+        return sum + (contribution.amount * 3700);
+      }, 0);
 
-    return Object.entries(currencyCount).map(([currency, amount]) => ({
-      name: currency,
-      value: amount
-    }));
+    // Return all contributions aggregated as UGX
+    return [{
+      name: 'UGX',
+      value: totalUGX
+    }];
   };
 
   // Calculate stats
   const totalGuests = guests.length;
   const totalContributions = contributions.filter(c => c.status === 'completed').length;
+  // Convert all amounts to UGX
   const totalAmount = contributions
-    .filter(c => c.status === 'completed' && c.currency === 'UGX')
-    .reduce((sum, contribution) => sum + contribution.amount, 0);
+    .filter(c => c.status === 'completed')
+    .reduce((sum, contribution) => {
+      if (contribution.currency === 'UGX') {
+        return sum + contribution.amount;
+      } else if (contribution.currency === 'USD') {
+        // Assuming exchange rate: 1 USD = 3700 UGX (typical rate)
+        return sum + (contribution.amount * 3700);
+      }
+      // For any other currency, we'll use a default conversion rate
+      return sum + (contribution.amount * 3700); // Default to USD rate
+    }, 0);
   const totalPledges = pledges.length;
   const fulfilledPledges = pledges.filter(p => p.status === 'fulfilled').length;
   const pendingMessages = messages.filter(m => !m.is_approved).length;
@@ -423,7 +449,7 @@ export default function Analytics() {
                   }}
                   formatter={(value, name) => [new Intl.NumberFormat('en-US', {
                     style: 'currency',
-                    currency: String(name),
+                    currency: 'UGX', // Always display in UGX
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 0
                   }).format(Number(value)), 'Amount']}
