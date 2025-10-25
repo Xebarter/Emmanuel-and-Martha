@@ -415,10 +415,7 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
               }}
             />
           ))}
-          {/* Enhanced gradient overlay with better visibility */}
-          <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-rose-950/30 to-purple-950/40"></div>
-          {/* Reduced blur for better image clarity */}
-          <div className="absolute inset-0 backdrop-blur-[1px]"></div>
+          {/* Removed overlays for better image visibility */}
         </div>
       )}
 
