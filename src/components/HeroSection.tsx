@@ -54,7 +54,7 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
   useEffect(() => {
     const updateMetaTags = () => {
       // Update title
-      const title = 'John and Priscilla';
+      const title = 'Emmanuel and Martha';
       document.title = title;
       
       // Update meta tags
@@ -339,19 +339,19 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
   };
 
   // Get names - use wedding details from site settings, fallback to prop values
-  // Get names - default to 'John and Priscilla' if not specified
+  // Get names - default to 'Emmanuel and Martha' if not specified
   const displayNames = useMemo(() => {
     if (weddingDetails.bride_name && weddingDetails.groom_name) {
       return `${weddingDetails.groom_name} and ${weddingDetails.bride_name}`;
     }
     if (weddingDetails.names) {
-      // If names contain "Priscilla and John", change to "John and Priscilla"
-      if (weddingDetails.names.includes("Priscilla and John")) {
-        return "John and Priscilla";
+      // If names contain "Martha and Emmanuel", change to "Emmanuel and Martha"
+      if (weddingDetails.names.includes("Martha and Emmanuel")) {
+        return "Emmanuel and Martha";
       }
       return weddingDetails.names;
     }
-    return 'John and Priscilla'; // Final fallback
+    return 'Emmanuel and Martha'; // Final fallback
   }, [weddingDetails.bride_name, weddingDetails.groom_name, weddingDetails.names]);
 
   // Format the wedding date with time if available
@@ -396,7 +396,7 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
   }, [weddingDetails.tagline]);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-amber-50 wedding-font">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden wedding-font">
       {/* Gallery image carousel background with parallax effect */}
       {galleryImages.length > 0 && (
         <div className="absolute inset-0 z-0">
@@ -410,8 +410,8 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
                 backgroundImage: `url(${image.url})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
-                filter: 'brightness(1.1) contrast(1.3) saturate(1.3)'
+                backgroundRepeat: 'no-repeat'
+                // Removed filter that was making images appear overly bright
               }}
             />
           ))}
@@ -419,12 +419,9 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
         </div>
       )}
 
-      {/* Refined mesh gradient background with reduced opacity */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute inset-0 bg-gradient-to-br from-rose-600/20 via-fuchsia-600/15 to-purple-600/20 animate-gradient"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(236,72,153,0.2),transparent_50%)] animate-pulse-slow"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.15),transparent_50%)] animate-pulse-slower"></div>
-      </div>
+      {/* Removed mesh gradient background that was reducing image clarity */}
+      
+      {/* Removed additional radial gradients that were creating overlay effects */}
 
       {/* Floating elements - hearts and sparkles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -439,9 +436,9 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
             }}
           >
             {i % 4 === 0 ? (
-              <div className="w-1 h-1 bg-white rounded-full animate-twinkle" />
+              <div className="w-1 h-1 bg-deep-purple rounded-full animate-twinkle" />
             ) : (
-              <Heart className={`${i % 3 === 0 ? 'w-4 h-4' : 'w-3 h-3'} text-rose-200/30 fill-rose-200/20`} />
+              <Heart className={`${i % 3 === 0 ? 'w-4 h-4' : 'w-3 h-3'} text-deep-purple/50 fill-deep-purple/40`} />
             )}
           </div>
         ))}
@@ -452,13 +449,13 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
         <div className="mb-6 md:mb-12 flex justify-center animate-float-gentle"> {/* Reduced margin on mobile */}
           <div className="relative group">
             {/* Outer glow rings */}
-            <div className="absolute inset-0 bg-gradient-to-r from-rose-400 to-fuchsia-500 blur-3xl opacity-50 rounded-full animate-pulse-glow"></div>
-            <div className="absolute -inset-2 bg-gradient-to-r from-rose-300 to-pink-400 blur-2xl opacity-30 rounded-full animate-spin-slow"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-deep-purple to-coral-primary blur-3xl opacity-50 rounded-full animate-pulse-glow"></div>
+            <div className="absolute -inset-2 bg-gradient-to-r from-deep-purple to-coral-light blur-2xl opacity-30 rounded-full animate-spin-slow"></div>
             
             {/* Main icon container */}
-            <div className="relative p-2 sm:p-3 md:p-6 bg-gradient-to-br from-white/95 to-rose-50/95 backdrop-blur-xl rounded-full shadow-2xl border-2 border-white/50 group-hover:scale-110 transition-all duration-500">
-              <div className="absolute inset-0 bg-gradient-to-br from-rose-100/50 to-fuchsia-100/50 rounded-full animate-pulse-subtle"></div>
-              <Heart className="relative w-8 h-8 sm:w-10 sm:h-10 md:w-16 md:h-16 text-rose-500 fill-rose-500 drop-shadow-lg group-hover:scale-110 transition-transform duration-300" />
+            <div className="relative p-2 sm:p-3 md:p-6 bg-gradient-to-br from-white/95 to-coral-lightest/50 backdrop-blur-xl rounded-full shadow-2xl border-2 border-deep-purple/30 group-hover:scale-110 transition-all duration-500">
+              <div className="absolute inset-0 bg-gradient-to-br from-deep-purple/20 to-coral-light/40 rounded-full animate-pulse-subtle"></div>
+              <Heart className="relative w-8 h-8 sm:w-10 sm:h-10 md:w-16 md:h-16 text-deep-purple fill-deep-purple drop-shadow-lg group-hover:scale-110 transition-transform duration-300" />
             </div>
           </div>
         </div>
@@ -467,35 +464,35 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
         <div className="mb-4 md:mb-8 animate-fade-in-up">
           <h1 className="text-5xl xs:text-6xl sm:text-7xl md:text-9xl lg:text-[12rem] font-bold mb-3 md:mb-4 leading-none tracking-tight" 
             style={{ 
-              fontFamily: 'Tangerine, cursive',
-              background: 'linear-gradient(135deg, #ffffff 0%, #fecdd3 20%, #fda4af 40%, #fb7185 60%, #f43f5e 80%, #ffffff 100%)',
+              fontFamily: 'Cinzel, serif',
+              background: 'linear-gradient(135deg, #ffffff 0%, #5C3E94 15%, #FFE5D4 30%, #FFCCB6 50%, #FFB3A1 70%, #FF8C69 85%, #FF6F61 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
-              textShadow: '0 0 80px rgba(251, 113, 133, 0.5)',
-              filter: 'drop-shadow(0 4px 20px rgba(244, 63, 94, 0.4))'
+              textShadow: '0 0 80px rgba(92, 62, 148, 0.5)',
+              filter: 'drop-shadow(0 4px 20px rgba(92, 62, 148, 0.4))'
             }}>
             {displayNames}
           </h1>
           {/* Decorative line under names */}
           <div className="flex items-center justify-center gap-2 md:gap-3 mt-3 md:mt-6">
-            <div className="h-[1px] md:h-[2px] w-8 xs:w-10 sm:w-14 md:w-20 bg-gradient-to-r from-transparent via-white to-rose-300"></div>
-            <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-white rounded-full shadow-lg shadow-rose-300/50"></div>
-            <div className="h-[1px] md:h-[2px] w-8 xs:w-10 sm:w-14 md:w-20 bg-gradient-to-l from-transparent via-white to-rose-300"></div>
+            <div className="h-[1px] md:h-[2px] w-8 xs:w-10 sm:w-14 md:w-20 bg-gradient-to-r from-transparent via-deep-purple to-coral-light"></div>
+            <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-deep-purple rounded-full shadow-lg shadow-deep-purple/50"></div>
+            <div className="h-[1px] md:h-[2px] w-8 xs:w-10 sm:w-14 md:w-20 bg-gradient-to-l from-transparent via-deep-purple to-coral-light"></div>
           </div>
         </div>
 
         {/* Tagline with elegant styling */}
-        <p className="text-sm xs:text-base sm:text-xl md:text-3xl text-white/95 mb-6 md:mb-12 font-light italic max-w-3xl mx-auto leading-relaxed drop-shadow-lg animate-fade-in-up px-2" style={{ animationDelay: '0.2s' }}>
+        <p className="text-sm xs:text-base sm:text-xl md:text-3xl text-deep-purple mb-6 md:mb-12 font-light italic max-w-3xl mx-auto leading-relaxed drop-shadow-lg animate-fade-in-up px-2" style={{ animationDelay: '0.2s' }}>
           "{weddingDetails.tagline || 'Join us as we celebrate our love'}"
         </p>
                   
         {/* Enhanced loading state */}
         {loading && (
           <div className="flex justify-center items-center py-6 md:py-8">
-            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-xl px-4 py-2 rounded-xl sm:px-6 sm:py-3">
-              <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 animate-spin text-white" />
-              <span className="text-white/80 text-xs sm:text-sm md:text-base">Loading wedding details...</span>
+            <div className="flex items-center gap-2 bg-deep-purple/20 backdrop-blur-xl px-4 py-2 rounded-xl sm:px-6 sm:py-3">
+              <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 animate-spin text-deep-purple" />
+              <span className="text-deep-purple text-xs sm:text-sm md:text-base">Loading wedding details...</span>
             </div>
           </div>
         )}
@@ -503,7 +500,7 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
         {/* Wedding details with modern glassmorphic cards */}
           {loading ? (
             <div className="flex justify-center items-center py-6 md:py-8">
-              <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 animate-spin text-white drop-shadow-lg" />
+              <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 animate-spin text-deep-purple drop-shadow-lg" />
             </div>
           ) : null}
 
@@ -520,22 +517,22 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
               className="group relative overflow-hidden"
             >
               {/* Animated gradient background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-rose-500/20 to-fuchsia-600/20 rounded-2xl sm:rounded-3xl blur-lg sm:blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-deep-purple/30 to-coral-primary/30 rounded-2xl sm:rounded-3xl blur-lg sm:blur-xl group-hover:blur-2xl transition-all duration-500"></div>
               
               {/* Main card */}
-              <div className="relative bg-white/15 backdrop-blur-2xl rounded-2xl sm:rounded-3xl shadow-2xl p-2 sm:p-3 md:p-8 border border-white/30 group-hover:border-white/50 group-hover:bg-white/25 group-hover:scale-105 transition-all duration-500">
+              <div className="relative bg-white/15 backdrop-blur-2xl rounded-2xl sm:rounded-3xl shadow-2xl p-2 sm:p-3 md:p-8 border border-deep-purple/20 group-hover:border-deep-purple/40 group-hover:bg-white/25 group-hover:scale-105 transition-all duration-500">
                 {/* Shimmer effect */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
                 </div>
                 
                 <div className="relative">
-                  <div className="text-2xl xs:text-3xl sm:text-4xl md:text-7xl font-black text-white mb-0.5 sm:mb-1 md:mb-3 drop-shadow-2xl group-hover:scale-110 transition-transform duration-300" style={{
-                    textShadow: '0 0 20px rgba(251, 113, 133, 0.8), 0 0 40px rgba(236, 72, 153, 0.5)'
+                  <div className="text-2xl xs:text-3xl sm:text-4xl md:text-7xl font-black text-deep-purple mb-0.5 sm:mb-1 md:mb-3 drop-shadow-2xl group-hover:scale-110 transition-transform duration-300" style={{
+                    textShadow: '0 0 20px rgba(92, 62, 148, 0.8), 0 0 40px rgba(255, 111, 97, 0.5)'
                   }}>
                     {item.value.toString().padStart(2, '0')}
                   </div>
-                  <div className="text-[0.5rem] xs:text-[0.6rem] sm:text-xs md:text-base text-white/90 font-bold uppercase tracking-wider drop-shadow-lg">
+                  <div className="text-[0.5rem] xs:text-[0.6rem] sm:text-xs md:text-base text-coral-secondary font-bold uppercase tracking-wider drop-shadow-lg">
                     {item.label}
                   </div>
                 </div>
@@ -561,12 +558,12 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
 
         {/* Elegant decorative divider */}
         <div className="flex items-center justify-center gap-2 sm:gap-3 md:gap-6 animate-fade-in-up" style={{ animationDelay: '1s' }}>
-          <div className="h-[1px] w-8 xs:w-12 sm:w-20 md:w-32 bg-gradient-to-r from-transparent via-white/40 to-white/60"></div>
+          <div className="h-[1px] w-8 xs:w-12 sm:w-20 md:w-32 bg-gradient-to-r from-transparent via-deep-purple/40 to-coral-light/60"></div>
           <div className="relative">
-            <div className="absolute inset-0 bg-white blur-sm opacity-50"></div>
-            <Heart className="relative w-2 h-2 sm:w-3 sm:h-3 md:w-5 md:h-5 text-white fill-white drop-shadow-lg animate-pulse-gentle" />
+            <div className="absolute inset-0 bg-deep-purple blur-sm opacity-50"></div>
+            <Heart className="relative w-2 h-2 sm:w-3 sm:h-3 md:w-5 md:h-5 text-deep-purple fill-deep-purple drop-shadow-lg animate-pulse-gentle" />
           </div>
-          <div className="h-[1px] w-8 xs:w-12 sm:w-20 md:w-32 bg-gradient-to-l from-transparent via-white/40 to-white/60"></div>
+          <div className="h-[1px] w-8 xs:w-12 sm:w-20 md:w-32 bg-gradient-to-l from-transparent via-deep-purple/40 to-coral-light/60"></div>
         </div>
 
         {/* Contribute button */}
@@ -578,13 +575,13 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
                 contributeSection.scrollIntoView({ behavior: 'smooth' });
               }
             }}
-            className="group relative px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out"
+            className="group relative px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-deep-purple to-coral-primary hover:from-deep-purple hover:to-deep-purple text-white font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out"
           >
             <span className="relative z-10 flex items-center gap-2">
               Contribute
               <DollarSign className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
             </span>
-            <div className="absolute inset-0 bg-gradient-to-r from-rose-400 to-pink-400 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-coral-secondary to-deep-purple rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
           </button>
         </div>
       </div>

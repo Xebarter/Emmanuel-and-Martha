@@ -35,7 +35,7 @@ function AppContent() {
   // Update meta tags for SEO and social sharing
   useEffect(() => {
     // Update basic meta tags
-    document.title = 'John and Priscilla';
+    document.title = 'Emmanuel and Martha';
     
     // Update or create meta tags
     const updateMetaTag = (selector: string, attribute: string, value: string, isProperty = false) => {
@@ -54,21 +54,21 @@ function AppContent() {
     };
 
     // Update all relevant meta tags
-    updateMetaTag('meta[name="title"]', 'title', 'John and Priscilla');
+    updateMetaTag('meta[name="title"]', 'title', 'Emmanuel and Martha');
     updateMetaTag('meta[name="description"]', 'description', 'Join us as we celebrate our love');
     
     // Open Graph tags
-    updateMetaTag('meta[property="og:title"]', 'og:title', 'John and Priscilla', true);
+    updateMetaTag('meta[property="og:title"]', 'og:title', 'Emmanuel and Martha', true);
     updateMetaTag('meta[property="og:description"]', 'og:description', 'Join us as we celebrate our love', true);
     updateMetaTag('meta[property="og:type"]', 'og:type', 'website', true);
-    updateMetaTag('meta[property="og:url"]', 'og:url', 'https://johnandpriscilla.vercel.app/', true);
-    updateMetaTag('meta[property="og:image"]', 'og:image', 'https://johnandpriscilla.vercel.app/og-image.jpg', true);
+    updateMetaTag('meta[property="og:url"]', 'og:url', 'https://emmanuelandmartha.vercel.app/', true);
+    updateMetaTag('meta[property="og:image"]', 'og:image', 'https://emmanuelandmartha.vercel.app/og-image.jpg', true);
     
     // Twitter tags
     updateMetaTag('meta[property="twitter:card"]', 'twitter:card', 'summary_large_image', true);
-    updateMetaTag('meta[property="twitter:title"]', 'twitter:title', 'John and Priscilla', true);
+    updateMetaTag('meta[property="twitter:title"]', 'twitter:title', 'Emmanuel and Martha', true);
     updateMetaTag('meta[property="twitter:description"]', 'twitter:description', 'Join us as we celebrate our love', true);
-    updateMetaTag('meta[property="twitter:image"]', 'twitter:image', 'https://johnandpriscilla.vercel.app/og-image.jpg', true);
+    updateMetaTag('meta[property="twitter:image"]', 'twitter:image', 'https://emmanuelandmartha.vercel.app/og-image.jpg', true);
     
     // Update image tags if we have gallery data
     if (metadata?.gallery && metadata.gallery.length > 0) {
@@ -77,7 +77,7 @@ function AppContent() {
       updateMetaTag('meta[property="twitter:image"]', 'twitter:image', imageUrl, true);
     } else {
       // Fallback image
-      const fallbackImageUrl = 'https://johnandpriscilla.vercel.app/og-image.svg';
+      const fallbackImageUrl = 'https://emmanuelandmartha.vercel.app/og-image.svg';
       updateMetaTag('meta[property="og:image"]', 'og:image', fallbackImageUrl, true);
       updateMetaTag('meta[property="twitter:image"]', 'twitter:image', fallbackImageUrl, true);
     }
@@ -149,10 +149,10 @@ function AppContent() {
   // Show loading state while initializing (only if we're not in offline mode)
   if ((loading || authLoading) && !offlineMode) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-amber-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-coral-lightest via-white to-coral-lighter flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-rose-500 mb-4"></div>
-          <p className="text-gray-600 font-medium">Loading...</p>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-deep-purple mb-4"></div>
+          <p className="text-deep-purple font-medium">Loading...</p>
         </div>
       </div>
     );
@@ -161,15 +161,15 @@ function AppContent() {
   // Show error state if there's an error
   if (metadataError && !offlineMode) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-amber-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-coral-lightest via-white to-coral-lighter flex items-center justify-center p-4">
         <div className="text-center max-w-md mx-auto">
-          <div className="bg-white rounded-2xl shadow-xl p-8 border border-rose-100">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-deep-purple/30">
+            <div className="w-16 h-16 bg-coral-lightest rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-deep-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Unable to Load</h2>
+            <h2 className="text-xl font-semibold text-deep-purple mb-2">Unable to Load</h2>
             <p className="text-gray-600 mb-4 text-sm">
               {typeof metadataError === 'string'
                 ? metadataError
@@ -190,8 +190,8 @@ function AppContent() {
   // Provide default metadata if none exists (fallback for development)
   const safeMetadata = metadata || {
     couple: {
-      bride_name: 'Priscilla',
-      groom_name: 'John',
+      bride_name: 'Martha',
+      groom_name: 'Emmanuel',
       wedding_date: new Date().toISOString(),
       venue: 'Beautiful Venue',
       tagline: 'Celebrating Our Love'
@@ -208,7 +208,7 @@ function AppContent() {
     <Routes>
       {/* Public routes */}
       <Route path="*" element={
-        <div ref={homeRef} className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-amber-50">
+        <div ref={homeRef} className="min-h-screen bg-gradient-to-br from-coral-lightest via-white to-coral-lighter">
           <HeroSection coupleInfo={safeMetadata.couple} />
           <GallerySection />
           <div id="contribute">

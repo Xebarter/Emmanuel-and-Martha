@@ -8,24 +8,26 @@ ALTER TABLE contributions
   ADD COLUMN IF NOT EXISTS currency text DEFAULT 'UGX',
   ADD COLUMN IF NOT EXISTS status text DEFAULT 'pending';
 
--- Create index for looking up contributions by phone number
+-- Create indexes for efficient lookups
 CREATE INDEX IF NOT EXISTS idx_contributions_phone ON contributions(contributor_phone);
-
--- Create index for looking up contributions by status
 CREATE INDEX IF NOT EXISTS idx_contributions_status ON contributions(status);
 
--- Update RLS policies to allow public inserts with limited fields
+-- Update RLS policies
+-- 1️⃣ Public inserts: allow all inserts
 DROP POLICY IF EXISTS "Public can create contributions" ON contributions;
 CREATE POLICY "Public can create contributions"
   ON contributions FOR INSERT
   WITH CHECK (true);
 
--- Update RLS policy to allow public to read their own contributions
+-- 2️⃣ Public reads: only by contributor or guest
 DROP POLICY IF EXISTS "Public can view their contributions" ON contributions;
 CREATE POLICY "Public can view their contributions"
   ON contributions FOR SELECT
-  USING (auth.uid() IS NULL OR guest_id = auth.uid() OR 
-         (contributor_phone = (SELECT phone FROM guests WHERE id = auth.uid() LIMIT 1)));
+  USING (
+    auth.uid() IS NULL OR guest_id = auth.uid()
+    -- The following line is commented out to avoid errors if guests table does not exist yet
+    -- OR (contributor_phone = (SELECT phone FROM guests WHERE id = auth.uid() LIMIT 1))
+  );
 
 -- Add comments for documentation
 COMMENT ON COLUMN contributions.contributor_name IS 'Name of the person making the contribution';

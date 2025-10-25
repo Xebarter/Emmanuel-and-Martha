@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script&family=Tangerine:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,15 +6,59 @@
 
 @layer base {
   html {
-    font-family: 'Quivira', serif;
+    font-family: 'Cinzel', serif;
+  }
+  
+  body {
+    background: radial-gradient(circle at center, var(--royal-purple-luminous) 0%, var(--royal-purple) 50%, var(--royal-purple-dark) 100%);
+    color: var(--warm-gold);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
   }
 }
 
-body {
-  font-family: 'Tangerine', cursive;
-  @apply text-gray-800;
+/* Custom color palette */
+:root {
+  /* Regal Velvet & Gilded Elegance Theme */
+  --royal-purple-dark: #1a0033;
+  --royal-purple: #2d0052;
+  --royal-purple-light: #4a0073;
+  --royal-purple-luminous: #6a0dad;
+  --warm-gold: #d4af37;
+  --warm-gold-light: #e6c354;
+  --warm-gold-lighter: #f0d68c;
+  --golden-glitter: #ffecb3;
 }
 
 .wedding-font {
-  font-family: 'Dancing Script', cursive;
+  font-family: 'Cinzel', serif;
+}
+
+/* Apply gold accents to interactive elements */
+a, button {
+  color: var(--warm-gold);
+  border-color: var(--warm-gold);
+  transition: all 0.3s ease;
+}
+
+a:hover, button:hover {
+  background-color: var(--warm-gold);
+  color: var(--royal-purple-dark);
+  box-shadow: 0 0 10px var(--warm-gold-light);
+}
+
+/* Additional theme elements for a richer look */
+.gilded-border {
+  border: 2px solid var(--warm-gold);
+  box-shadow: 0 0 15px var(--warm-gold-lighter);
+}
+
+.golden-text {
+  color: var(--warm-gold);
+  text-shadow: 0 0 8px var(--warm-gold-light);
+}
+
+.purple-bg {
+  background: radial-gradient(circle at center, var(--royal-purple-luminous) 0%, var(--royal-purple) 50%, var(--royal-purple-dark) 100%);
 }
