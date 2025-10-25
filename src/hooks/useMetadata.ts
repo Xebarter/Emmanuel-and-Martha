@@ -56,9 +56,9 @@ export function useMetadata() {
 
         const metadata: SiteMetadata = {
           couple: {
-            bride_name: 'Priscilla',
-            groom_name: 'John',
-            names: 'John & Priscilla',
+            bride_name: 'Martha',
+            groom_name: 'Emmanuel',
+            names: 'Emmanuel & Martha',
             wedding_date: '2026-02-14',
             location: 'Kampala, Uganda',
             venue: 'Kampala, Uganda',
@@ -98,9 +98,9 @@ export function useMetadata() {
 function getFallbackMetadata(): SiteMetadata {
   return {
     couple: {
-      bride_name: 'Priscilla',
-      groom_name: 'John',
-      names: 'John & Priscilla',
+      bride_name: 'Martha',
+      groom_name: 'Emmanuel',
+      names: 'Emmanuel & Martha',
       wedding_date: '2026-02-14',
       location: 'Kampala, Uganda',
       venue: 'Kampala, Uganda',

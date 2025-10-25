@@ -121,7 +121,7 @@ export default function MeetingsManager() {
         console.error('Error fetching current settings:', fetchError);
         // Try to insert if we can't fetch
         const defaultSettings = {
-          names: "John & Priscilla",
+          names: "Emmanuel & Martha",
           hero_image: "",
           ...settings
         };
@@ -149,7 +149,7 @@ export default function MeetingsManager() {
       // Merge the existing data with new settings
       const updatedSettings = {
         ...(currentData?.value || {
-          names: "John & Priscilla",
+          names: "Emmanuel & Martha",
           hero_image: ""
         }),
         ...settings

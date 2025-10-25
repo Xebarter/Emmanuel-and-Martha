@@ -462,9 +462,9 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
 
         {/* Main heading with ultra-modern typography */}
         <div className="mb-4 md:mb-8 animate-fade-in-up">
-          <h1 className="text-5xl xs:text-6xl sm:text-7xl md:text-9xl lg:text-[12rem] font-bold mb-3 md:mb-4 leading-none tracking-tight" 
+          <h1 className="text-5xl xs:text-6xl sm:text-7xl md:text-9xl lg:text-[12rem] font-bold mb-3 md:mb-4 leading-none tracking-tight hero-font" 
             style={{ 
-              fontFamily: 'Cinzel, serif',
+              fontFamily: "'Cormorant Garamond', serif",
               background: 'linear-gradient(135deg, #ffffff 0%, #5C3E94 15%, #FFE5D4 30%, #FFCCB6 50%, #FFB3A1 70%, #FF8C69 85%, #FF6F61 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -483,7 +483,7 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
         </div>
 
         {/* Tagline with elegant styling */}
-        <p className="text-sm xs:text-base sm:text-xl md:text-3xl text-deep-purple mb-6 md:mb-12 font-light italic max-w-3xl mx-auto leading-relaxed drop-shadow-lg animate-fade-in-up px-2" style={{ animationDelay: '0.2s' }}>
+        <p className="text-sm xs:text-base sm:text-xl md:text-3xl text-deep-purple mb-6 md:mb-12 font-light italic max-w-3xl mx-auto leading-relaxed drop-shadow-lg animate-fade-in-up px-2 hero-font" style={{ animationDelay: '0.2s', fontFamily: "'Cormorant Garamond', serif" }}>
           "{weddingDetails.tagline || 'Join us as we celebrate our love'}"
         </p>
                   
@@ -575,7 +575,7 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
                 contributeSection.scrollIntoView({ behavior: 'smooth' });
               }
             }}
-            className="group relative px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-deep-purple to-coral-primary hover:from-deep-purple hover:to-deep-purple text-white font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out"
+            className="group relative px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-coral-primary to-coral-secondary hover:from-coral-secondary hover:to-coral-primary text-white font-bold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out animate-pulse hover:animate-none"
           >
             <span className="relative z-10 flex items-center gap-2">
               Contribute

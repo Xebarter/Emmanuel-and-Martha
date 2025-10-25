@@ -7,11 +7,11 @@ export function GallerySection() {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<{ id: string; url: string; title: string; description?: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [displayedIndices, setDisplayedIndices] = useState<number[]>([0, 1, 2, 3]); // Indices of currently displayed images
-  const [animatingIndex, setAnimatingIndex] = useState<number | null>(null); // Index of the position that's animating
+  const [displayedIndices, setDisplayedIndices] = useState<number[]>([0, 1, 2, 3]);
+  const [animatingIndex, setAnimatingIndex] = useState<number | null>(null);
   const carouselIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const positionIndexRef = useRef(0); // Which position (0-3) to update next
-  const nextImageIndexRef = useRef(4); // Index of the next image to show (not currently displayed)
+  const positionIndexRef = useRef(0);
+  const nextImageIndexRef = useRef(4);
 
   useEffect(() => {
     const loadImages = async () => {
@@ -20,7 +20,6 @@ export function GallerySection() {
         const galleryImages = await galleryService.getGalleryImages();
         setImages(galleryImages);
         
-        // Initialize displayed indices based on available images
         const initialIndices = [];
         for (let i = 0; i < Math.min(4, galleryImages.length); i++) {
           initialIndices.push(i);
@@ -38,11 +37,9 @@ export function GallerySection() {
     loadImages();
   }, []);
 
-  // Function to get next available image index that's not currently displayed
   const getNextAvailableIndex = useCallback(() => {
     if (images.length <= 4) return nextImageIndexRef.current % images.length;
     
-    // Find the next image that's not currently displayed
     let nextIndex = nextImageIndexRef.current % images.length;
     while (displayedIndices.includes(nextIndex)) {
       nextIndex = (nextIndex + 1) % images.length;
@@ -50,7 +47,6 @@ export function GallerySection() {
     return nextIndex;
   }, [images.length, displayedIndices]);
 
-  // Set up carousel rotation - one position at a time
   useEffect(() => {
     if (images.length <= 4) return;
 
@@ -59,17 +55,14 @@ export function GallerySection() {
       setTimeout(() => {
         setDisplayedIndices(prev => {
           const newIndices = [...prev];
-          // Update the image at the current position with an image not currently displayed
           newIndices[positionIndexRef.current] = getNextAvailableIndex();
           return newIndices;
         });
         setAnimatingIndex(null);
-        // Move to the next position for the next update
         positionIndexRef.current = (positionIndexRef.current + 1) % 4;
-        // Update nextImageIndexRef to point to the next potential image
         nextImageIndexRef.current = (nextImageIndexRef.current + 1) % images.length;
       }, 300);
-    }, 3000); // Change one position every 3 seconds
+    }, 3000);
 
     return () => {
       if (carouselIntervalRef.current) {
@@ -78,7 +71,6 @@ export function GallerySection() {
     };
   }, [images.length, getNextAvailableIndex]);
 
-  // Function to navigate to the next image
   const nextImage = useCallback(() => {
     if (!selectedImage || images.length === 0) return;
     
@@ -87,7 +79,6 @@ export function GallerySection() {
     setSelectedImage(images[nextIndex]);
   }, [selectedImage, images]);
 
-  // Function to navigate to the previous image
   const prevImage = useCallback(() => {
     if (!selectedImage || images.length === 0) return;
     
@@ -96,7 +87,6 @@ export function GallerySection() {
     setSelectedImage(images[prevIndex]);
   }, [selectedImage, images]);
 
-  // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!selectedImage) return;
@@ -114,7 +104,6 @@ export function GallerySection() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedImage, nextImage, prevImage]);
 
-  // Reset carousel when user interacts
   const resetCarouselInterval = useCallback(() => {
     if (carouselIntervalRef.current) {
       clearInterval(carouselIntervalRef.current);
@@ -126,14 +115,11 @@ export function GallerySection() {
         setTimeout(() => {
           setDisplayedIndices(prev => {
             const newIndices = [...prev];
-            // Update the image at the current position with an image not currently displayed
             newIndices[positionIndexRef.current] = getNextAvailableIndex();
             return newIndices;
           });
           setAnimatingIndex(null);
-          // Move to the next position for the next update
           positionIndexRef.current = (positionIndexRef.current + 1) % 4;
-          // Update nextImageIndexRef to point to the next potential image
           nextImageIndexRef.current = (nextImageIndexRef.current + 1) % images.length;
         }, 300);
       }, 3000);
@@ -142,22 +128,26 @@ export function GallerySection() {
 
   if (loading) {
     return (
-      <section id="gallery" className="py-20 bg-gray-50">
+      <section id="gallery" className="py-20 md:py-28 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-serif font-bold text-gray-900 mb-4">
+            <div className="inline-block mb-4">
+              <div className="flex items-center gap-3 px-6 py-2 bg-gradient-to-r from-rose-500/10 to-amber-500/10 rounded-full border border-rose-500/20 backdrop-blur-sm">
+                <ImageIcon className="w-5 h-5 text-rose-400 animate-pulse" />
+                <span className="text-sm font-medium text-rose-300 tracking-wider uppercase">Gallery</span>
+              </div>
+            </div>
+            <h2 className="text-4xl md:text-6xl font-serif font-bold bg-gradient-to-r from-white via-rose-100 to-amber-100 bg-clip-text text-transparent mb-4 tracking-tight">
               Our Gallery
             </h2>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg text-gray-400 font-light">
               Loading beautiful moments from our journey...
             </p>
           </div>
-          <div className="flex justify-center">
-            <div className="animate-pulse flex space-x-4">
-              <div className="h-64 w-64 bg-gray-200 rounded-lg"></div>
-              <div className="h-64 w-64 bg-gray-200 rounded-lg hidden md:block"></div>
-              <div className="h-64 w-64 bg-gray-200 rounded-lg hidden lg:block"></div>
-            </div>
+          <div className="flex justify-center gap-4 md:gap-6">
+            <div className="h-64 w-64 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl animate-pulse border border-white/10"></div>
+            <div className="h-64 w-64 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl animate-pulse border border-white/10 hidden md:block"></div>
+            <div className="h-64 w-64 bg-gradient-to-br from-slate-800/50 to-slate-900/50 rounded-2xl animate-pulse border border-white/10 hidden lg:block"></div>
           </div>
         </div>
       </section>
@@ -166,136 +156,147 @@ export function GallerySection() {
 
   if (error) {
     return (
-      <section id="gallery" className="py-20 bg-gray-50">
+      <section id="gallery" className="py-20 md:py-28 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-serif font-bold text-gray-900 mb-4">
+            <div className="inline-block mb-4">
+              <div className="flex items-center gap-3 px-6 py-2 bg-gradient-to-r from-rose-500/10 to-amber-500/10 rounded-full border border-rose-500/20 backdrop-blur-sm">
+                <ImageIcon className="w-5 h-5 text-rose-400" />
+                <span className="text-sm font-medium text-rose-300 tracking-wider uppercase">Gallery</span>
+              </div>
+            </div>
+            <h2 className="text-4xl md:text-6xl font-serif font-bold bg-gradient-to-r from-white via-rose-100 to-amber-100 bg-clip-text text-transparent mb-4 tracking-tight">
               Our Gallery
             </h2>
-            <p className="text-lg text-red-600">{error}</p>
+            <p className="text-lg text-rose-400/90">{error}</p>
           </div>
         </div>
       </section>
     );
   }
 
-  // Get the actual image objects to display
   const displayedImages = displayedIndices
     .filter(index => index < images.length)
     .map(index => images[index]);
 
   return (
-    <section id="gallery" className="py-16 md:py-20 relative bg-gradient-to-br from-rose-50 via-white to-amber-50 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-3xl md:text-5xl font-serif font-bold text-gray-900 mb-3 md:mb-4">
+    <section id="gallery" className="py-20 md:py-28 relative bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.1),transparent_50%)]"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(236,72,153,0.05),transparent_50%)]"></div>
+      
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
+        <div className="text-center mb-16 md:mb-20">
+          <div className="inline-block mb-4">
+            <div className="flex items-center gap-3 px-6 py-2 bg-gradient-to-r from-rose-500/10 to-amber-500/10 rounded-full border border-rose-500/20 backdrop-blur-sm">
+              <ImageIcon className="w-5 h-5 text-rose-400" />
+              <span className="text-sm font-medium text-rose-300 tracking-wider uppercase">Gallery</span>
+            </div>
+          </div>
+          <h2 className="text-4xl md:text-6xl font-serif font-bold bg-gradient-to-r from-white via-rose-100 to-amber-100 bg-clip-text text-transparent mb-6 tracking-tight">
             Our Gallery
           </h2>
-          <div className="flex items-center justify-center gap-2 md:gap-3 mb-3">
-            <div className="h-px w-8 md:w-16 bg-gradient-to-r from-transparent via-rose-300 to-transparent"></div>
-            <ImageIcon className="w-4 h-4 text-rose-500" />
-            <div className="h-px w-8 md:w-16 bg-gradient-to-l from-transparent via-rose-300 to-transparent"></div>
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <div className="h-px w-16 md:w-24 bg-gradient-to-r from-transparent via-rose-400/50 to-rose-400"></div>
+            <div className="w-2 h-2 rounded-full bg-rose-400"></div>
+            <div className="h-px w-16 md:w-24 bg-gradient-to-l from-transparent via-rose-400/50 to-rose-400"></div>
           </div>
-          <p className="text-base md:text-lg text-gray-600">
+          <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto font-light">
             Beautiful moments from our journey together
           </p>
         </div>
 
         <div className="relative">
-          {/* Navigation arrows for carousel */}
           {images.length > 4 && (
             <>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   resetCarouselInterval();
-                  // Manually update current position
                   setAnimatingIndex(positionIndexRef.current);
                   setTimeout(() => {
                     setDisplayedIndices(prev => {
                       const newIndices = [...prev];
-                      // Update the image at the current position with an image not currently displayed
                       newIndices[positionIndexRef.current] = getNextAvailableIndex();
                       return newIndices;
                     });
                     setAnimatingIndex(null);
-                    // Move to the next position for the next update
                     positionIndexRef.current = (positionIndexRef.current + 1) % 4;
-                    // Update nextImageIndexRef to point to the next potential image
                     nextImageIndexRef.current = (nextImageIndexRef.current + 1) % images.length;
                   }, 300);
                 }}
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-white/80 hover:bg-white text-gray-800 rounded-full p-2 shadow-lg transition-all duration-300 hover:scale-110"
+                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 bg-gradient-to-br from-slate-800/90 to-slate-900/90 hover:from-slate-700 hover:to-slate-800 text-white rounded-full p-3 shadow-2xl backdrop-blur-xl border border-white/10 transition-all duration-300 hover:scale-110 hover:shadow-rose-500/20"
                 aria-label="Previous"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-5 h-5" />
               </button>
               
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   resetCarouselInterval();
-                  // Manually update current position
                   setAnimatingIndex(positionIndexRef.current);
                   setTimeout(() => {
                     setDisplayedIndices(prev => {
                       const newIndices = [...prev];
-                      // Update the image at the current position with an image not currently displayed
                       newIndices[positionIndexRef.current] = getNextAvailableIndex();
                       return newIndices;
                     });
                     setAnimatingIndex(null);
-                    // Move to the next position for the next update
                     positionIndexRef.current = (positionIndexRef.current + 1) % 4;
-                    // Update nextImageIndexRef to point to the next potential image
                     nextImageIndexRef.current = (nextImageIndexRef.current + 1) % images.length;
                   }, 300);
                 }}
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-white/80 hover:bg-white text-gray-800 rounded-full p-2 shadow-lg transition-all duration-300 hover:scale-110"
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 bg-gradient-to-br from-slate-800/90 to-slate-900/90 hover:from-slate-700 hover:to-slate-800 text-white rounded-full p-3 shadow-2xl backdrop-blur-xl border border-white/10 transition-all duration-300 hover:scale-110 hover:shadow-rose-500/20"
                 aria-label="Next"
               >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight className="w-5 h-5" />
               </button>
             </>
           )}
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {displayedImages.map((image, index) => (
               <div
-                key={`${image.id}-${displayedIndices[index]}`} // Key includes position to trigger animation
-                className={`relative group aspect-square overflow-hidden rounded-2xl bg-white/60 backdrop-blur-sm border border-white/50 cursor-pointer transition-all duration-300 shadow-md hover:shadow-xl hover:-translate-y-1 ${
+                key={`${image.id}-${displayedIndices[index]}`}
+                className={`relative group aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-md border border-white/10 cursor-pointer transition-all duration-500 shadow-lg hover:shadow-2xl hover:shadow-rose-500/20 hover:-translate-y-2 hover:border-rose-500/30 ${
                   animatingIndex === index ? 'animate-fadeIn' : ''
                 }`}
                 onClick={() => setSelectedImage(image)}
               >
+                <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                
                 <img
                   src={image.url}
                   alt={image.title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center">
-                  <div className="opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 text-center p-3 md:p-4">
+                
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                
+                <div className="absolute inset-0 flex items-end justify-center p-4 md:p-6">
+                  <div className="opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 text-center w-full">
                     {image.description && (
-                      <p className="text-white text-xs md:text-sm opacity-90 line-clamp-2">{image.description}</p>
+                      <p className="text-white text-sm md:text-base font-light tracking-wide line-clamp-2 drop-shadow-lg">{image.description}</p>
                     )}
                   </div>
                 </div>
+                
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-rose-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-bl-full"></div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Carousel indicators */}
         {images.length > 4 && (
-          <div className="flex justify-center mt-8 space-x-2">
+          <div className="flex justify-center mt-10 md:mt-12 space-x-3">
             {images.map((_, index) => (
               <div
                 key={index}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                className={`h-1.5 rounded-full transition-all duration-500 ${
                   displayedIndices.includes(index)
-                    ? 'bg-rose-500' 
-                    : 'bg-gray-300'
+                    ? 'w-8 bg-gradient-to-r from-rose-500 to-rose-400 shadow-lg shadow-rose-500/50' 
+                    : 'w-1.5 bg-slate-600/50 hover:bg-slate-500/70'
                 }`}
               />
             ))}
@@ -304,23 +305,24 @@ export function GallerySection() {
 
         {selectedImage && (
           <div 
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" 
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl" 
             onClick={() => setSelectedImage(null)}
           >
+            <div className="absolute inset-0 bg-gradient-to-br from-rose-500/5 via-transparent to-amber-500/5"></div>
+            
             <div 
-              className="relative max-w-6xl w-full max-h-[90vh] flex flex-col rounded-2xl border border-white/10 shadow-2xl" 
+              className="relative max-w-6xl w-full max-h-[90vh] flex flex-col" 
               onClick={e => e.stopPropagation()}
             >
-              {/* Navigation arrows */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   prevImage();
                 }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-white/90 hover:text-white transition-colors p-3 z-10 bg-black/30 rounded-full backdrop-blur-sm hover:bg-black/50 border border-white/10"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-white/90 hover:text-white transition-all duration-300 p-4 z-10 bg-gradient-to-br from-slate-800/80 to-slate-900/80 rounded-full backdrop-blur-xl hover:from-slate-700 hover:to-slate-800 border border-white/10 hover:border-rose-500/30 shadow-2xl hover:scale-110 hover:shadow-rose-500/20"
                 aria-label="Previous image"
               >
-                <ChevronLeft className="w-8 h-8" />
+                <ChevronLeft className="w-6 h-6" />
               </button>
               
               <button
@@ -328,49 +330,51 @@ export function GallerySection() {
                   e.stopPropagation();
                   nextImage();
                 }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/90 hover:text-white transition-colors p-3 z-10 bg-black/30 rounded-full backdrop-blur-sm hover:bg-black/50 border border-white/10"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/90 hover:text-white transition-all duration-300 p-4 z-10 bg-gradient-to-br from-slate-800/80 to-slate-900/80 rounded-full backdrop-blur-xl hover:from-slate-700 hover:to-slate-800 border border-white/10 hover:border-rose-500/30 shadow-2xl hover:scale-110 hover:shadow-rose-500/20"
                 aria-label="Next image"
               >
-                <ChevronRight className="w-8 h-8" />
+                <ChevronRight className="w-6 h-6" />
               </button>
               
-              {/* Close button at the top right */}
               <button
                 onClick={() => setSelectedImage(null)}
-                className="absolute -top-12 right-0 text-white/80 hover:text-white transition-colors p-2 z-10"
+                className="absolute -top-14 right-0 text-white/80 hover:text-white transition-all duration-300 p-3 z-10 bg-gradient-to-br from-slate-800/60 to-slate-900/60 rounded-full backdrop-blur-xl hover:from-slate-700 hover:to-slate-800 border border-white/10 hover:border-rose-500/30 hover:scale-110"
                 aria-label="Close"
               >
-                <X className="w-10 h-10" />
+                <X className="w-6 h-6" />
               </button>
               
-              {/* Image container with premium styling */}
-              <div className="flex-1 flex items-center justify-center rounded-2xl overflow-hidden bg-black/30 backdrop-blur md:backdrop-blur-sm border border-white/10 shadow-2xl">
+              <div className="flex-1 flex items-center justify-center rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900/50 to-slate-800/50 backdrop-blur-xl border border-white/10 shadow-2xl p-4">
                 <img
                   src={selectedImage.url}
                   alt="Gallery image preview"
-                  className="max-w-full max-h-[80vh] object-contain"
+                  className="max-w-full max-h-[75vh] object-contain rounded-2xl shadow-2xl"
                 />
               </div>
               
-              {/* Image details with premium styling */}
-              <div className="mt-6 text-center">
+              <div className="mt-8 text-center">
                 {selectedImage.description && (
-                  <p className="text-gray-300 text-base md:text-lg max-w-3xl mx-auto">{selectedImage.description}</p>
+                  <p className="text-gray-300 text-base md:text-lg max-w-3xl mx-auto font-light tracking-wide leading-relaxed">{selectedImage.description}</p>
                 )}
-                {/* Image counter */}
-                <div className="mt-4 text-gray-400 text-sm">
-                  {images.findIndex(img => img.id === selectedImage.id) + 1} of {images.length}
+                
+                <div className="mt-6 inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-slate-800/60 to-slate-900/60 rounded-full border border-white/10 backdrop-blur-xl">
+                  <div className="w-1.5 h-1.5 rounded-full bg-rose-500"></div>
+                  <span className="text-gray-300 text-sm font-medium tracking-wider">
+                    {images.findIndex(img => img.id === selectedImage.id) + 1} <span className="text-gray-500 mx-1">of</span> {images.length}
+                  </span>
+                  <div className="w-1.5 h-1.5 rounded-full bg-rose-500"></div>
                 </div>
-                {/* Navigation dots */}
-                <div className="mt-4 flex justify-center space-x-2">
+                
+                <div className="mt-6 flex justify-center space-x-2">
                   {images.map((_, index) => (
                     <div 
                       key={index}
-                      className={`w-3 h-3 rounded-full transition-colors ${
+                      className={`h-1.5 rounded-full transition-all duration-500 ${
                         images[index].id === selectedImage.id 
-                          ? 'bg-rose-500' 
-                          : 'bg-white/30'
+                          ? 'w-8 bg-gradient-to-r from-rose-500 to-rose-400 shadow-lg shadow-rose-500/50' 
+                          : 'w-1.5 bg-white/20 hover:bg-white/30 cursor-pointer'
                       }`}
+                      onClick={() => images[index].id !== selectedImage.id && setSelectedImage(images[index])}
                     />
                   ))}
                 </div>
@@ -380,14 +384,41 @@ export function GallerySection() {
         )}
       </div>
       
-      {/* Add fade-in animation for new images */}
       <style>{`
         @keyframes fadeIn {
-          from { opacity: 0; transform: scale(0.95); }
-          to { opacity: 1; transform: scale(1); }
+          from { 
+            opacity: 0; 
+            transform: scale(0.95) translateY(10px); 
+          }
+          to { 
+            opacity: 1; 
+            transform: scale(1) translateY(0); 
+          }
         }
         .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
+          animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        html {
+          scroll-behavior: smooth;
+        }
+        
+        ::-webkit-scrollbar {
+          width: 12px;
+        }
+        
+        ::-webkit-scrollbar-track {
+          background: #1e293b;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+          background: linear-gradient(to bottom, #f43f5e, #fb923c);
+          border-radius: 6px;
+          border: 2px solid #1e293b;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(to bottom, #fb7185, #fbbf24);
         }
       `}</style>
     </section>

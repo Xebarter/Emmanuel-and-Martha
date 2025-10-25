@@ -9,7 +9,7 @@ export function Footer() {
           <div>
             <h3 className="text-xl font-bold mb-3 md:mb-4 flex items-center gap-2">
               <Heart className="w-5 h-5 text-rose-400" />
-              John & Priscilla
+              Emmanuel & Martha
             </h3>
             <p className="text-gray-400 text-sm md:text-base">
               Join us in celebrating our love and commitment as we begin our journey together.
@@ -68,7 +68,7 @@ export function Footer() {
         </div>
 
         <div className="mt-6 md:mt-8 border-t border-white/10 pt-6 text-center text-gray-400">
-          <p className="text-sm md:text-base">&copy; {new Date().getFullYear()} John & Priscilla. All rights reserved.</p>
+          <p className="text-sm md:text-base">&copy; {new Date().getFullYear()} Emmanuel & Martha. All rights reserved.</p>
           <p className="mt-2 text-xs md:text-sm">Made with love for our special day</p>
         </div>
       </div>

@@ -695,8 +695,8 @@ USING (bucket_id = 'gallery');
 
 -- Insert default site settings
 INSERT INTO site_settings (key, value, description, is_public) VALUES
-  ('site_title', '"John & Priscilla''s Wedding"', 'The main title of the wedding website', true),
-  ('couple_names', '"John & Priscilla"', 'Names of the couple', true),
+  ('site_title', '"Emmanuel & Martha''s Wedding"', 'The main title of the wedding website', true),
+  ('couple_names', '"Emmanuel & Martha"', 'Names of the couple', true),
   ('wedding_date', '"2026-02-14T15:00:00+03:00"', 'Wedding date and time', true),
   ('wedding_location', '{"name": "Kampala Serena Hotel", "address": "Kampala, Uganda", "latitude": 0.3163, "longitude": 32.5822}', 'Wedding venue details', true),
   ('default_currency', '"UGX"', 'Default currency for monetary values', true),
