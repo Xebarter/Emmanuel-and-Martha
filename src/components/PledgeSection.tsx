@@ -281,7 +281,7 @@ export function PledgeSection({ totalPledges }: PledgeSectionProps) {
                   type="text"
                   id="name"
                   className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
-                  placeholder="John Doe"
+                  placeholder="Guest"
                 />
                 {errors.name && <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.name.message}</p>}
               </div>

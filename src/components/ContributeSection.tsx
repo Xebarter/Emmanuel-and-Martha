@@ -194,15 +194,15 @@ export function ContributeSection({ totalContributions }: ContributeSectionProps
           </div>
 
           <div className="mb-6">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Email (Optional)
+            <label htmlFor="email" className="block text-sm font-semibold text-gray-800 mb-3 tracking-wide">
+              Email Address (Optional)
             </label>
             <input
               {...register('email')}
               type="email"
               id="email"
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent bg-white/70"
-              placeholder="john@example.com"
+              className="w-full px-5 py-4 rounded-xl border-2 border-gray-200 focus:ring-4 focus:ring-rose-100/50 focus:border-rose-400 bg-white/80 transition-all duration-200 shadow-sm hover:shadow-md"
+              placeholder="guest@example.com"
             />
             {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
           </div>

@@ -305,91 +305,93 @@ export function MeetingsSection() {
 
   if (loading) {
     return (
-      <section id="meetings" className="py-20 bg-white">
+      <section id="meetings" className="py-20 bg-gradient-to-br from-purple-950 via-purple-900 to-purple-800">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto text-rose-500" />
+          <Loader2 className="w-8 h-8 animate-spin mx-auto text-amber-400" />
         </div>
       </section>
     );
   }
 
   return (
-    <section id="meetings" className="py-16 md:py-20 bg-gradient-to-br from-white via-rose-50 to-amber-50">
+    <section id="meetings" className="py-20 md:py-24 bg-gradient-to-br from-purple-950 via-purple-900 to-purple-800">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-3xl md:text-5xl font-serif font-bold text-gray-900 mb-3 md:mb-4">
-            Upcoming Meetings
+        <div className="text-center mb-16 md:mb-20">
+          <h2 className="text-4xl md:text-6xl font-serif font-extrabold text-amber-100 mb-4 md:mb-6 tracking-tight">
+            Upcoming Gatherings
           </h2>
-          <div className="flex items-center justify-center gap-2 md:gap-3 mb-3">
-            <div className="h-px w-8 md:w-16 bg-gradient-to-r from-transparent via-rose-300 to-transparent"></div>
-            <Calendar className="w-4 h-4 text-rose-500" />
-            <div className="h-px w-8 md:w-16 bg-gradient-to-l from-transparent via-rose-300 to-transparent"></div>
+          <div className="flex items-center justify-center gap-3 md:gap-4 mb-4">
+            <div className="h-px w-12 md:w-20 bg-gradient-to-r from-transparent via-purple-400 to-amber-400"></div>
+            <Calendar className="w-5 h-5 text-amber-400" />
+            <div className="h-px w-12 md:w-20 bg-gradient-to-l from-transparent via-purple-400 to-amber-400"></div>
           </div>
-          <p className="text-base md:text-lg text-gray-600">
-            Join us for our wedding preparation meetings
+          <p className="text-lg md:text-xl text-amber-200 max-w-3xl mx-auto leading-relaxed">
+            Join us in the sacred moments leading to our eternal union
           </p>
         </div>
 
         {getAllEvents().length === 0 ? (
-          <div className="text-center py-12">
-            <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg">No upcoming meetings or wedding events found</p>
-            <p className="text-sm text-gray-400 mt-2">Check back later for updates</p>
+          <div className="text-center py-16">
+            <Calendar className="w-16 h-16 text-purple-500 mx-auto mb-4" />
+            <p className="text-amber-200 text-xl font-medium">No forthcoming gatherings or sacred events unveiled</p>
+            <p className="text-amber-300 text-base mt-2">Return anon for revelations</p>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {getAllEvents().map((meeting) => (
               <div
                 key={meeting.id}
-                className={`bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-lg border-2 p-6 hover:shadow-xl transition-all duration-300 ${
-                  (meeting as any).is_wedding ? 'border-rose-300 ring-2 ring-rose-100' : 'border-gray-100'
+                className={`bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl border-2 p-8 hover:shadow-3xl transition-all duration-500 ${
+                  (meeting as any).is_wedding 
+                    ? 'border-amber-400/50 ring-4 ring-amber-500/20 bg-gradient-to-br from-amber-900/20' 
+                    : 'border-purple-600/30'
                 }`}
               >
-                <div className="mb-4">
-                  <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium mb-3 ${
+                <div className="mb-6">
+                  <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-4 ${
                     (meeting as any).is_wedding 
-                      ? 'bg-rose-500 text-white' 
-                      : 'bg-rose-100 text-rose-700'
+                      ? 'bg-amber-500/90 text-amber-900 shadow-lg' 
+                      : 'bg-purple-500/20 text-amber-200 border border-purple-400/30'
                   }`}>
                     {(meeting as any).is_wedding ? (
                       <Heart className="w-4 h-4" />
                     ) : (
                       <Clock className="w-4 h-4" />
                     )}
-                    {(meeting as any).is_wedding ? 'Wedding Day' : `${getTimeUntilMeeting(meeting.starts_at)} away`}
+                    {(meeting as any).is_wedding ? 'The Sacred Union' : `${getTimeUntilMeeting(meeting.starts_at)} hence`}
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{meeting.title}</h3>
+                  <h3 className="text-3xl font-bold text-amber-100 mb-3 tracking-tight">{meeting.title}</h3>
                   {meeting.description && (
-                    <p className="text-gray-600 mb-4">{meeting.description}</p>
+                    <p className="text-amber-300 mb-6 leading-relaxed">{meeting.description}</p>
                   )}
                 </div>
 
-                <div className="space-y-3 mb-6">
-                  <div className="flex items-start gap-3 text-gray-700">
-                    <Calendar className="w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">
+                <div className="space-y-4 mb-8">
+                  <div className="flex items-start gap-4 text-amber-200">
+                    <Calendar className="w-6 h-6 text-amber-400 flex-shrink-0 mt-0.5" />
+                    <span className="text-base leading-relaxed">
                       {formatDateTime(meeting.starts_at)}
                       {(meeting as any).is_wedding && (
-                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-white text-rose-500 border border-rose-500">
+                        <span className="ml-3 inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/90 text-amber-900 border border-amber-400 shadow-md">
                           <Heart className="w-3 h-3 mr-1" />
-                          Save the Date
+                          Eternal Vow
                         </span>
                       )}
                     </span>
                   </div>
-                  <div className="flex items-start gap-3 text-gray-700">
-                    <MapPin className="w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">{meeting.location}</span>
+                  <div className="flex items-start gap-4 text-amber-200">
+                    <MapPin className="w-6 h-6 text-amber-400 flex-shrink-0 mt-0.5" />
+                    <span className="text-base leading-relaxed">{meeting.location}</span>
                   </div>
                 </div>
 
                 {!meeting.is_wedding && (
                   <button
                     onClick={() => setSelectedMeeting(meeting)}
-                    className="w-full bg-gradient-to-r from-rose-500 to-rose-600 text-white py-3 rounded-lg font-semibold hover:from-rose-600 hover:to-rose-700 transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                    className="w-full bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 text-white py-4 rounded-xl font-serif font-semibold text-lg tracking-wide hover:from-purple-700 hover:via-purple-600 hover:to-amber-600 transition-all duration-300 shadow-xl hover:shadow-2xl flex items-center justify-center gap-3 transform hover:-translate-y-1"
                   >
                     <Users className="w-5 h-5" />
-                    Register Now
+                    Reserve Thy Place
                   </button>
                 )}
               </div>
@@ -400,84 +402,84 @@ export function MeetingsSection() {
 
       {selectedMeeting && (
         <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4"
           onClick={() => setSelectedMeeting(null)}
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 md:p-8 border border-gray-100"
+            className="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl max-w-lg w-full p-8 md:p-10 border border-white/20"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-gray-900">Register for Meeting</h3>
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-3xl font-bold text-amber-100">Reserve Attendance</h3>
               <button
                 onClick={() => setSelectedMeeting(null)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-3 hover:bg-white/10 rounded-full transition-all duration-200 text-amber-200 hover:text-amber-100"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
 
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-              <p className="font-semibold text-gray-900 mb-2">{selectedMeeting.title}</p>
-              <p className="text-sm text-gray-600 flex items-center gap-2 mb-1">
-                <Calendar className="w-4 h-4" />
+            <div className="mb-8 p-6 bg-white/5 rounded-2xl border border-white/10">
+              <p className="font-serif text-2xl text-amber-100 mb-3 font-semibold">{selectedMeeting.title}</p>
+              <p className="text-base text-amber-300 flex items-center gap-3 mb-2">
+                <Calendar className="w-5 h-5 text-amber-400" />
                 {formatDateTime(selectedMeeting.starts_at)}
               </p>
-              <p className="text-sm text-gray-600 flex items-center gap-2">
-                <MapPin className="w-4 h-4" />
+              <p className="text-base text-amber-300 flex items-center gap-3">
+                <MapPin className="w-5 h-5 text-amber-400" />
                 {selectedMeeting.location}
               </p>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)}>
-              <div className="mb-4">
-                <label htmlFor="modal-name" className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name *
+              <div className="mb-6">
+                <label htmlFor="modal-name" className="block text-sm font-semibold text-amber-100 mb-3 tracking-wide">
+                  Thy Full Name *
                 </label>
                 <input
                   {...register('name')}
                   type="text"
                   id="modal-name"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-                  placeholder="John Doe"
+                  className="w-full px-5 py-4 rounded-2xl border-2 border-purple-600/50 focus:ring-4 focus:ring-amber-500/30 focus:border-amber-400 bg-purple-800/60 text-amber-100 placeholder-purple-300 transition-all duration-200 shadow-inner hover:shadow-lg"
+                  placeholder="Thy Noble Name"
                 />
-                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+                {errors.name && <p className="text-rose-400 text-sm mt-2 font-medium">{errors.name.message}</p>}
               </div>
 
-              <div className="mb-4">
-                <label htmlFor="modal-phone" className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number *
+              <div className="mb-6">
+                <label htmlFor="modal-phone" className="block text-sm font-semibold text-amber-100 mb-3 tracking-wide">
+                  Herald's Call (Phone) *
                 </label>
                 <input
                   {...register('phone')}
                   type="tel"
                   id="modal-phone"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-                  placeholder="+256700000000"
+                  className="w-full px-5 py-4 rounded-2xl border-2 border-purple-600/50 focus:ring-4 focus:ring-amber-500/30 focus:border-amber-400 bg-purple-800/60 text-amber-100 placeholder-purple-300 transition-all duration-200 shadow-inner hover:shadow-lg"
+                  placeholder="+256 700 000 000"
                 />
-                {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
+                {errors.phone && <p className="text-rose-400 text-sm mt-2 font-medium">{errors.phone.message}</p>}
               </div>
 
-              <div className="mb-6">
-                <label htmlFor="modal-email" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email (Optional)
+              <div className="mb-8">
+                <label htmlFor="modal-email" className="block text-sm font-semibold text-amber-100 mb-3 tracking-wide">
+                  Missive (Email, Optional)
                 </label>
                 <input
                   {...register('email')}
                   type="email"
                   id="modal-email"
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-                  placeholder="john@example.com"
+                  placeholder="guest@example.com"
                 />
                 {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
               </div>
 
               {submitMessage && (
                 <div
-                  className={`mb-4 p-4 rounded-lg ${
+                  className={`mb-8 p-6 rounded-2xl border-2 shadow-xl ${
                     submitMessage.type === 'success'
-                      ? 'bg-green-50 text-green-800 border border-green-200'
-                      : 'bg-red-50 text-red-800 border border-red-200'
+                      ? 'bg-amber-900/50 text-amber-100 border-amber-400/50'
+                      : 'bg-rose-900/50 text-rose-100 border-rose-400/50'
                   }`}
                 >
                   {submitMessage.text}
@@ -487,15 +489,15 @@ export function MeetingsSection() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-rose-500 via-fuchsia-500 to-rose-600 text-white py-3 rounded-lg font-semibold hover:from-rose-600 hover:to-fuchsia-600 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-purple-600 via-purple-500 to-amber-500 text-white py-5 rounded-2xl font-serif font-semibold text-lg tracking-wide hover:from-purple-700 hover:via-purple-600 hover:to-amber-600 transition-all duration-300 shadow-2xl hover:shadow-3xl disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-3 transform hover:-translate-y-0.5"
               >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Registering...
+                    Sealing Thy Covenant...
                   </>
                 ) : (
-                  'Complete Registration'
+                  'Seal Thy Attendance'
                 )}
               </button>
             </form>

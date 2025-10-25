@@ -134,8 +134,8 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
         twitterImage.content = galleryImages[0].url;
       } else {
         // Fallback to default image
-        ogImage.content = 'https://johnandpriscilla.vercel.app/og-image.jpg';
-        twitterImage.content = 'https://johnandpriscilla.vercel.app/og-image.jpg';
+        ogImage.content = 'https://emmanuelandmartha.vercel.app/og-image.jpg';
+        twitterImage.content = 'https://emmanuelandmartha.vercel.app/og-image.jpg';
       }
     };
     
@@ -396,8 +396,8 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
   }, [weddingDetails.tagline]);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden wedding-font">
-      {/* Gallery image carousel background with parallax effect */}
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Gallery image carousel background without overlay for clarity */}
       {galleryImages.length > 0 && (
         <div className="absolute inset-0 z-0">
           {galleryImages.map((image, index) => (
@@ -411,21 +411,15 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat'
-                // Removed filter that was making images appear overly bright
               }}
             />
           ))}
-          {/* Removed overlays for better image visibility */}
         </div>
       )}
 
-      {/* Removed mesh gradient background that was reducing image clarity */}
-      
-      {/* Removed additional radial gradients that were creating overlay effects */}
-
-      {/* Floating elements - hearts and sparkles */}
+      {/* Floating elements - golden sparkles and hearts */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(6)].map((_, i) => ( // Reduced from 10 to 6 for better mobile performance
+        {[...Array(8)].map((_, i) => (
           <div
             key={i}
             className={`absolute ${i % 3 === 0 ? 'animate-float-slow' : i % 2 === 0 ? 'animate-float-medium' : 'animate-float-fast'}`}
@@ -435,76 +429,69 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
               animationDelay: `${Math.random() * 5}s`,
             }}
           >
-            {i % 4 === 0 ? (
-              <div className="w-1 h-1 bg-deep-purple rounded-full animate-twinkle" />
+            {i % 3 === 0 ? (
+              <div className="w-1 h-1 bg-amber-400 rounded-full animate-twinkle" />
             ) : (
-              <Heart className={`${i % 3 === 0 ? 'w-4 h-4' : 'w-3 h-3'} text-deep-purple/50 fill-deep-purple/40`} />
+              <Heart className={`${i % 3 === 0 ? 'w-4 h-4' : 'w-3 h-3'} text-amber-400/60 fill-amber-400/40`} />
             )}
           </div>
         ))}
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-20 text-center"> {/* Adjusted padding for mobile */}
-        {/* Luxury heart icon with advanced effects */}
-        <div className="mb-6 md:mb-12 flex justify-center animate-float-gentle"> {/* Reduced margin on mobile */}
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-20 text-center">
+        {/* Regal heart icon with gilded effects */}
+        <div className="mb-6 md:mb-12 flex justify-center animate-float-gentle">
           <div className="relative group">
-            {/* Outer glow rings */}
-            <div className="absolute inset-0 bg-gradient-to-r from-deep-purple to-coral-primary blur-3xl opacity-50 rounded-full animate-pulse-glow"></div>
-            <div className="absolute -inset-2 bg-gradient-to-r from-deep-purple to-coral-light blur-2xl opacity-30 rounded-full animate-spin-slow"></div>
+            {/* Outer glow rings in gold and purple */}
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-amber-400 blur-3xl opacity-40 rounded-full animate-pulse-glow"></div>
+            <div className="absolute -inset-2 bg-gradient-to-r from-amber-400 to-purple-500 blur-2xl opacity-20 rounded-full animate-spin-slow"></div>
             
             {/* Main icon container */}
-            <div className="relative p-2 sm:p-3 md:p-6 bg-gradient-to-br from-white/95 to-coral-lightest/50 backdrop-blur-xl rounded-full shadow-2xl border-2 border-deep-purple/30 group-hover:scale-110 transition-all duration-500">
-              <div className="absolute inset-0 bg-gradient-to-br from-deep-purple/20 to-coral-light/40 rounded-full animate-pulse-subtle"></div>
-              <Heart className="relative w-8 h-8 sm:w-10 sm:h-10 md:w-16 md:h-16 text-deep-purple fill-deep-purple drop-shadow-lg group-hover:scale-110 transition-transform duration-300" />
+            <div className="relative p-2 sm:p-3 md:p-6 bg-gradient-to-br from-white/10 to-purple-800/20 backdrop-blur-xl rounded-full shadow-2xl border-2 border-amber-400/30 group-hover:scale-110 transition-all duration-500">
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-400/20 to-purple-600/20 rounded-full animate-pulse-subtle"></div>
+              <Heart className="relative w-8 h-8 sm:w-10 sm:h-10 md:w-16 md:h-16 text-amber-400 fill-amber-400 drop-shadow-lg group-hover:scale-110 transition-transform duration-300" />
             </div>
           </div>
         </div>
 
-        {/* Main heading with ultra-modern typography */}
+        {/* Main heading with gilded gradient */}
         <div className="mb-4 md:mb-8 animate-fade-in-up">
-          <h1 className="text-5xl xs:text-6xl sm:text-7xl md:text-9xl lg:text-[12rem] font-bold mb-3 md:mb-4 leading-none tracking-tight hero-font" 
+          <h1 className="text-5xl xs:text-6xl sm:text-7xl md:text-9xl lg:text-[12rem] font-bold mb-3 md:mb-4 leading-none tracking-tight" 
             style={{ 
               fontFamily: "'Cormorant Garamond', serif",
-              background: 'linear-gradient(135deg, #ffffff 0%, #5C3E94 15%, #FFE5D4 30%, #FFCCB6 50%, #FFB3A1 70%, #FF8C69 85%, #FF6F61 100%)',
+              background: 'linear-gradient(135deg, #ffffff 0%, #D4AF37 15%, #B8860B 30%, #FFD700 50%, #FFA500 70%, #FF8C00 85%, #FF4500 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
-              textShadow: '0 0 80px rgba(92, 62, 148, 0.5)',
-              filter: 'drop-shadow(0 4px 20px rgba(92, 62, 148, 0.4))'
+              textShadow: '0 0 80px rgba(212, 175, 55, 0.5)',
+              filter: 'drop-shadow(0 4px 20px rgba(212, 175, 55, 0.4))'
             }}>
             {displayNames}
           </h1>
-          {/* Decorative line under names */}
+          {/* Gilded decorative line */}
           <div className="flex items-center justify-center gap-2 md:gap-3 mt-3 md:mt-6">
-            <div className="h-[1px] md:h-[2px] w-8 xs:w-10 sm:w-14 md:w-20 bg-gradient-to-r from-transparent via-deep-purple to-coral-light"></div>
-            <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-deep-purple rounded-full shadow-lg shadow-deep-purple/50"></div>
-            <div className="h-[1px] md:h-[2px] w-8 xs:w-10 sm:w-14 md:w-20 bg-gradient-to-l from-transparent via-deep-purple to-coral-light"></div>
+            <div className="h-[1px] md:h-[2px] w-8 xs:w-10 sm:w-14 md:w-20 bg-gradient-to-r from-transparent via-purple-400 to-amber-400"></div>
+            <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-amber-400 rounded-full shadow-lg shadow-amber-400/50"></div>
+            <div className="h-[1px] md:h-[2px] w-8 xs:w-10 sm:w-14 md:w-20 bg-gradient-to-l from-transparent via-purple-400 to-amber-400"></div>
           </div>
         </div>
 
-        {/* Tagline with elegant styling */}
-        <p className="text-sm xs:text-base sm:text-xl md:text-3xl text-deep-purple mb-6 md:mb-12 font-light italic max-w-3xl mx-auto leading-relaxed drop-shadow-lg animate-fade-in-up px-2 hero-font" style={{ animationDelay: '0.2s', fontFamily: "'Cormorant Garamond', serif" }}>
-          "{weddingDetails.tagline || 'Join us as we celebrate our love'}"
+        {/* Tagline with elegant gilded styling */}
+        <p className="text-sm xs:text-base sm:text-xl md:text-3xl text-amber-200 mb-6 md:mb-12 font-light italic max-w-3xl mx-auto leading-relaxed drop-shadow-lg animate-fade-in-up px-2" style={{ animationDelay: '0.2s', fontFamily: "'Cormorant Garamond', serif" }}>
+          "{displayTagline}"
         </p>
                   
         {/* Enhanced loading state */}
         {loading && (
           <div className="flex justify-center items-center py-6 md:py-8">
-            <div className="flex items-center gap-2 bg-deep-purple/20 backdrop-blur-xl px-4 py-2 rounded-xl sm:px-6 sm:py-3">
-              <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 animate-spin text-deep-purple" />
-              <span className="text-deep-purple text-xs sm:text-sm md:text-base">Loading wedding details...</span>
+            <div className="flex items-center gap-2 bg-purple-900/50 backdrop-blur-xl px-4 py-2 rounded-xl sm:px-6 sm:py-3">
+              <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 animate-spin text-amber-400" />
+              <span className="text-amber-300 text-xs sm:text-sm md:text-base">Unveiling sacred union...</span>
             </div>
           </div>
         )}
 
-        {/* Wedding details with modern glassmorphic cards */}
-          {loading ? (
-            <div className="flex justify-center items-center py-6 md:py-8">
-              <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 animate-spin text-deep-purple drop-shadow-lg" />
-            </div>
-          ) : null}
-
-        {/* Ultra-modern countdown timer */}
+        {/* Ultra-regal countdown timer */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 md:gap-8 max-w-4xl mx-auto mb-6 sm:mb-8 md:mb-16 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
           {[
             { label: 'Days', value: timeRemaining.days },
@@ -516,23 +503,23 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
               key={item.label}
               className="group relative overflow-hidden"
             >
-              {/* Animated gradient background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-deep-purple/30 to-coral-primary/30 rounded-2xl sm:rounded-3xl blur-lg sm:blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+              {/* Animated golden glow */}
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-600/30 to-amber-400/30 rounded-2xl sm:rounded-3xl blur-lg sm:blur-xl group-hover:blur-2xl transition-all duration-500"></div>
               
               {/* Main card */}
-              <div className="relative bg-white/15 backdrop-blur-2xl rounded-2xl sm:rounded-3xl shadow-2xl p-2 sm:p-3 md:p-8 border border-deep-purple/20 group-hover:border-deep-purple/40 group-hover:bg-white/25 group-hover:scale-105 transition-all duration-500">
+              <div className="relative bg-white/10 backdrop-blur-2xl rounded-2xl sm:rounded-3xl shadow-2xl p-2 sm:p-3 md:p-8 border border-amber-400/20 group-hover:border-amber-400/40 group-hover:bg-white/20 group-hover:scale-105 transition-all duration-500">
                 {/* Shimmer effect */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/20 to-transparent animate-shimmer"></div>
                 </div>
                 
                 <div className="relative">
-                  <div className="text-2xl xs:text-3xl sm:text-4xl md:text-7xl font-black text-deep-purple mb-0.5 sm:mb-1 md:mb-3 drop-shadow-2xl group-hover:scale-110 transition-transform duration-300" style={{
-                    textShadow: '0 0 20px rgba(92, 62, 148, 0.8), 0 0 40px rgba(255, 111, 97, 0.5)'
+                  <div className="text-2xl xs:text-3xl sm:text-4xl md:text-7xl font-black text-amber-300 mb-0.5 sm:mb-1 md:mb-3 drop-shadow-2xl group-hover:scale-110 transition-transform duration-300" style={{
+                    textShadow: '0 0 20px rgba(212, 175, 55, 0.8), 0 0 40px rgba(92, 62, 148, 0.5)'
                   }}>
                     {item.value.toString().padStart(2, '0')}
                   </div>
-                  <div className="text-[0.5rem] xs:text-[0.6rem] sm:text-xs md:text-base text-coral-secondary font-bold uppercase tracking-wider drop-shadow-lg">
+                  <div className="text-[0.5rem] xs:text-[0.6rem] sm:text-xs md:text-base text-purple-300 font-bold uppercase tracking-wider drop-shadow-lg">
                     {item.label}
                   </div>
                 </div>
@@ -541,32 +528,32 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
           ))}
         </div>
 
-        {/* Call to action with premium styling */}
+        {/* Call to action with opulent styling */}
         <div className="max-w-3xl mx-auto mb-6 sm:mb-8 md:mb-12 animate-fade-in-up px-2" style={{ animationDelay: '0.8s' }}>
           <div className="relative group">
-            {/* Glow effect */}
-            <div className="absolute -inset-1 sm:-inset-2 md:-inset-4 bg-gradient-to-r from-rose-400 to-fuchsia-500 rounded-lg sm:rounded-xl md:rounded-3xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
+            {/* Glow effect in gold and purple */}
+            <div className="absolute -inset-1 sm:-inset-2 md:-inset-4 bg-gradient-to-r from-purple-600 to-amber-400 rounded-lg sm:rounded-xl md:rounded-3xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
             
             {/* Content card */}
-            <div className="relative bg-white/10 backdrop-blur-2xl rounded-lg sm:rounded-xl md:rounded-3xl p-3 sm:p-4 md:p-8 border border-white/20 shadow-2xl">
-              <p className="text-white/95 leading-relaxed text-xs sm:text-sm md:text-xl lg:text-2xl font-light drop-shadow-lg">
+            <div className="relative bg-white/5 backdrop-blur-2xl rounded-lg sm:rounded-xl md:rounded-3xl p-3 sm:p-4 md:p-8 border border-amber-400/20 shadow-2xl">
+              <p className="text-amber-200 leading-relaxed text-xs sm:text-sm md:text-xl lg:text-2xl font-light drop-shadow-lg">
                 Your presence and support mean the world to us as we begin this beautiful journey together.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Elegant decorative divider */}
+        {/* Gilded decorative divider */}
         <div className="flex items-center justify-center gap-2 sm:gap-3 md:gap-6 animate-fade-in-up" style={{ animationDelay: '1s' }}>
-          <div className="h-[1px] w-8 xs:w-12 sm:w-20 md:w-32 bg-gradient-to-r from-transparent via-deep-purple/40 to-coral-light/60"></div>
+          <div className="h-[1px] w-8 xs:w-12 sm:w-20 md:w-32 bg-gradient-to-r from-transparent via-purple-400/40 to-amber-400/60"></div>
           <div className="relative">
-            <div className="absolute inset-0 bg-deep-purple blur-sm opacity-50"></div>
-            <Heart className="relative w-2 h-2 sm:w-3 sm:h-3 md:w-5 md:h-5 text-deep-purple fill-deep-purple drop-shadow-lg animate-pulse-gentle" />
+            <div className="absolute inset-0 bg-amber-400 blur-sm opacity-50"></div>
+            <Heart className="relative w-2 h-2 sm:w-3 sm:h-3 md:w-5 md:h-5 text-amber-400 fill-amber-400 drop-shadow-lg animate-pulse-gentle" />
           </div>
-          <div className="h-[1px] w-8 xs:w-12 sm:w-20 md:w-32 bg-gradient-to-l from-transparent via-deep-purple/40 to-coral-light/60"></div>
+          <div className="h-[1px] w-8 xs:w-12 sm:w-20 md:w-32 bg-gradient-to-l from-transparent via-purple-400/40 to-amber-400/60"></div>
         </div>
 
-        {/* Contribute button */}
+        {/* Contribute button with regal gradient */}
         <div className="mt-8 animate-fade-in-up" style={{ animationDelay: '1.2s' }}>
           <button
             onClick={() => {
@@ -575,13 +562,13 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
                 contributeSection.scrollIntoView({ behavior: 'smooth' });
               }
             }}
-            className="group relative px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-coral-primary to-coral-secondary hover:from-coral-secondary hover:to-coral-primary text-white font-bold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out animate-pulse hover:animate-none"
+            className="group relative px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-purple-600 to-amber-500 hover:from-purple-700 hover:to-amber-600 text-white font-bold rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 ease-in-out animate-pulse hover:animate-none"
           >
             <span className="relative z-10 flex items-center gap-2">
               Contribute
               <DollarSign className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
             </span>
-            <div className="absolute inset-0 bg-gradient-to-r from-coral-secondary to-deep-purple rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-purple-600 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
           </button>
         </div>
       </div>

@@ -700,7 +700,7 @@ INSERT INTO site_settings (key, value, description, is_public) VALUES
   ('wedding_date', '"2026-02-14T15:00:00+03:00"', 'Wedding date and time', true),
   ('wedding_location', '{"name": "Kampala Serena Hotel", "address": "Kampala, Uganda", "latitude": 0.3163, "longitude": 32.5822}', 'Wedding venue details', true),
   ('default_currency', '"UGX"', 'Default currency for monetary values', true),
-  ('contact_email', '"info@johnandpriscilla.com"', 'Contact email for inquiries', true),
+  ('contact_email', '"info@emmanuelandmartha.com"', 'Contact email for inquiries', true),
   ('rsvp_deadline', '"2026-01-31T23:59:59+03:00"', 'RSVP deadline date and time', true),
   ('gallery_enabled', 'true', 'Whether the gallery section is enabled', true),
   ('guestbook_enabled', 'true', 'Whether the guestbook is enabled', true),

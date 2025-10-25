@@ -78,7 +78,7 @@ export default function Analytics() {
   
   // Mock data for demonstration
   const [guests] = useState<Guest[]>([
-    { id: '1', full_name: 'John Doe', phone: '123', created_at: '2024-08-15T10:00:00Z' },
+    { id: '1', full_name: 'Emmanuel Martha', phone: '123', created_at: '2024-08-15T10:00:00Z' },
     { id: '2', full_name: 'Jane Smith', phone: '456', created_at: '2024-09-10T10:00:00Z' },
     { id: '3', full_name: 'Bob Johnson', phone: '789', created_at: '2024-09-20T10:00:00Z' },
     { id: '4', full_name: 'Alice Brown', phone: '012', created_at: '2024-10-01T10:00:00Z' },

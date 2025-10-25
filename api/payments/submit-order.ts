@@ -43,7 +43,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Get auth token first
-    const authUrl = `${req.headers.origin || 'https://priscillaandjohn.vercel.app'}/api/payments/auth`;
+    const authUrl = `${req.headers.origin || 'https://emmanuelandmartha.vercel.app'}/api/payments/auth`;
     console.log('Authenticating with:', authUrl);
     
     const authResponse = await fetch(authUrl, {

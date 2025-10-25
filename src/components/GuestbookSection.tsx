@@ -120,7 +120,7 @@ export function GuestbookSection() {
                   type="text"
                   id="gb-name"
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-rose-500 focus:border-transparent bg-white/70"
-                  placeholder="John Doe"
+                  placeholder="Guest"
                 />
                 {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
               </div>
