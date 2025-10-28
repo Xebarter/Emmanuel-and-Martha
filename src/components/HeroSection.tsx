@@ -1,4 +1,4 @@
-import { Heart, MapPin, Calendar, Loader2, DollarSign } from 'lucide-react';
+import { Heart, MapPin, Calendar, Loader2, DollarSign, MessageCircle } from 'lucide-react';
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -396,7 +396,7 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
   }, [weddingDetails.tagline]);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#89CFF0] to-[#C8A2C8]">
       {/* Gallery image carousel background without overlay for clarity */}
       {galleryImages.length > 0 && (
         <div className="absolute inset-0 z-0">
@@ -430,36 +430,36 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
             }}
           >
             {i % 3 === 0 ? (
-              <div className="w-1 h-1 bg-amber-400 rounded-full animate-twinkle" />
+              <div className="w-1 h-1 bg-[#89CFF0] rounded-full animate-twinkle" />
             ) : (
-              <Heart className={`${i % 3 === 0 ? 'w-4 h-4' : 'w-3 h-3'} text-amber-400/60 fill-amber-400/40`} />
+              <Heart className={`${i % 3 === 0 ? 'w-4 h-4' : 'w-3 h-3'} text-[#C8A2C8]/60 fill-[#C8A2C8]/40`} />
             )}
           </div>
         ))}
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-20 text-center">
-        {/* Regal heart icon with gilded effects */}
+        {/* Heart icon with royal blue and purple effects */}
         <div className="mb-6 md:mb-12 flex justify-center animate-float-gentle">
           <div className="relative group">
             {/* Outer glow rings in gold and purple */}
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-amber-400 blur-3xl opacity-40 rounded-full animate-pulse-glow"></div>
-            <div className="absolute -inset-2 bg-gradient-to-r from-amber-400 to-purple-500 blur-2xl opacity-20 rounded-full animate-spin-slow"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#89CFF0] to-[#C8A2C8] blur-3xl opacity-40 rounded-full animate-pulse-glow"></div>
+            <div className="absolute -inset-2 bg-gradient-to-r from-[#89CFF0] to-[#C8A2C8] blur-2xl opacity-20 rounded-full animate-spin-slow"></div>
             
             {/* Main icon container */}
-            <div className="relative p-2 sm:p-3 md:p-6 bg-gradient-to-br from-white/10 to-purple-800/20 backdrop-blur-xl rounded-full shadow-2xl border-2 border-amber-400/30 group-hover:scale-110 transition-all duration-500">
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-400/20 to-purple-600/20 rounded-full animate-pulse-subtle"></div>
-              <Heart className="relative w-8 h-8 sm:w-10 sm:h-10 md:w-16 md:h-16 text-amber-400 fill-amber-400 drop-shadow-lg group-hover:scale-110 transition-transform duration-300" />
+            <div className="relative p-2 sm:p-3 md:p-6 bg-gradient-to-br from-white/90 to-[#89CFF0]/10 backdrop-blur-xl rounded-full shadow-2xl border-2 border-[#C8A2C8]/30 group-hover:scale-110 transition-all duration-500">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#89CFF0]/20 to-[#C8A2C8]/20 rounded-full animate-pulse-subtle"></div>
+              <Heart className="relative w-8 h-8 sm:w-10 sm:h-10 md:w-16 md:h-16 text-[#C8A2C8] fill-[#C8A2C8] drop-shadow-lg group-hover:scale-110 transition-transform duration-300" />
             </div>
           </div>
         </div>
 
-        {/* Main heading with gilded gradient */}
+        {/* Main heading with royal blue and gold gradient */}
         <div className="mb-4 md:mb-8 animate-fade-in-up">
           <h1 className="text-5xl xs:text-6xl sm:text-7xl md:text-9xl lg:text-[12rem] font-bold mb-3 md:mb-4 leading-none tracking-tight" 
             style={{ 
               fontFamily: "'Cormorant Garamond', serif",
-              background: 'linear-gradient(135deg, #ffffff 0%, #D4AF37 15%, #B8860B 30%, #FFD700 50%, #FFA500 70%, #FF8C00 85%, #FF4500 100%)',
+              background: 'linear-gradient(135deg, #ffffff 0%, #d4af37 15%, #9d7cd8 30%, #ffffff 50%, #ffcc00 70%, #b86dd3 85%, #9d7cd8 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
@@ -468,30 +468,34 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
             }}>
             {displayNames}
           </h1>
-          {/* Gilded decorative line */}
+          {/* Gold decorative line */}
           <div className="flex items-center justify-center gap-2 md:gap-3 mt-3 md:mt-6">
-            <div className="h-[1px] md:h-[2px] w-8 xs:w-10 sm:w-14 md:w-20 bg-gradient-to-r from-transparent via-purple-400 to-amber-400"></div>
-            <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-amber-400 rounded-full shadow-lg shadow-amber-400/50"></div>
-            <div className="h-[1px] md:h-[2px] w-8 xs:w-10 sm:w-14 md:w-20 bg-gradient-to-l from-transparent via-purple-400 to-amber-400"></div>
+            <div className="h-[1px] md:h-[2px] w-8 xs:w-10 sm:w-14 md:w-20 bg-gradient-to-r from-transparent via-[#d4af37] to-[#9d7cd8]"></div>
+            <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-[#d4af37] rounded-full shadow-lg shadow-[#d4af37]/50"></div>
+            <div className="h-[1px] md:h-[2px] w-8 xs:w-10 sm:w-14 md:w-20 bg-gradient-to-l from-transparent via-[#d4af37] to-[#9d7cd8]"></div>
           </div>
         </div>
 
-        {/* Tagline with elegant gilded styling */}
-        <p className="text-sm xs:text-base sm:text-xl md:text-3xl text-amber-200 mb-6 md:mb-12 font-light italic max-w-3xl mx-auto leading-relaxed drop-shadow-lg animate-fade-in-up px-2" style={{ animationDelay: '0.2s', fontFamily: "'Cormorant Garamond', serif" }}>
+        {/* Tagline with elegant gold styling */}
+        <p className="text-sm xs:text-base sm:text-xl md:text-3xl text-[#FFE4B5] mb-6 md:mb-12 font-medium italic max-w-3xl mx-auto leading-relaxed drop-shadow-lg animate-fade-in-up px-2" style={{ 
+          animationDelay: '0.2s', 
+          fontFamily: "'Cormorant Garamond', serif",
+          textShadow: '0 1px 3px rgba(0, 0, 0, 0.3)'
+        }}>
           "{displayTagline}"
         </p>
                   
         {/* Enhanced loading state */}
         {loading && (
           <div className="flex justify-center items-center py-6 md:py-8">
-            <div className="flex items-center gap-2 bg-purple-900/50 backdrop-blur-xl px-4 py-2 rounded-xl sm:px-6 sm:py-3">
-              <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 animate-spin text-amber-400" />
-              <span className="text-amber-300 text-xs sm:text-sm md:text-base">Unveiling sacred union...</span>
+            <div className="flex items-center gap-2 bg-[#2d2d2d]/50 backdrop-blur-xl px-4 py-2 rounded-xl sm:px-6 sm:py-3">
+              <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 animate-spin text-[#d4af37]" />
+              <span className="text-[#f0f0f0] text-xs sm:text-sm md:text-base">Unveiling sacred union...</span>
             </div>
           </div>
         )}
 
-        {/* Ultra-regal countdown timer */}
+        {/* Countdown timer with royal theme */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 md:gap-8 max-w-4xl mx-auto mb-6 sm:mb-8 md:mb-16 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
           {[
             { label: 'Days', value: timeRemaining.days },
@@ -503,23 +507,23 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
               key={item.label}
               className="group relative overflow-hidden"
             >
-              {/* Animated golden glow */}
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-600/30 to-amber-400/30 rounded-2xl sm:rounded-3xl blur-lg sm:blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+              {/* Animated gold glow */}
+              <div className="absolute inset-0 bg-gradient-to-br from-[#4b2e83]/30 to-[#d4af37]/30 rounded-2xl sm:rounded-3xl blur-lg sm:blur-xl group-hover:blur-2xl transition-all duration-500"></div>
               
               {/* Main card */}
-              <div className="relative bg-white/10 backdrop-blur-2xl rounded-2xl sm:rounded-3xl shadow-2xl p-2 sm:p-3 md:p-8 border border-amber-400/20 group-hover:border-amber-400/40 group-hover:bg-white/20 group-hover:scale-105 transition-all duration-500">
+              <div className="relative bg-white/10 backdrop-blur-2xl rounded-2xl sm:rounded-3xl shadow-2xl p-2 sm:p-3 md:p-8 border border-[#d4af37]/20 group-hover:border-[#d4af37]/40 group-hover:bg-white/20 group-hover:scale-105 transition-all duration-500">
                 {/* Shimmer effect */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/20 to-transparent animate-shimmer"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#d4af37]/20 to-transparent animate-shimmer"></div>
                 </div>
                 
                 <div className="relative">
-                  <div className="text-2xl xs:text-3xl sm:text-4xl md:text-7xl font-black text-amber-300 mb-0.5 sm:mb-1 md:mb-3 drop-shadow-2xl group-hover:scale-110 transition-transform duration-300" style={{
-                    textShadow: '0 0 20px rgba(212, 175, 55, 0.8), 0 0 40px rgba(92, 62, 148, 0.5)'
+                  <div className="text-2xl xs:text-3xl sm:text-4xl md:text-7xl font-black bg-clip-text text-transparent bg-gradient-to-b from-[#FFD700] via-[#FFC000] to-[#FFA500] mb-0.5 sm:mb-1 md:mb-3 drop-shadow-2xl group-hover:scale-110 transition-all duration-300" style={{
+                    textShadow: '0 0 15px rgba(255, 215, 0, 0.7)'
                   }}>
                     {item.value.toString().padStart(2, '0')}
                   </div>
-                  <div className="text-[0.5rem] xs:text-[0.6rem] sm:text-xs md:text-base text-purple-300 font-bold uppercase tracking-wider drop-shadow-lg">
+                  <div className="text-[0.5rem] xs:text-[0.6rem] sm:text-xs md:text-base text-[#FFE4B5] font-semibold uppercase tracking-wider drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]">
                     {item.label}
                   </div>
                 </div>
@@ -528,32 +532,35 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
           ))}
         </div>
 
-        {/* Call to action with opulent styling */}
+        {/* Call to action with royal styling */}
         <div className="max-w-3xl mx-auto mb-6 sm:mb-8 md:mb-12 animate-fade-in-up px-2" style={{ animationDelay: '0.8s' }}>
           <div className="relative group">
             {/* Glow effect in gold and purple */}
-            <div className="absolute -inset-1 sm:-inset-2 md:-inset-4 bg-gradient-to-r from-purple-600 to-amber-400 rounded-lg sm:rounded-xl md:rounded-3xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
+            <div className="absolute -inset-1 sm:-inset-2 md:-inset-4 bg-gradient-to-r from-[#4b2e83] to-[#d4af37] rounded-lg sm:rounded-xl md:rounded-3xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-500"></div>
             
             {/* Content card */}
-            <div className="relative bg-white/5 backdrop-blur-2xl rounded-lg sm:rounded-xl md:rounded-3xl p-3 sm:p-4 md:p-8 border border-amber-400/20 shadow-2xl">
-              <p className="text-amber-200 leading-relaxed text-xs sm:text-sm md:text-xl lg:text-2xl font-light drop-shadow-lg">
+            <div className="relative bg-white/5 backdrop-blur-2xl rounded-lg sm:rounded-xl md:rounded-3xl p-3 sm:p-4 md:p-8 border border-[#d4af37]/20 shadow-2xl">
+              <p className="text-[#FFE4B5] leading-relaxed text-sm sm:text-base md:text-xl lg:text-2xl font-medium drop-shadow-lg transition-colors duration-300 group-hover:text-[#FFD700]" style={{
+                textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+                fontFamily: "'Cormorant Garamond', serif"
+              }}>
                 Your presence and support mean the world to us as we begin this beautiful journey together.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Gilded decorative divider */}
+        {/* Gold decorative divider */}
         <div className="flex items-center justify-center gap-2 sm:gap-3 md:gap-6 animate-fade-in-up" style={{ animationDelay: '1s' }}>
-          <div className="h-[1px] w-8 xs:w-12 sm:w-20 md:w-32 bg-gradient-to-r from-transparent via-purple-400/40 to-amber-400/60"></div>
+          <div className="h-[1px] w-8 xs:w-12 sm:w-20 md:w-32 bg-gradient-to-r from-transparent via-[#C8A2C8]/40 to-[#89CFF0]/60"></div>
           <div className="relative">
-            <div className="absolute inset-0 bg-amber-400 blur-sm opacity-50"></div>
-            <Heart className="relative w-2 h-2 sm:w-3 sm:h-3 md:w-5 md:h-5 text-amber-400 fill-amber-400 drop-shadow-lg animate-pulse-gentle" />
+            <div className="absolute inset-0 bg-[#C8A2C8] blur-sm opacity-50"></div>
+            <Heart className="relative w-2 h-2 sm:w-3 sm:h-3 md:w-5 md:h-5 text-[#C8A2C8] fill-[#C8A2C8] drop-shadow-lg animate-pulse-gentle" />
           </div>
-          <div className="h-[1px] w-8 xs:w-12 sm:w-20 md:w-32 bg-gradient-to-l from-transparent via-purple-400/40 to-amber-400/60"></div>
+          <div className="h-[1px] w-8 xs:w-12 sm:w-20 md:w-32 bg-gradient-to-l from-transparent via-[#C8A2C8]/40 to-[#89CFF0]/60"></div>
         </div>
 
-        {/* Contribute button with regal gradient */}
+        {/* Contribute button with bright colors by default */}
         <div className="mt-8 animate-fade-in-up" style={{ animationDelay: '1.2s' }}>
           <button
             onClick={() => {
@@ -562,14 +569,46 @@ export function HeroSection({ coupleInfo }: HeroSectionProps) {
                 contributeSection.scrollIntoView({ behavior: 'smooth' });
               }
             }}
-            className="group relative px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-purple-600 to-amber-500 hover:from-purple-700 hover:to-amber-600 text-white font-bold rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 ease-in-out animate-pulse hover:animate-none"
+            className="group relative px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-[#FFD700] via-[#FFAA00] to-[#FF6B6B] hover:from-[#FFD700] hover:via-[#FFAA00] hover:to-[#FF4500] text-white font-bold rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 ease-in-out"
           >
             <span className="relative z-10 flex items-center gap-2">
               Contribute
               <DollarSign className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
             </span>
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-purple-600 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#FF4500] via-[#FFAA00] to-[#FFD700] rounded-full opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
           </button>
+        </div>
+
+        {/* New CTA buttons: Pledge and Join WhatsApp Group with royal theme */}
+        <div className="mt-6 flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up" style={{ animationDelay: '1.4s' }}>
+          <button
+            onClick={() => {
+              const pledgeSection = document.getElementById('pledge');
+              if (pledgeSection) {
+                pledgeSection.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+            className="group relative px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-[#89CFF0] to-[#C8A2C8] hover:from-[#89CFF0] hover:to-[#DDA0DD] text-white font-bold rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 ease-in-out w-full sm:w-auto"
+          >
+            <span className="relative z-10 flex items-center gap-2">
+              Pledge
+              <Heart className="w-5 h-5 group-hover:scale-125 transition-transform duration-300" />
+            </span>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#C8A2C8] to-[#89CFF0] rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+          </button>
+
+          <a
+            href="https://chat.whatsapp.com/DR3HYGQXJHjKHrT1I9th3o?mode=wwt"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group relative px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-[#25D366] to-[#128C7E] hover:from-[#25D366] hover:to-[#075E54] text-white font-bold rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 ease-in-out flex items-center justify-center"
+          >
+            <span className="relative z-10 flex items-center gap-2">
+              Join Our WhatsApp Group
+              <MessageCircle className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
+            </span>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#128C7E] to-[#25D366] rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+          </a>
         </div>
       </div>
 

@@ -53,7 +53,7 @@ export function Footer() {
                 <Phone className="w-5 h-5 text-amber-400" />
                 <span className="text-sm md:text-base">+256 783 676 313</span>
               </a>
-              <a href="https://chat.whatsapp.com/FdZrxOZFq8Y6ahLcgebRjW?mode=ems_copy_t" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-amber-300 hover:text-amber-100 transition-colors">
+              <a href="https://chat.whatsapp.com/DR3HYGQXJHjKHrT1I9th3o?mode=wwt" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-amber-300 hover:text-amber-100 transition-colors">
                 <MessageCircle className="w-5 h-5 text-amber-400" />
                 <span className="text-sm md:text-base">Join our WhatsApp group</span>
               </a>
