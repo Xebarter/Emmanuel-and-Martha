@@ -17,12 +17,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    // Log the raw request body for debugging
+    console.log('Raw IPN Body:', req.body);
+
     const {
       OrderNotificationType,
       OrderMerchantReference,
       OrderTrackingId,
       OrderReference,
       PaymentStatus,
+      PaymentStatusDescription, // Added for more detailed status info
     } = req.body;
 
     console.log('IPN Received:', {
@@ -31,8 +35,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       OrderTrackingId,
       OrderReference,
       PaymentStatus,
+      PaymentStatusDescription,
     });
 
+    // Handle different notification types
     if (OrderNotificationType === 'IPN' && OrderMerchantReference) {
       // Extract contribution ID from the reference (format: WED-{contributionId})
       const contributionId = OrderMerchantReference.replace('WED-', '');
@@ -43,6 +49,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         status = 'completed';
       } else if (['FAILED', 'INVALID'].includes(PaymentStatus)) {
         status = 'failed';
+      } else if (PaymentStatus === 'CANCELLED') {
+        status = 'cancelled';
       }
 
       // Update the contribution in the database

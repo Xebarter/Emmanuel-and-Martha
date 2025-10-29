@@ -13,11 +13,11 @@ VITE_SUPABASE_URL=your-supabase-project-url
 VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
 VITE_SUPABASE_STORAGE_BUCKET=gallery
 
-VITE_PESAPAL_API_URL=https://pay.pesapal.com
+VITE_PESAPAL_ENVIRONMENT=sandbox # or 'live' for production
 VITE_PESAPAL_CONSUMER_KEY=your-pesapal-consumer-key
 VITE_PESAPAL_CONSUMER_SECRET=your-pesapal-consumer-secret
 VITE_PESAPAL_IPN_ID=your-pesapal-ipn-id
-VITE_PESAPAL_IPN_URL=https://yourdomain.com/ipn
+VITE_PESAPAL_IPN_URL=https://yourdomain.com/api/payments/ipn
 VITE_PESAPAL_CALLBACK_URL=https://yourdomain.com/callback
 VITE_PESAPAL_CANCEL_URL=https://yourdomain.com/cancel
 
@@ -30,11 +30,11 @@ VITE_CONTACT_EMAIL=contact@yourdomain.com
 These variables are used by the serverless functions and should NOT be prefixed with `VITE_`:
 
 ```
-PESAPAL_API_URL=https://pay.pesapal.com
+PESAPAL_ENVIRONMENT=sandbox # or 'live' for production
 PESAPAL_CONSUMER_KEY=your-pesapal-consumer-key
 PESAPAL_CONSUMER_SECRET=your-pesapal-consumer-secret
 PESAPAL_IPN_ID=your-pesapal-ipn-id
-PESAPAL_IPN_URL=https://yourdomain.com/ipn
+PESAPAL_IPN_URL=https://yourdomain.com/api/payments/ipn
 PESAPAL_CALLBACK_URL=https://yourdomain.com/callback
 PESAPAL_CANCEL_URL=https://yourdomain.com/cancel
 
@@ -52,7 +52,7 @@ When deploying to Vercel, you need to add both sets of environment variables in 
 ## Domain Configuration
 
 Make sure to update your Pesapal account with your production domain URLs:
-- IPN URL: `https://yourdomain.com/ipn`
+- IPN URL: `https://yourdomain.com/api/payments/ipn`
 - Callback URL: `https://yourdomain.com/callback`
 - Cancel URL: `https://yourdomain.com/cancel`
 

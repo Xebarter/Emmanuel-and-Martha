@@ -18,7 +18,7 @@ export default function Login() {
     try {
       // Simple local credential gate (bypasses Supabase)
       const emailNorm = email.trim().toLowerCase();
-      if (emailNorm === 'admin@muwanguzis.com' && password === 'Admin123') {
+      if (emailNorm === 'admin@segonas.com' && password === 'Admin123') {
         localStorage.setItem('simple_admin_authed', '1');
         // Redirect to dashboard after successful login
         navigate('/dashboard');

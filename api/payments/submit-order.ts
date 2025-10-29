@@ -26,19 +26,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const PESAPAL_API_URL = process.env.PESAPAL_API_URL;
     const PESAPAL_CALLBACK_URL = process.env.PESAPAL_CALLBACK_URL;
     const PESAPAL_CANCEL_URL = process.env.PESAPAL_CANCEL_URL;
     const PESAPAL_IPN_ID = process.env.PESAPAL_IPN_ID;
+    const PESAPAL_ENVIRONMENT = process.env.PESAPAL_ENVIRONMENT || 'sandbox'; // 'sandbox' or 'live'
 
     console.log('Environment variables check:', {
-      PESAPAL_API_URL: !!PESAPAL_API_URL,
       PESAPAL_CALLBACK_URL: !!PESAPAL_CALLBACK_URL,
       PESAPAL_CANCEL_URL: !!PESAPAL_CANCEL_URL,
-      PESAPAL_IPN_ID: !!PESAPAL_IPN_ID
+      PESAPAL_IPN_ID: !!PESAPAL_IPN_ID,
+      PESAPAL_ENVIRONMENT
     });
 
-    if (!PESAPAL_API_URL || !PESAPAL_CALLBACK_URL || !PESAPAL_CANCEL_URL || !PESAPAL_IPN_ID) {
+    if (!PESAPAL_CALLBACK_URL || !PESAPAL_CANCEL_URL || !PESAPAL_IPN_ID) {
       throw new Error('Missing required environment variables for Pesapal order submission');
     }
 
@@ -75,10 +75,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       description,
     } = req.body as OrderRequest;
 
-    // Ensure the URL ends with the correct path
-    const orderEndpoint = PESAPAL_API_URL.endsWith('/Transactions/SubmitOrderRequest') 
-      ? PESAPAL_API_URL 
-      : `${PESAPAL_API_URL.replace(/\/$/, '')}/Transactions/SubmitOrderRequest`;
+    // Determine the base URL based on environment
+    const baseUrl = PESAPAL_ENVIRONMENT === 'live' 
+      ? 'https://pay.pesapal.com/v3' 
+      : 'https://cybqa.pesapal.com/pesapalv3';
+
+    const orderEndpoint = `${baseUrl}/api/Transactions/SubmitOrderRequest`;
 
     const response = await fetch(
       orderEndpoint,

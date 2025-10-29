@@ -15,24 +15,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const PESAPAL_API_URL = process.env.PESAPAL_API_URL;
     const PESAPAL_CONSUMER_KEY = process.env.PESAPAL_CONSUMER_KEY;
     const PESAPAL_CONSUMER_SECRET = process.env.PESAPAL_CONSUMER_SECRET;
+    const PESAPAL_ENVIRONMENT = process.env.PESAPAL_ENVIRONMENT || 'sandbox'; // 'sandbox' or 'live'
 
     console.log('Environment variables check:', {
-      PESAPAL_API_URL: !!PESAPAL_API_URL,
       PESAPAL_CONSUMER_KEY: !!PESAPAL_CONSUMER_KEY,
-      PESAPAL_CONSUMER_SECRET: !!PESAPAL_CONSUMER_SECRET
+      PESAPAL_CONSUMER_SECRET: !!PESAPAL_CONSUMER_SECRET,
+      PESAPAL_ENVIRONMENT
     });
 
-    if (!PESAPAL_API_URL || !PESAPAL_CONSUMER_KEY || !PESAPAL_CONSUMER_SECRET) {
+    if (!PESAPAL_CONSUMER_KEY || !PESAPAL_CONSUMER_SECRET) {
       throw new Error('Missing required environment variables for Pesapal');
     }
 
-    // Ensure the URL ends with the correct path
-    const authEndpoint = PESAPAL_API_URL.endsWith('/Auth/RequestToken') 
-      ? PESAPAL_API_URL 
-      : `${PESAPAL_API_URL.replace(/\/$/, '')}/Auth/RequestToken`;
+    // Determine the base URL based on environment
+    const baseUrl = PESAPAL_ENVIRONMENT === 'live' 
+      ? 'https://pay.pesapal.com/v3' 
+      : 'https://cybqa.pesapal.com/pesapalv3';
+
+    const authEndpoint = `${baseUrl}/api/Auth/RequestToken`;
 
     const response = await fetch(authEndpoint, {
       method: 'POST',

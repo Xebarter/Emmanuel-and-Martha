@@ -257,7 +257,7 @@ export function GallerySection() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {displayedImages.map((image, index) => (
               <div
-                key={`${image.id}-${displayedIndices[index]}`}
+                key={`${image.id}-${Date.now()}-${index}`}
                 className={`relative group aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-purple-900/50 to-purple-800/50 backdrop-blur-md border border-amber-400/20 cursor-pointer transition-all duration-500 shadow-xl hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-2 hover:border-amber-400/40 ${
                   animatingIndex === index ? 'animate-fadeIn' : ''
                 }`}
