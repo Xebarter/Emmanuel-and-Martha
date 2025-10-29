@@ -55,14 +55,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     console.log('Auth response status:', authResponse.status);
 
+    const authResponseText = await authResponse.text();
+    console.log('Auth response text:', authResponseText);
+
     if (!authResponse.ok) {
-      const errorData = await authResponse.json().catch(() => ({}));
-      console.error('Auth service error details:', errorData);
-      throw new Error('Failed to authenticate with Pesapal');
+      console.error('Auth service error details:', authResponseText);
+      throw new Error(`Failed to authenticate with Pesapal: ${authResponse.status} - ${authResponseText}`);
     }
 
-    const { token } = await authResponse.json();
+    let authData;
+    try {
+      authData = JSON.parse(authResponseText);
+    } catch (parseError) {
+      console.error('Failed to parse auth response:', authResponseText);
+      throw new Error(`Failed to parse auth response: ${authResponseText}`);
+    }
+
+    const { token } = authData;
     console.log('Authentication token received');
+
+    // Check if we received a valid token
+    if (!token) {
+      console.error('Auth response missing token:', authData);
+      throw new Error(`Auth failed: No token in response - ${JSON.stringify(authData)}`);
+    }
     
     const {
       amount,
@@ -122,7 +138,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       throw new Error(`Pesapal order submission failed: ${response.status} - ${errorData}`);
     }
 
-    const data = await response.json();
+    const responseText = await response.text();
+    console.log('Pesapal order submission response text:', responseText);
+
+    if (!response.ok) {
+      console.error('Pesapal order submission failed with status:', response.status);
+      console.error('Pesapal order submission error details:', responseText);
+      throw new Error(`Pesapal order submission failed: ${response.status} - ${responseText}`);
+    }
+
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('Failed to parse order submission response:', responseText);
+      throw new Error(`Failed to parse order submission response: ${responseText}`);
+    }
+
     console.log('Pesapal order submission successful');
     res.status(200).json({
       order_tracking_id: data.order_tracking_id,

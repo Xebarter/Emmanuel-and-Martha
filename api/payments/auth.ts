@@ -50,14 +50,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     console.log('Pesapal auth response status:', response.status);
 
+    const responseText = await response.text();
+    console.log('Pesapal auth response text:', responseText);
+
     if (!response.ok) {
-      const errorData = await response.text();
       console.error('Pesapal auth failed with status:', response.status);
-      console.error('Pesapal auth error details:', errorData);
-      throw new Error(`Pesapal auth failed: ${response.status} - ${errorData}`);
+      console.error('Pesapal auth error details:', responseText);
+      throw new Error(`Pesapal auth failed: ${response.status} - ${responseText}`);
     }
 
-    const data = await response.json();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('Failed to parse auth response:', responseText);
+      throw new Error(`Failed to parse auth response: ${responseText}`);
+    }
+
+    // Check if we received a valid token
+    if (!data.token) {
+      console.error('Pesapal auth response missing token:', data);
+      throw new Error(`Pesapal auth failed: No token in response - ${JSON.stringify(data)}`);
+    }
+
     console.log('Pesapal auth successful');
     res.status(200).json({
       token: data.token,
